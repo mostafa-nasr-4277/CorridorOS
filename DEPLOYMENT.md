@@ -76,7 +76,7 @@ COS/
 - **Main Site**: `https://your-site.netlify.app/`
 - **OS Simulator**: `https://your-site.netlify.app/corridoros_advanced.html`
 - **Dashboard**: `https://your-site.netlify.app/dashboard`
-- **Quick Demo**: `https://your-site.netlify.app/simulator`
+<!-- Quick Demo removed in v4: simulator page no longer linked. -->
 
 ## 🔒 Security Features
 - HTTPS enforced
