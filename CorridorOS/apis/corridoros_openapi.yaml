@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: CorridorOS Control Plane
-  version: 0.1.0
+  version: 4.0.0
 servers:
   - url: http://localhost:7080
 paths:

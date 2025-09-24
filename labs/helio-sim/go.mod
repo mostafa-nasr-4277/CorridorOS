@@ -1,4 +1,4 @@
-module github.com/corridoros/helio-sim
+module github.com/corridoros/helio-sim/v4
 
 go 1.21
 

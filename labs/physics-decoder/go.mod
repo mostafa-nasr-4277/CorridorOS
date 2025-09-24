@@ -1,4 +1,4 @@
-module github.com/corridoros/physics-decoder
+module github.com/corridoros/physics-decoder/v4
 
 go 1.21
 

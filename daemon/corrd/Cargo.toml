@@ -1,6 +1,6 @@
 [package]
 name = "corrd"
-version = "0.1.0"
+version = "4.0.0"
 edition = "2021"
 authors = ["CorridorOS Team"]
 description = "Photonic Corridor Management Daemon"

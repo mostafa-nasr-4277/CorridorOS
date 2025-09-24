@@ -1,4 +1,4 @@
-# CorridorOS Starter Kit (v0.1)
+# CorridorOS Starter Kit (v4.0)
 Date: 2025-09-23
 
 This pack includes:

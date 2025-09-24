@@ -1,4 +1,4 @@
-module github.com/corridoros/cli
+module github.com/corridoros/cli/v4
 
 go 1.25.1
 

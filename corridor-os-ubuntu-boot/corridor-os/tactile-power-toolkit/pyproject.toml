@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tactile-power-toolkit"
-version = "0.1.0"
+version = "4.0.0"
 description = "Design calculators for tactile, genderless power transmission (pads, pogo arrays, inductive/capacitive), with pre-charge and safety heuristics."
 readme = "README.md"
 requires-python = ">=3.9"

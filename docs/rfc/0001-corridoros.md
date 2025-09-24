@@ -1,13 +1,13 @@
-# RFC-0001: CorridorOS v0.1 Architecture and API Specification
+# RFC-0001: CorridorOS v4.0 Architecture and API Specification
 
 **Status:** Draft  
 **Authors:** CorridorOS Team  
 **Date:** 2024-01-15  
-**Version:** 0.1.0  
+**Version:** 4.0.0  
 
 ## Abstract
 
-CorridorOS is a production-grade operating system that treats photonic interconnects and pooled memory as first-class resources. This RFC defines the architecture, APIs, and implementation details for CorridorOS v0.1, which provides photonic corridor management, free-form memory allocation with QoS guarantees, and comprehensive security features.
+CorridorOS is a production-grade operating system that treats photonic interconnects and pooled memory as first-class resources. This RFC defines the architecture, APIs, and implementation details for CorridorOS v4.0, which provides photonic corridor management, free-form memory allocation with QoS guarantees, and comprehensive security features.
 
 ## Table of Contents
 
@@ -471,7 +471,7 @@ Configuration files are located in `/etc/corridoros/`:
 
 ## Conclusion
 
-CorridorOS v0.1 provides a solid foundation for photonic computing and advanced memory management. The architecture is designed to be both practical for current hardware and extensible for future technologies. The comprehensive API and security model enable real-world deployments while maintaining the flexibility to evolve with the technology.
+CorridorOS v4.0 provides a solid foundation for photonic computing and advanced memory management. The architecture is designed to be both practical for current hardware and extensible for future technologies. The comprehensive API and security model enable real-world deployments while maintaining the flexibility to evolve with the technology.
 
 ## References
 

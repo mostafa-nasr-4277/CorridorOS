@@ -651,7 +651,7 @@
                     } else {
                         result = {
                             status: 'healthy',
-                            version: 'v0.1.0',
+                            version: 'v4.0.0',
                             uptime: Math.floor(Math.random() * 86400),
                             active_corridors: corridorCount
                         };
@@ -662,7 +662,7 @@
                     el.textContent = isHealthy ? 'Online' : 'Degraded';
                     el.style.color = isHealthy ? '#28a745' : '#ff9800';
                     el.title = isHealthy
-                        ? `${svc.name} v${result.version || '0.1.0'} - Active corridors: ${result.active_corridors || corridorCount}`
+                        ? `${svc.name} v${result.version || '4.0.0'} - Active corridors: ${result.active_corridors || corridorCount}`
                         : `${svc.name} - Service degraded`;
                 } catch (e) {
                     const el = document.getElementById(svc.id);

@@ -1,4 +1,4 @@
-# Attestation & Measured Boot — CorridorOS v0.1
+# Attestation & Measured Boot — CorridorOS v4.0
 
 Scope
 - Documents measured boot, device attestation, and ticket binding for CorridorOS services.

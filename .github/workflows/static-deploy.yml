@@ -68,6 +68,26 @@ jobs:
           
           echo "✅ Cleanup complete"
         
+      - name: Clean Rust build artifacts
+        run: |
+          set -euo pipefail
+          
+          echo "🧹 Cleaning Rust build artifacts..."
+          
+          # Remove all target directories
+          find . -name "target" -type d -exec rm -rf {} + 2>/dev/null || true
+          
+          # Remove Cargo.lock files (they're generated)
+          find . -name "Cargo.lock" -type f -delete 2>/dev/null || true
+          
+          # Remove any remaining build artifacts
+          find . -name "*.rlib" -type f -delete 2>/dev/null || true
+          find . -name "*.rmeta" -type f -delete 2>/dev/null || true
+          find . -name "*.d" -type f -delete 2>/dev/null || true
+          find . -name "CACHEDIR.TAG" -type f -delete 2>/dev/null || true
+          
+          echo "✅ Rust artifacts cleaned"
+        
       - name: Create curated deployment package
         run: |
           set -euo pipefail
@@ -83,7 +103,6 @@ jobs:
             ".github"
             ".gocache"
             ".gomodcache"
-            ".daemon"
             "node_modules"
             "*.tar.gz"
             "*.zip"
@@ -91,6 +110,16 @@ jobs:
             "*.iso"
             "*.img"
             "*.bin"
+            "**/target"
+            "**/Cargo.lock"
+            "**/*.rlib"
+            "**/*.rmeta"
+            "**/*.d"
+            "**/build"
+            "**/incremental"
+            "**/release"
+            "**/debug"
+            "**/CACHEDIR.TAG"
           )
           
           # Copy files with exclusions (avoid recursive copy)
@@ -126,6 +155,10 @@ jobs:
           find deploy_artifact -type f | wc -l
           echo "🔍 Checking for problematic files:"
           find deploy_artifact -name "*WARNING*" -o -name "*INFO*" -o -name "*SUCCESS*" || echo "✅ No problematic files found"
+          echo "🔍 Checking for Rust build artifacts:"
+          find deploy_artifact -name "target" -o -name "*.rlib" -o -name "*.rmeta" -o -name "*.d" -o -name "Cargo.lock" || echo "✅ No Rust build artifacts found"
+          echo "🔍 Checking for large files that might cause issues:"
+          find deploy_artifact -type f -size +10M -exec ls -lh {} \; || echo "✅ No large files found"
         
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4

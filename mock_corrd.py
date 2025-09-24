@@ -117,7 +117,7 @@ class CorridorHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(response, indent=2).encode())
     
     def handle_health(self):
-        response = {"status": "healthy", "service": "corrd-mock", "version": "0.1"}
+        response = {"status": "healthy", "service": "corrd-mock", "version": "4.0"}
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')

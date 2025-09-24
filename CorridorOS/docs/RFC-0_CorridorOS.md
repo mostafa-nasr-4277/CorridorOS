@@ -1,4 +1,4 @@
-# CorridorOS v0.1 — RFC‑0 (Draft)
+# CorridorOS v4.0 — RFC‑0 (Draft)
 Date: 2025-09-23
 Author: Mostafa (with collaborators)
 
@@ -75,7 +75,7 @@ Reply:
 ### POST /v1/corridors/{id}/recalibrate
 → Calls **heliopassd**; returns new bias/λ settings and status.
 
-## 8. HELIOPASS (v0.1)
+## 8. HELIOPASS (v4.0)
 Objective: minimize power subject to BER ≤ target and eye ≥ margin.
 Inputs: per‑λ BER/eye, temp, drift; ambient profile.
 Outputs: bias voltages, minor λ shifts, Tx power nudges.

@@ -44,9 +44,14 @@ pids
 */metricsd
 */securityd
 
-# Rust binaries
+# Rust binaries and build artifacts
 */target/
 *.pdb
+*.rlib
+*.rmeta
+*.d
+Cargo.lock
+CACHEDIR.TAG
 
 # Python
 __pycache__/
