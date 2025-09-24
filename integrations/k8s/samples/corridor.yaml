@@ -1,0 +1,11 @@
+apiVersion: corridoros.io/v1
+kind: Corridor
+metadata: { name: si-8x1550 }
+spec:
+  type: SiCorridor
+  lanes: 8
+  lambdaNm: [1550,1551,1552,1553,1554,1555,1556,1557]
+  minGbps: 400
+  latencyBudgetNs: 250
+  attestationRequired: true
+

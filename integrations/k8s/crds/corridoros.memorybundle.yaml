@@ -1,0 +1,37 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: memorybundles.corridoros.io
+spec:
+  group: corridoros.io
+  scope: Namespaced
+  names:
+    plural: memorybundles
+    singular: memorybundle
+    kind: MemoryBundle
+    shortNames: [ffm]
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required: [bytes, latencyClass, bandwidthFloorGBs]
+            properties:
+              bytes: {type: integer, minimum: 1073741824}
+              latencyClass: {type: string}
+              bandwidthFloorGBs: {type: integer}
+              persistence: {type: string}
+              shareable: {type: boolean}
+              securityDomain: {type: string}
+          status:
+            type: object
+            properties:
+              handle: {type: string}
+              state: {type: string}
+              bandwidthActualGBs: {type: integer}
+              message: {type: string}

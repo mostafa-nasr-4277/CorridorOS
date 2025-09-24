@@ -1,0 +1,22 @@
+{
+  "title": "CorridorOS v4 – SRE Overview",
+  "panels": [
+    {
+      "type": "stat", "title": "Active Corridors", "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "targets": [{"expr": "corridoros_corridors_active"}]
+    },
+    {
+      "type": "graph", "title": "BER", "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0},
+      "targets": [{"expr": "corridoros_corridor_ber"}]
+    },
+    {
+      "type": "graph", "title": "FFM Allocated (GB)", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "targets": [{"expr": "corridoros_ffm_allocated_gb"}]
+    },
+    {
+      "type": "graph", "title": "Bandwidth Floor (GB/s)", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "targets": [{"expr": "corridoros_ffm_bandwidth_floor_gbs"}]
+    }
+  ],
+  "schemaVersion": 36, "version": 1
+}

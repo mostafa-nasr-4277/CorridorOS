@@ -1,0 +1,10 @@
+apiVersion: corridoros.io/v1
+kind: MemoryBundle
+metadata: { name: infer-a-256g }
+spec:
+  bytes: 274877906944   # 256 GiB
+  latencyClass: T2
+  bandwidthFloorGBs: 150
+  shareable: true
+  securityDomain: tenant-a
+
