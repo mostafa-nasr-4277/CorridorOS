@@ -1,8 +1,9 @@
-name: Deploy Static Site (No Jekyll)
+name: CorridorOS Stable Deployment
 
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,20 +15,93 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
         
-      - name: Create .nojekyll file
-        run: touch .nojekyll
+      - name: Clean problematic files and directories
+        run: |
+          set -euo pipefail
+          
+          echo "🧹 Cleaning workspace..."
+          
+          # Remove any files/dirs with problematic characters
+          find . -name "*WARNING*" -type f -delete 2>/dev/null || true
+          find . -name "*INFO*" -type f -delete 2>/dev/null || true
+          find . -name "*SUCCESS*" -type f -delete 2>/dev/null || true
+          find . -name "*WARNING*" -type d -exec rm -rf {} + 2>/dev/null || true
+          find . -name "*INFO*" -type d -exec rm -rf {} + 2>/dev/null || true
+          find . -name "*SUCCESS*" -type d -exec rm -rf {} + 2>/dev/null || true
+          
+          # Remove hidden problematic files
+          find . -name ".*WARNING*" -delete 2>/dev/null || true
+          find . -name ".*INFO*" -delete 2>/dev/null || true
+          find . -name ".*SUCCESS*" -delete 2>/dev/null || true
+          
+          # Clean up any remaining problematic paths
+          python3 << 'EOF' || true
+          import os
+          import shutil
+          import glob
+          
+          # Clean up any remaining problematic entries
+          for root, dirs, files in os.walk('.'):
+              for d in dirs[:]:  # Use slice to modify during iteration
+                  if any(x in d for x in ['[WARNING]', '[INFO]', '[SUCCESS]', '\033']):
+                      try:
+                          shutil.rmtree(os.path.join(root, d))
+                          dirs.remove(d)
+                      except:
+                          pass
+              for f in files:
+                  if any(x in f for x in ['[WARNING]', '[INFO]', '[SUCCESS]', '\033']):
+                      try:
+                          os.remove(os.path.join(root, f))
+                      except:
+                          pass
+          EOF
+          
+          echo "✅ Cleanup complete"
         
-      - name: Upload artifact
+      - name: Create deployment structure
+        run: |
+          set -euo pipefail
+          
+          echo "📁 Creating deployment structure..."
+          
+          # Ensure .nojekyll exists
+          touch .nojekyll
+          
+          # Verify critical files exist
+          if [ ! -f "index.html" ]; then
+            echo "❌ Critical file index.html missing!"
+            exit 1
+          fi
+          
+          # Count files to deploy
+          FILE_COUNT=$(find . -type f | wc -l)
+          echo "📊 Deploying $FILE_COUNT files"
+          
+          echo "✅ Deployment structure ready"
+        
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
           
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
