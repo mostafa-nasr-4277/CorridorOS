@@ -93,11 +93,14 @@ jobs:
             "*.bin"
           )
           
+          # Copy files with exclusions (avoid recursive copy)
           RSYNC_CMD=(rsync -a --delete)
           for pattern in "${RSYNC_EXCLUDES[@]}"; do
             RSYNC_CMD+=(--exclude "$pattern")
           done
-          RSYNC_CMD+=(./ "$DEPLOY_DIR")
+          # Exclude the deploy directory itself to prevent recursion
+          RSYNC_CMD+=(--exclude "$DEPLOY_DIR")
+          RSYNC_CMD+=(./ "$DEPLOY_DIR/")
           "${RSYNC_CMD[@]}"
           
           # Verify critical files exist
