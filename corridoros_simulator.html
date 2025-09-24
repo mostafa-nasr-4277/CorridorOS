@@ -903,7 +903,150 @@
         }
         
         function openDashboard() {
-            window.open('http://localhost:8000/corridoros_dashboard.html', '_blank');
+            // Try to open the enhanced dashboard, fallback to inline if needed
+            const dashboardUrl = window.location.origin + '/corridoros_dashboard.html';
+            const dashboardWindow = window.open(dashboardUrl, '_blank');
+            
+            if (!dashboardWindow) {
+                // Fallback: show inline dashboard
+                showInlineDashboard();
+            }
+        }
+        
+        function showInlineDashboard() {
+            // Create and show an inline dashboard overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="background: #1a1a2e; border-radius: 12px; padding: 2rem; max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="color: #00d4ff; margin: 0;">🔧 CorridorOS Advanced Dashboard</h2>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; margin-left: auto;">✕ Close</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h3 style="color: #00d4ff; margin-bottom: 1rem;">🌈 Photonic Corridors</h3>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <label style="display: block; margin-bottom: 0.5rem;">Lanes: <input type="number" value="8" min="1" max="16" style="width: 60px; margin-left: 0.5rem; padding: 0.25rem;"></label>
+                                <label style="display: block; margin-bottom: 0.5rem;">Wavelength (nm): <input type="number" value="1550" min="1500" max="1600" style="width: 80px; margin-left: 0.5rem; padding: 0.25rem;"></label>
+                                <label style="display: block; margin-bottom: 1rem;">Bandwidth (Gbps): <input type="number" value="400" min="1" max="1000" style="width: 80px; margin-left: 0.5rem; padding: 0.25rem;"></label>
+                                <button onclick="allocateCorridorFromMain()" style="background: #00d4ff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; width: 100%;">Allocate Corridor</button>
+                            </div>
+                            <div id="corridorResult" style="background: rgba(0,212,255,0.1); padding: 1rem; border-radius: 8px; display: none; font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                        <div>
+                            <h3 style="color: #00d4ff; margin-bottom: 1rem;">💾 Free-Form Memory</h3>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <label style="display: block; margin-bottom: 0.5rem;">Size: <select style="margin-left: 0.5rem; padding: 0.25rem;"><option value="268435456">256 GB</option><option value="536870912">512 GB</option><option value="1073741824">1 TB</option></select></label>
+                                <label style="display: block; margin-bottom: 0.5rem;">Tier: <select style="margin-left: 0.5rem; padding: 0.25rem;"><option value="T1">T1 - HBM</option><option value="T2">T2 - CXL</option><option value="T3">T3 - DDR</option></select></label>
+                                <label style="display: block; margin-bottom: 1rem;">Bandwidth (Gbps): <input type="number" value="150" min="1" max="1000" style="width: 80px; margin-left: 0.5rem; padding: 0.25rem;"></label>
+                                <button onclick="allocateMemoryFromMain()" style="background: #00d4ff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; width: 100%;">Allocate Memory</button>
+                            </div>
+                            <div id="memoryResult" style="background: rgba(0,212,255,0.1); padding: 1rem; border-radius: 8px; display: none; font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <button onclick="window.open('${window.location.origin}/corridoros_dashboard.html', '_blank')" style="background: #4CAF50; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; margin-right: 1rem;">🌐 Open Full Dashboard</button>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: #666; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer;">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+        }
+        
+        // Enhanced allocation functions for inline dashboard
+        async function allocateCorridorFromMain() {
+            const overlay = document.querySelector('[style*="position: fixed"]');
+            if (!overlay) return;
+            
+            const lanes = overlay.querySelector('input[type="number"]').value;
+            const wavelength = overlay.querySelectorAll('input[type="number"]')[1].value;
+            const bandwidth = overlay.querySelectorAll('input[type="number"]')[2].value;
+            
+            const resultDiv = overlay.querySelector('#corridorResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="color: #00d4ff;">Allocating corridor...</div>';
+            
+            try {
+                // Mock allocation for demo
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                const mockResult = {
+                    id: `cor-${Math.random().toString(16).substr(2, 4)}`,
+                    corridor_type: "SiCorridor",
+                    lanes: parseInt(lanes),
+                    lambda_nm: Array.from({length: parseInt(lanes)}, (_, i) => parseInt(wavelength) + i),
+                    min_gbps: parseInt(bandwidth),
+                    achievable_gbps: Math.round(parseInt(bandwidth) * 1.04),
+                    status: "Active",
+                    created_at: new Date().toISOString()
+                };
+                
+                resultDiv.innerHTML = `<pre style="color: #4CAF50;">${JSON.stringify(mockResult, null, 2)}</pre>`;
+                
+                // Update main interface metrics
+                corridorsActive++;
+                document.getElementById('corridorsActive').textContent = corridorsActive;
+                document.getElementById('bandwidth').textContent = `${parseInt(bandwidth) * corridorsActive} Gbps`;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: #dc3545;">Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function allocateMemoryFromMain() {
+            const overlay = document.querySelector('[style*="position: fixed"]');
+            if (!overlay) return;
+            
+            const memorySelect = overlay.querySelector('select');
+            const tierSelect = overlay.querySelectorAll('select')[1];
+            const bandwidthInput = overlay.querySelector('input[type="number"]');
+            
+            const bytes = parseInt(memorySelect.value);
+            const tier = tierSelect.value;
+            const bandwidth = parseInt(bandwidthInput.value);
+            
+            const resultDiv = overlay.querySelector('#memoryResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="color: #00d4ff;">Allocating memory...</div>';
+            
+            try {
+                // Mock allocation for demo
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                const mockResult = {
+                    id: `ffm-${Math.random().toString(16).substr(2, 6)}`,
+                    bytes: bytes,
+                    latency_class: tier,
+                    bandwidth_floor_GBs: bandwidth,
+                    achievable_bandwidth_GBs: Math.round(bandwidth * 1.08),
+                    status: "Allocated",
+                    created_at: new Date().toISOString()
+                };
+                
+                resultDiv.innerHTML = `<pre style="color: #4CAF50;">${JSON.stringify(mockResult, null, 2)}</pre>`;
+                
+                // Update main interface metrics
+                memoryPools += bytes / (1024**3);
+                document.getElementById('memoryPools').textContent = `${memoryPools.toFixed(1)} GB`;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: #dc3545;">Error: ${error.message}</div>`;
+            }
         }
         
         function showConsole() {
@@ -975,6 +1118,28 @@
                 </body>
                 </html>
             `);
+        }
+        
+        // Quick action functions for main interface
+        function allocateCorridor() {
+            addConsoleLog('Opening corridor allocation interface...');
+            showInlineDashboard();
+        }
+        
+        function allocateMemory() {
+            addConsoleLog('Opening memory allocation interface...');
+            showInlineDashboard();
+        }
+        
+        function runDiagnostics() {
+            addConsoleLog('Running system diagnostics...');
+            setTimeout(() => {
+                addConsoleLog('✓ Photonic subsystem: OK');
+                addConsoleLog('✓ CXL memory controller: OK');
+                addConsoleLog('✓ Network interfaces: OK');
+                addConsoleLog('✓ Security framework: OK');
+                addConsoleLog('Diagnostics complete - All systems healthy');
+            }, 1500);
         }
         
         function reboot() {
