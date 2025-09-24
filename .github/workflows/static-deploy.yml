@@ -1,4 +1,4 @@
-name: Deploy Static Site
+name: Deploy Static Site (No Jekyll)
 
 on:
   push:
@@ -22,9 +22,6 @@ jobs:
         
       - name: Create .nojekyll file
         run: touch .nojekyll
-        
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
