@@ -228,11 +228,17 @@
             color: #28a745;
         }
     </style>
+    <link rel="stylesheet" href="brand/corridoros-brand.css">
 </head>
 <body>
-    <div class="header">
-        <h1>CorridorOS Dashboard</h1>
-        <p>Photonic Interconnect & Free-Form Memory Management Console</p>
+    <div class="header" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+        <div>
+            <h1>CorridorOS Dashboard</h1>
+            <p>Photonic Interconnect & Free-Form Memory Management Console</p>
+        </div>
+        <div>
+            <a href="index.html" class="co-back" title="Back to Home">← Exit Dashboard</a>
+        </div>
     </div>
     
     <div class="container">
@@ -340,6 +346,8 @@
             </div>
         </div>
     </div>
+    <!-- Optional floating back button -->
+    <a href="index.html" class="co-back co-exit" title="Back to Home">Home</a>
     
     <script>
         // Environment + service endpoints
