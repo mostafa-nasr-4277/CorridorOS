@@ -1,0 +1,55 @@
+#!/bin/bash
+
+echo "🚀 Cloning CorridorOS to New GitHub Repository"
+echo "=============================================="
+
+# Navigate to project directory
+cd /Users/mnasr/Desktop/COS
+
+echo "📁 Current directory: $(pwd)"
+echo "📦 Current repository: $(git remote get-url origin)"
+echo ""
+
+# Create a backup of current state
+echo "💾 Creating backup of current state..."
+cp -r . ../COS_backup_$(date +%Y%m%d_%H%M%S)
+
+echo "🔄 Setting up new repository..."
+echo ""
+echo "📋 Steps to clone to new repository:"
+echo ""
+echo "1. First, make sure you're logged into the correct GitHub account (mostafa-nasr-4277)"
+echo "   - Go to: https://github.com/settings/tokens"
+echo "   - Generate a new Personal Access Token with repo permissions"
+echo ""
+echo "2. Run these commands:"
+echo ""
+echo "   # Remove current remote"
+echo "   git remote remove origin"
+echo ""
+echo "   # Add new remote with your credentials"
+echo "   git remote add origin https://github.com/mostafa-nasr-4277/CorridorOS.git"
+echo ""
+echo "   # Push to new repository"
+echo "   git push -u origin main --force"
+echo ""
+echo "3. Alternative: Clone fresh repository"
+echo "   # Go to a new directory"
+echo "   cd .."
+echo "   git clone https://github.com/mostafa-nasr-4277/CorridorOS.git CorridorOS_new"
+echo "   cd CorridorOS_new"
+echo "   # Copy all files from current directory"
+echo "   cp -r ../COS/* ."
+echo "   cp -r ../COS/.* . 2>/dev/null || true"
+echo "   git add ."
+echo "   git commit -m 'Initial CorridorOS deployment'"
+echo "   git push origin main"
+echo ""
+echo "4. Set up GitHub Pages:"
+echo "   - Go to: https://github.com/mostafa-nasr-4277/CorridorOS/settings/pages"
+echo "   - Source: Deploy from a branch"
+echo "   - Branch: main"
+echo "   - Folder: / (root)"
+echo "   - Your site will be at: https://mostafa-nasr-4277.github.io/CorridorOS"
+echo ""
+echo "✅ Ready to proceed with manual setup!"
