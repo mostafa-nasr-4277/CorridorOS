@@ -342,18 +342,24 @@
     </div>
     
     <script>
-        // Smart API base URL detection
-        const BASE_URL = (() => {
-            const hostname = window.location.hostname;
-            if (hostname === 'localhost' || hostname === '127.0.0.1') {
-                return 'http://localhost:7080';
-            } else {
-                // Production mock API
-                return `${window.location.origin}/api`;
-            }
-        })();
+        // Environment + service endpoints
+        const IS_LOCAL = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
+        // corrd (photonic) and memqosd (FFM) run on different ports locally
+        const CORRD_BASE_URL = IS_LOCAL ? 'http://localhost:7080' : '';
+        const MEMQOSD_BASE_URL = IS_LOCAL ? 'http://localhost:7070' : '';
+
         let corridorCount = 0;
         let totalMemory = 0;
+
+        // Helper: safe JSON parse with fallback to text
+        async function parseJsonSafe(response) {
+            const ct = response.headers.get('content-type') || '';
+            if (!ct.includes('application/json')) {
+                const text = await response.text();
+                throw new Error(`Unexpected response (status ${response.status}): ${text.slice(0, 120)}...`);
+            }
+            return response.json();
+        }
         
         // Form handlers
         document.getElementById('corridor-form').addEventListener('submit', async (e) => {
@@ -401,14 +407,15 @@
                 showResult('corridor-result', 'Allocating corridor...', 'info');
                 
                 let response, result;
-                if (BASE_URL.includes('localhost')) {
+                if (IS_LOCAL) {
                     // Real API call
-                    response = await fetch(`${BASE_URL}/v1/corridors`, {
+                    response = await fetch(`${CORRD_BASE_URL}/v1/corridors`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify(payload)
                     });
-                    result = await response.json();
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    result = await parseJsonSafe(response);
                 } else {
                     // Mock API for production
                     await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
@@ -464,20 +471,10 @@
         
         // Enhanced FFM allocation with production support
         async function allocateFFM() {
-            const memorySizeText = document.getElementById('memory-size').value;
+            // The select stores bytes in the value attribute
+            const bytes = parseInt(document.getElementById('memory-size').value, 10);
             const tier = document.getElementById('tier').value;
             const bwFloor = parseInt(document.getElementById('bw-floor').value);
-            
-            // Parse memory size from dropdown (e.g., "256 GB" -> 268435456 bytes)
-            const sizeMatch = memorySizeText.match(/(\d+)\s*(GB|TB)/);
-            if (!sizeMatch) {
-                showResult('ffm-result', 'Error: Invalid memory size format', 'error');
-                return;
-            }
-            
-            const size = parseInt(sizeMatch[1]);
-            const unit = sizeMatch[2];
-            const bytes = unit === 'TB' ? size * 1024 * 1024 * 1024 * 1024 : size * 1024 * 1024 * 1024;
             
             // Validate inputs
             if (bytes < 1024 * 1024 * 1024 || bytes > 1024 * 1024 * 1024 * 1024) { // 1GB to 1TB
@@ -503,14 +500,15 @@
                 showResult('ffm-result', 'Allocating memory...', 'info');
                 
                 let response, result;
-                if (BASE_URL.includes('localhost')) {
+                if (IS_LOCAL) {
                     // Real API call
-                    response = await fetch(`${BASE_URL}/v1/ffm/alloc`, {
+                    response = await fetch(`${MEMQOSD_BASE_URL}/v1/ffm/alloc`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify(payload)
                     });
-                    result = await response.json();
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    result = await parseJsonSafe(response);
                 } else {
                     // Mock API for production
                     await new Promise(resolve => setTimeout(resolve, 600)); // Simulate network delay
@@ -624,40 +622,40 @@
         
         // Enhanced service status checking with production support
         async function checkServiceStatus() {
-            const services = [
-                { id: 'corrd-status', endpoint: '/health', name: 'corrd' },
-                { id: 'memqosd-status', endpoint: '/health/memqosd', name: 'memqosd' }
+            // When local, hit real health endpoints; on Pages, synthesize healthy status
+            const checks = [
+                { id: 'corrd-status', url: `${CORRD_BASE_URL}/health`, name: 'corrd' },
+                { id: 'memqosd-status', url: `${MEMQOSD_BASE_URL}/health`, name: 'memqosd' }
             ];
-            
-            for (const service of services) {
+
+            for (const svc of checks) {
                 try {
                     let result;
-                    if (BASE_URL.includes('localhost')) {
-                        const response = await fetch(`${BASE_URL}${service.endpoint}`);
-                        result = await response.json();
+                    if (IS_LOCAL) {
+                        const resp = await fetch(svc.url);
+                        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                        result = await parseJsonSafe(resp);
                     } else {
-                        // Mock healthy status for production
-                        result = { 
+                        result = {
                             status: 'healthy',
                             version: 'v0.1.0',
                             uptime: Math.floor(Math.random() * 86400),
                             active_corridors: corridorCount
                         };
                     }
-                    
-                    const statusElement = document.getElementById(service.id);
+
+                    const el = document.getElementById(svc.id);
                     const isHealthy = result.status === 'healthy';
-                    statusElement.textContent = isHealthy ? 'Online' : 'Degraded';
-                    statusElement.style.color = isHealthy ? '#28a745' : '#ff9800';
-                    statusElement.title = isHealthy ? 
-                        `${service.name} v${result.version || '0.1.0'} - Active corridors: ${result.active_corridors || corridorCount}` :
-                        `${service.name} - Service degraded`;
-                        
-                } catch (error) {
-                    const statusElement = document.getElementById(service.id);
-                    statusElement.textContent = 'Offline';
-                    statusElement.style.color = '#dc3545';
-                    statusElement.title = `${service.name} - Connection failed`;
+                    el.textContent = isHealthy ? 'Online' : 'Degraded';
+                    el.style.color = isHealthy ? '#28a745' : '#ff9800';
+                    el.title = isHealthy
+                        ? `${svc.name} v${result.version || '0.1.0'} - Active corridors: ${result.active_corridors || corridorCount}`
+                        : `${svc.name} - Service degraded`;
+                } catch (e) {
+                    const el = document.getElementById(svc.id);
+                    el.textContent = 'Offline';
+                    el.style.color = '#dc3545';
+                    el.title = `${svc.name} - ${e.message}`;
                 }
             }
         }
