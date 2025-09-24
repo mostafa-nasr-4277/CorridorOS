@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CorridorOS - Photonic Operating System</title>
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <style>
         * {
             margin: 0;
@@ -32,6 +36,18 @@
             align-items: center;
             z-index: 1000;
             transition: opacity 0.5s ease;
+        }
+        
+        .corridor-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('corridor_screen_2560x1600.png') center/cover no-repeat;
+            opacity: 0.15;
+            filter: blur(1px);
+            z-index: -1;
         }
         
         .boot-screen.hidden {
@@ -115,9 +131,47 @@
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #00d4ff, #ff00ff);
+            background: linear-gradient(90deg, #00d4ff, #ff00ff, #ffff00);
+            background-size: 200% 100%;
             width: 0%;
             transition: width 0.3s ease;
+            animation: shimmer 2s linear infinite;
+        }
+        
+        .circular-progress {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 1rem auto;
+            display: none;
+        }
+        
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(0, 212, 255, 0.2);
+            border-top: 3px solid #00d4ff;
+            border-right: 3px solid #ff00ff;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .spinner-inner {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            border: 2px solid transparent;
+            border-top: 2px solid rgba(255, 255, 0, 0.8);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite reverse;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
         
         .progress-text {
@@ -433,6 +487,7 @@
 <body>
     <!-- Boot/Installation Screen -->
     <div class="boot-screen" id="bootScreen">
+        <div class="corridor-backdrop"></div>
         <div class="corridoros-logo">CorridorOS</div>
         <div class="install-section">
             <h2>Photonic Operating System</h2>
@@ -448,6 +503,10 @@
             <div class="progress-container" id="progressContainer">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="circular-progress" id="circularProgress">
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-inner"></div>
                 </div>
                 <div class="progress-text" id="progressText">Initializing...</div>
             </div>
@@ -667,6 +726,7 @@
             document.getElementById('installBtn').disabled = true;
             document.getElementById('installBtn').textContent = 'Installing...';
             document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('circularProgress').style.display = 'block';
             
             installationStep = 0;
             installCorridorOS();
