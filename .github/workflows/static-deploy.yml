@@ -1,4 +1,4 @@
-name: CorridorOS Stable Deployment
+name: CorridorOS Stable Deployment (v4)
 
 on:
   push:
@@ -23,147 +23,50 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-        
-      - name: Clean problematic files and directories
-        run: |
-          set -euo pipefail
-          
-          echo "🧹 Cleaning workspace..."
-          
-          # Remove any files/dirs with problematic characters
-          find . -name "*WARNING*" -type f -delete 2>/dev/null || true
-          find . -name "*INFO*" -type f -delete 2>/dev/null || true
-          find . -name "*SUCCESS*" -type f -delete 2>/dev/null || true
-          find . -name "*WARNING*" -type d -exec rm -rf {} + 2>/dev/null || true
-          find . -name "*INFO*" -type d -exec rm -rf {} + 2>/dev/null || true
-          find . -name "*SUCCESS*" -type d -exec rm -rf {} + 2>/dev/null || true
-          
-          # Remove hidden problematic files
-          find . -name ".*WARNING*" -delete 2>/dev/null || true
-          find . -name ".*INFO*" -delete 2>/dev/null || true
-          find . -name ".*SUCCESS*" -delete 2>/dev/null || true
-          
-          # Clean up any remaining problematic paths
-          python3 << 'EOF' || true
-          import os
-          import shutil
-          import glob
-          
-          # Clean up any remaining problematic entries
-          for root, dirs, files in os.walk('.'):
-              for d in dirs[:]:  # Use slice to modify during iteration
-                  if any(x in d for x in ['[WARNING]', '[INFO]', '[SUCCESS]', '\033']):
-                      try:
-                          shutil.rmtree(os.path.join(root, d))
-                          dirs.remove(d)
-                      except:
-                          pass
-              for f in files:
-                  if any(x in f for x in ['[WARNING]', '[INFO]', '[SUCCESS]', '\033']):
-                      try:
-                          os.remove(os.path.join(root, f))
-                      except:
-                          pass
-          EOF
-          
-          echo "✅ Cleanup complete"
-        
-      - name: Clean Rust build artifacts
-        run: |
-          set -euo pipefail
-          
-          echo "🧹 Cleaning Rust build artifacts..."
-          
-          # Remove all target directories
-          find . -name "target" -type d -exec rm -rf {} + 2>/dev/null || true
-          
-          # Remove Cargo.lock files (they're generated)
-          find . -name "Cargo.lock" -type f -delete 2>/dev/null || true
-          
-          # Remove any remaining build artifacts
-          find . -name "*.rlib" -type f -delete 2>/dev/null || true
-          find . -name "*.rmeta" -type f -delete 2>/dev/null || true
-          find . -name "*.d" -type f -delete 2>/dev/null || true
-          find . -name "CACHEDIR.TAG" -type f -delete 2>/dev/null || true
-          
-          echo "✅ Rust artifacts cleaned"
-        
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Create curated deployment package
         run: |
           set -euo pipefail
-          
-          echo "📦 Creating curated deployment package..."
-          
-          DEPLOY_DIR="deploy_artifact"
-          rm -rf "$DEPLOY_DIR"
-          mkdir "$DEPLOY_DIR"
-          
-          RSYNC_EXCLUDES=(
-            ".git"
-            ".github"
-            ".gocache"
-            ".gomodcache"
-            "node_modules"
-            "*.tar.gz"
-            "*.zip"
-            "*.dmg"
-            "*.iso"
-            "*.img"
-            "*.bin"
-            "**/target"
-            "**/Cargo.lock"
-            "**/*.rlib"
-            "**/*.rmeta"
-            "**/*.d"
-            "**/build"
-            "**/incremental"
-            "**/release"
-            "**/debug"
-            "**/CACHEDIR.TAG"
-          )
-          
-          # Copy files with exclusions (avoid recursive copy)
-          RSYNC_CMD=(rsync -a --delete)
-          for pattern in "${RSYNC_EXCLUDES[@]}"; do
-            RSYNC_CMD+=(--exclude "$pattern")
+          echo "📦 Preparing _site/ for GitHub Pages"
+          SITE_DIR="_site"
+          rm -rf "$SITE_DIR" && mkdir "$SITE_DIR"
+          # Use cp -a to avoid rsync dependency; prune heavy/dev folders
+          shopt -s dotglob
+          for f in *; do
+            case "$f" in
+              .git|.github|node_modules|dist|deploy_artifact|_site) ;; # skip
+              daemon)              # remove built targets within daemon
+                cp -a "$f" "$SITE_DIR/" && find "$SITE_DIR/$f" -name target -type d -prune -exec rm -rf {} + || true ;;
+              *) cp -a "$f" "$SITE_DIR/" ;;
+            esac
           done
-          # Exclude the deploy directory itself to prevent recursion
-          RSYNC_CMD+=(--exclude "$DEPLOY_DIR")
-          RSYNC_CMD+=(./ "$DEPLOY_DIR/")
-          "${RSYNC_CMD[@]}"
-          
-          # Verify critical files exist
-          if [ ! -f "$DEPLOY_DIR/index.html" ]; then
-            echo "❌ Critical file index.html missing!"
-            exit 1
-          fi
-          
-          # Ensure .nojekyll exists within deployment package
-          touch "$DEPLOY_DIR/.nojekyll"
-          
-          # Count files to deploy
-          FILE_COUNT=$(find "$DEPLOY_DIR" -type f | wc -l)
-          echo "📊 Deploying $FILE_COUNT files after curation"
-          
-          echo "✅ Deployment package ready"
+          shopt -u dotglob
+          # Additional pruning
+          find "$SITE_DIR" -name "Cargo.lock" -delete || true
+          find "$SITE_DIR" -name "*.rlib" -o -name "*.rmeta" -o -name "*.d" -delete || true
+          touch "$SITE_DIR/.nojekyll"
+          test -f "$SITE_DIR/index.html" || { echo "❌ index.html missing in _site"; ls -la "$SITE_DIR"; exit 1; }
+          echo "✅ _site prepared"
         
       - name: Verify deployment package
         run: |
-          echo "📋 Contents of deploy_artifact:"
-          ls -la deploy_artifact/
-          echo "📊 File count in deploy_artifact:"
-          find deploy_artifact -type f | wc -l
+          echo "📋 Contents of _site:"
+          ls -la _site/ | head -n 200
+          echo "📊 File count in _site:"
+          find _site -type f | wc -l
           echo "🔍 Checking for problematic files:"
-          find deploy_artifact -name "*WARNING*" -o -name "*INFO*" -o -name "*SUCCESS*" || echo "✅ No problematic files found"
+          find _site -name "*WARNING*" -o -name "*INFO*" -o -name "*SUCCESS*" || echo "✅ No problematic files found"
           echo "🔍 Checking for Rust build artifacts:"
-          find deploy_artifact -name "target" -o -name "*.rlib" -o -name "*.rmeta" -o -name "*.d" -o -name "Cargo.lock" || echo "✅ No Rust build artifacts found"
+          find _site -name "target" -o -name "*.rlib" -o -name "*.rmeta" -o -name "*.d" -o -name "Cargo.lock" || echo "✅ No Rust build artifacts found"
           echo "🔍 Checking for large files that might cause issues:"
-          find deploy_artifact -type f -size +10M -exec ls -lh {} \; || echo "✅ No large files found"
+          find _site -type f -size +10M -exec ls -lh {} \; || echo "✅ No large files found"
         
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: deploy_artifact
+          path: _site
           
   deploy:
     needs: build
