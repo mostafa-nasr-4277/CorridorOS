@@ -68,31 +68,57 @@ jobs:
           
           echo "✅ Cleanup complete"
         
-      - name: Create deployment structure
+      - name: Create curated deployment package
         run: |
           set -euo pipefail
           
-          echo "📁 Creating deployment structure..."
+          echo "📦 Creating curated deployment package..."
           
-          # Ensure .nojekyll exists
-          touch .nojekyll
+          DEPLOY_DIR="deploy_artifact"
+          rm -rf "$DEPLOY_DIR"
+          mkdir "$DEPLOY_DIR"
+          
+          RSYNC_EXCLUDES=(
+            ".git"
+            ".github"
+            ".gocache"
+            ".gomodcache"
+            ".daemon"
+            "node_modules"
+            "*.tar.gz"
+            "*.zip"
+            "*.dmg"
+            "*.iso"
+            "*.img"
+            "*.bin"
+          )
+          
+          RSYNC_CMD=(rsync -a --delete)
+          for pattern in "${RSYNC_EXCLUDES[@]}"; do
+            RSYNC_CMD+=(--exclude "$pattern")
+          done
+          RSYNC_CMD+=(./ "$DEPLOY_DIR")
+          "${RSYNC_CMD[@]}"
           
           # Verify critical files exist
-          if [ ! -f "index.html" ]; then
+          if [ ! -f "$DEPLOY_DIR/index.html" ]; then
             echo "❌ Critical file index.html missing!"
             exit 1
           fi
           
-          # Count files to deploy
-          FILE_COUNT=$(find . -type f | wc -l)
-          echo "📊 Deploying $FILE_COUNT files"
+          # Ensure .nojekyll exists within deployment package
+          touch "$DEPLOY_DIR/.nojekyll"
           
-          echo "✅ Deployment structure ready"
+          # Count files to deploy
+          FILE_COUNT=$(find "$DEPLOY_DIR" -type f | wc -l)
+          echo "📊 Deploying $FILE_COUNT files after curation"
+          
+          echo "✅ Deployment package ready"
         
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.'
+          path: deploy_artifact
           
   deploy:
     needs: build
