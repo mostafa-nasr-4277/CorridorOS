@@ -1,0 +1,45 @@
+# CorridorOS FFM CSI Skeleton (for demo only)
+apiVersion: v1
+kind: Namespace
+metadata: { name: corridoros }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ffm-csi-skeleton-src
+  namespace: corridoros
+data:
+  ffm_csi_skeleton.py: |
+    {{FFM_CSI_SRC}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ffm-csi-controller
+  namespace: corridoros
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: ffm-csi-controller } }
+  template:
+    metadata: { labels: { app: ffm-csi-controller } }
+    spec:
+      containers:
+        - name: csi
+          image: python:3.11-slim
+          command: ["python", "/src/ffm_csi_skeleton.py"]
+          ports: [{ name: http, containerPort: 9810 }]
+          volumeMounts:
+            - { name: src, mountPath: /src }
+      volumes:
+        - name: src
+          configMap: { name: ffm-csi-skeleton-src }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ffm-csi-skeleton
+  namespace: corridoros
+spec:
+  selector: { app: ffm-csi-controller }
+  ports: [{ name: http, port: 80, targetPort: http }]
+

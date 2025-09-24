@@ -1,0 +1,18 @@
+{
+  "cniVersion": "0.4.0",
+  "name": "corridoros-chain",
+  "plugins": [
+    {
+      "type": "bridge",
+      "bridge": "cni0",
+      "isDefaultGateway": true,
+      "ipMasq": true,
+      "ipam": {"type": "host-local", "subnet": "10.244.0.0/16"}
+    },
+    {
+      "type": "corridor-annotator",
+      "env": {"CORRIDOR_ID": "si-8x1550"}
+    }
+  ]
+}
+

@@ -1,0 +1,86 @@
+# CorridorOS v4 Operator (reference)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: corridoros
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: corridoros-operator
+  namespace: corridoros
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: corridoros-operator
+rules:
+  - apiGroups: ["corridoros.io"]
+    resources: ["corridors", "memorybundles", "attestationpolicies"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods", "namespaces"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: corridoros-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: corridoros-operator
+subjects:
+  - kind: ServiceAccount
+    name: corridoros-operator
+    namespace: corridoros
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: corridoros-operator-src
+  namespace: corridoros
+data:
+  controller.py: |
+    {{CONTROLLER_SRC}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: corridoros-operator
+  namespace: corridoros
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: corridoros-operator } }
+  template:
+    metadata:
+      labels: { app: corridoros-operator }
+    spec:
+      serviceAccountName: corridoros-operator
+      containers:
+        - name: operator
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          env:
+            - { name: CORRD_URL, value: "http://corrd.corridoros.svc.cluster.local:7080" }
+            - { name: MEMQOSD_URL, value: "http://memqosd.corridoros.svc.cluster.local:7070" }
+          command: ["python", "/src/controller.py"]
+          ports: [{ containerPort: 8099, name: http }]
+          volumeMounts:
+            - { name: src, mountPath: /src }
+      volumes:
+        - name: src
+          configMap: { name: corridoros-operator-src }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: corridoros-operator
+  namespace: corridoros
+spec:
+  selector: { app: corridoros-operator }
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+

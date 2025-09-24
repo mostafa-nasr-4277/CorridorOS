@@ -1,0 +1,51 @@
+# CorridorOS v4 Scheduler Extender (reference)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: corridoros
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: corridoros-scheduler-extender-src
+  namespace: corridoros
+data:
+  scheduler_extender.py: |
+    {{SCHEDULER_SRC}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: corridoros-scheduler-extender
+  namespace: corridoros
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: corridoros-scheduler-extender } }
+  template:
+    metadata:
+      labels: { app: corridoros-scheduler-extender }
+    spec:
+      containers:
+        - name: extender
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          command: ["python", "/src/scheduler_extender.py"]
+          ports: [{ containerPort: 8098, name: http }]
+          volumeMounts:
+            - { name: src, mountPath: /src }
+      volumes:
+        - name: src
+          configMap: { name: corridoros-scheduler-extender-src }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: corridoros-scheduler-extender
+  namespace: corridoros
+spec:
+  selector: { app: corridoros-scheduler-extender }
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+
