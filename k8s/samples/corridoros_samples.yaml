@@ -1,0 +1,34 @@
+apiVersion: corridoros.io/v1
+kind: Corridor
+metadata: { name: si-8x1550, namespace: default }
+spec:
+  type: SiCorridor
+  lanes: 8
+  lambdaNm: [1550,1551,1552,1553,1554,1555,1556,1557]
+  minGbps: 400
+  latencyBudgetNs: 250
+  attestationRequired: true
+---
+apiVersion: corridoros.io/v1
+kind: MemoryBundle
+metadata: { name: infer-a-256g, namespace: default }
+spec:
+  bytes: 274877906944
+  latencyClass: T2
+  bandwidthFloorGBs: 150
+  shareable: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-infer
+  namespace: default
+  annotations:
+    corridoros.io/corridorRef: "default/si-8x1550"
+    corridoros.io/memoryBundleRef: "default/infer-a-256g"
+spec:
+  restartPolicy: Never
+  containers:
+  - name: sleep
+    image: public.ecr.aws/docker/library/busybox:stable
+    command: ["sh","-c","echo running; sleep 3600"]

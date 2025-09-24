@@ -1,0 +1,21 @@
+apiVersion: kubescheduler.config.k8s.io/v1beta3
+kind: KubeSchedulerConfiguration
+profiles:
+- schedulerName: corridor-scheduler
+  plugins:
+    filter:
+      enabled:
+      - name: CorridorFilter
+    reserve:
+      enabled:
+      - name: CorridorReserve
+    preBind:
+      enabled:
+      - name: CorridorPreBind
+    unreserve:
+      enabled:
+      - name: CorridorUnreserve
+  pluginConfig:
+  - name: CorridorFilter
+    args:
+      apiEndpoint: "http://corridor-operator.corridor-system.svc:8080"

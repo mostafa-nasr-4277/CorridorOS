@@ -25,3 +25,31 @@ Quick start (local mocks)
 Kubernetes notes
 - Operator and extender are lightweight references intended for containerization. They do not require cluster access for local testing; when run in a cluster, set env vars `KUBECONFIG` or in-cluster service account.
 
+K8s + Observability Addendum (v4)
+- Unpacked addendum resources under `k8s/`:
+  - CRDs: `k8s/crds/*.yaml`
+  - Operator: `k8s/operator/deployment.yaml`
+  - Scheduler plugin: `k8s/scheduler-plugin/` (config + README)
+  - Samples: `k8s/samples/corridoros_samples.yaml`
+  - Observability:
+    - Prometheus ServiceMonitor: `k8s/observability/prometheus/servicemonitor.yaml`
+    - Prometheus rules: `k8s/observability/prometheus/rules.yml`
+    - Grafana dashboard JSON: `k8s/observability/grafana/dashboard_corridoros_overview.json`
+
+Hand-off checklist (engineering pod)
+1) Apply CRDs & operator
+   kubectl apply -f k8s/crds/
+   kubectl apply -f k8s/operator/deployment.yaml
+
+2) (Optional) Scheduler plugin
+   Build/load per `k8s/scheduler-plugin/README.md` and wire with kube-scheduler via `k8s/scheduler-plugin/config.yaml`.
+
+3) Create sample resources & pod
+   kubectl apply -f k8s/samples/corridoros_samples.yaml
+
+4) Wire metrics
+   - Ensure `corrd`, `memqosd`, and `metricsd_exporter` expose `/metrics`.
+   - Apply `k8s/observability/prometheus/servicemonitor.yaml` and import Grafana dashboard JSON.
+
+5) Acceptance criteria
+   - CRs reconcile to Ready; pods schedule only when Ready; Grafana shows live metrics; finalizers release allocations cleanly.

@@ -1,0 +1,16 @@
+groups:
+- name: corridoros.rules
+  rules:
+  - record: corridoros:corridor_power_avg_pj_per_bit
+    expr: avg by (corridor) (corridor_power_pj_per_bit)
+  - record: corridoros:corridor_ber_max
+    expr: max by (corridor,lambda) (corridor_ber)
+  - alert: CorridorHighBER
+    expr: max by (corridor) (corridor_ber) > 1e-9
+    for: 5m
+    labels: { severity: warning }
+    annotations:
+      summary: "High BER on {{ $labels.corridor }}"
+      description: "Bit error rate exceeded 1e-9 for 5m. Check HELIOPASS."
+  - record: corridoros:ffm_bw_deficit
+    expr: max(0, (ffm_bandwidth_floor_gbs - on(bundle) ffm_achieved_gbs))

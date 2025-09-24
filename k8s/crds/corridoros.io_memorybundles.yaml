@@ -1,0 +1,59 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: memorybundles.corridoros.io
+spec:
+  group: corridoros.io
+  scope: Namespaced
+  names:
+    plural: memorybundles
+    singular: memorybundle
+    kind: MemoryBundle
+    shortNames: [mb]
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required: [bytes, latencyClass]
+            properties:
+              bytes: { type: integer, format: int64 }
+              latencyClass:
+                type: string
+                enum: ["T0","T1","T2","T3"]
+              bandwidthFloorGBs: { type: integer }
+              persistence:
+                type: string
+                enum: ["none","durable"]
+                default: "none"
+              shareable: { type: boolean, default: true }
+              securityDomain: { type: string }
+              schedule:
+                type: object
+                additionalProperties: true
+              nodeSelector:
+                type: object
+                additionalProperties: { type: string }
+          status:
+            type: object
+            properties:
+              phase: { type: string }
+              ffmHandle: { type: string }
+              achievedGBs: { type: number }
+              movedPages: { type: integer, format: int64 }
+              tailP99Ms: { type: number }
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type: { type: string }
+                    status: { type: string }
+                    reason: { type: string }
+                    message: { type: string }
+                    lastTransitionTime: { type: string, format: date-time }

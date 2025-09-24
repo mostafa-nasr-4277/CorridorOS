@@ -1,0 +1,77 @@
+{
+  "id": null,
+  "uid": "corridoros-main",
+  "title": "CorridorOS Overview",
+  "timezone": "browser",
+  "version": 1,
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Energy per bit (pJ/bit)",
+      "id": 1,
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "avg(corridor_power_pj_per_bit)"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "BER by corridor",
+      "id": 2,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 8,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "max by (corridor) (corridor_ber)"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "FFM Achieved GB/s vs Floor",
+      "id": 3,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "expr": "sum by (bundle) (ffm_achieved_gbs)"
+        },
+        {
+          "expr": "sum by (bundle) (ffm_bandwidth_floor_gbs)"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Recalibrations (total)",
+      "id": 4,
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(corridor_recalibrations_total)"
+        }
+      ]
+    }
+  ]
+}
