@@ -38,3 +38,10 @@
 /* Floating exit button for pages */
 .co-exit{position:fixed;right:18px;bottom:18px;z-index:9999}
 
+/* Global bottom dock */
+.co-dock{position:fixed;left:0;right:0;bottom:0;z-index:9998;display:flex;justify-content:center;pointer-events:none}
+.co-dock-inner{pointer-events:auto;display:flex;gap:14px;align-items:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(20,27,45,.55);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:8px 12px;margin:10px auto;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.co-dock-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;text-decoration:none;color:var(--co-text-dim);min-width:60px;transition:transform .18s ease, background .18s ease, box-shadow .18s ease}
+.co-dock-item:hover{transform:translateY(-4px);background:rgba(255,255,255,.06);box-shadow:0 0 18px rgba(38,230,255,.25)}
+.co-dock-item img{width:26px;height:26px;filter:drop-shadow(0 0 8px rgba(38,230,255,.4))}
+.co-dock-item span{font-size:11px;font-weight:600;letter-spacing:.02em}
