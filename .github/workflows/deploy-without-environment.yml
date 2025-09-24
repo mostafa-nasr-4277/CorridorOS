@@ -1,4 +1,4 @@
-name: Simple GitHub Pages Deploy
+name: Deploy to GitHub Pages (No Environment)
 
 on:
   push:
@@ -15,9 +15,6 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
