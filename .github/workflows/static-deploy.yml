@@ -115,6 +115,15 @@ jobs:
           
           echo "✅ Deployment package ready"
         
+      - name: Verify deployment package
+        run: |
+          echo "📋 Contents of deploy_artifact:"
+          ls -la deploy_artifact/
+          echo "📊 File count in deploy_artifact:"
+          find deploy_artifact -type f | wc -l
+          echo "🔍 Checking for problematic files:"
+          find deploy_artifact -name "*WARNING*" -o -name "*INFO*" -o -name "*SUCCESS*" || echo "✅ No problematic files found"
+        
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
