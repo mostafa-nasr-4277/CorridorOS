@@ -344,9 +344,13 @@
     <script>
         // Environment + service endpoints
         const IS_LOCAL = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
+        // Optional overrides via query params: ?corrd=https://api.example.com&memqosd=https://mem.example.com
+        const _q = new URLSearchParams(window.location.search);
+        const CORRD_OVERRIDE = _q.get('corrd');
+        const MEMQOSD_OVERRIDE = _q.get('memqosd');
         // corrd (photonic) and memqosd (FFM) run on different ports locally
-        const CORRD_BASE_URL = IS_LOCAL ? 'http://localhost:7080' : '';
-        const MEMQOSD_BASE_URL = IS_LOCAL ? 'http://localhost:7070' : '';
+        const CORRD_BASE_URL = CORRD_OVERRIDE || (IS_LOCAL ? 'http://localhost:7080' : '');
+        const MEMQOSD_BASE_URL = MEMQOSD_OVERRIDE || (IS_LOCAL ? 'http://localhost:7070' : '');
 
         let corridorCount = 0;
         let totalMemory = 0;
