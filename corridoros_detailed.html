@@ -1763,14 +1763,7 @@
         }
         
         function getCommandOutput(command) {
-            const outputs = {
-                'ls': 'bin  etc  home  opt  proc  sys  tmp  usr  var',
-                'ps': 'PID TTY      TIME CMD\n  1 ?        00:00:01 init\n  2 ?        00:00:00 corrd\n  3 ?        00:00:00 memqosd',
-                'uname -a': 'CorridorOS 4.0.0 quantum-photonic x86_64 GNU/Linux',
-                'whoami': 'root',
-                'date': new Date().toString()
-            };
-            return outputs[command] || `${command}: command not found`;
+            return 'Command Line Interface not ready yet!';
         }
         
         // Click terminal to focus
