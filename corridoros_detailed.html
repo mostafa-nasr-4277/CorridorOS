@@ -176,7 +176,7 @@
             display: none;
             width: 100vw;
             height: 100vh;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #2a2a4e 100%);
+            background: linear-gradient(135deg, #1a1a3a 0%, #2e2e5a 50%, #4a4a7a 100%);
             position: relative;
             overflow: hidden;
         }
@@ -1360,6 +1360,9 @@
             document.getElementById('bootScreen').classList.add('hidden');
             document.getElementById('osInterface').style.display = 'block';
             initializeOS();
+            // Default theme: Quantum
+            try { document.getElementById('themeSelect').value = 'quantum'; } catch(_){ }
+            changeTheme('quantum');
             showNotificationDetailed('System Initialized', 'Welcome to CorridorOS - Quantum-Photonic Computing Platform');
             // Auto-activate a photonic corridor once per session on boot
             autoActivateCorridorOnce();
