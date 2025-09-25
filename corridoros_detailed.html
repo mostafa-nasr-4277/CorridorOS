@@ -359,6 +359,11 @@
             left: 10%;
         }
         
+        .fm-toolbar { display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.1); }
+        .fm-btn { background: rgba(255,255,255,.08); color:#e6e6e6; border:1px solid rgba(255,255,255,.18); border-radius:8px; padding:6px 10px; cursor:pointer }
+        .fm-btn:hover { background: rgba(255,255,255,.16) }
+        .fm-path { font-size:12px; color:#9aa5b1; padding:6px 10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:8px; flex:1 }
+
         .file-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -380,6 +385,7 @@
         }
         
         .file-item:hover { background: rgba(255,255,255,.1); transform: translateY(-3px); box-shadow: 0 12px 26px rgba(0,0,0,.35); }
+        .file-item.selected { outline:2px solid #26E6FF; background: rgba(38,230,255,.12); }
         
         .file-icon { font-size: 2.2rem; margin-bottom: 0.5rem; filter: drop-shadow(0 2px 8px rgba(0,0,0,.35)); }
         
@@ -896,16 +902,12 @@
                 </div>
             </div>
             <div class="window-content">
-                <div class="file-grid">
-                    <div class="file-item"><div class="file-icon">🧩</div><div class="file-name">Applications</div></div>
-                    <div class="file-item"><div class="file-icon">📄</div><div class="file-name">Documents</div></div>
-                    <div class="file-item"><div class="file-icon">⬇️</div><div class="file-name">Downloads</div></div>
-                    <div class="file-item"><div class="file-icon">🛰️</div><div class="file-name">Corridor</div></div>
-                    <div class="file-item"><div class="file-icon">⚙️</div><div class="file-name">Config</div></div>
-                    <div class="file-item"><div class="file-icon">🖥️</div><div class="file-name">Systems</div></div>
-                    <div class="file-item"><div class="file-icon">🌐</div><div class="file-name">Network</div></div>
-                    <div class="file-item"><div class="file-icon">🧪</div><div class="file-name">Sandbox</div></div>
+                <div class="fm-toolbar">
+                    <button class="fm-btn" onclick="fmBack()" title="Back">←</button>
+                    <button class="fm-btn" onclick="fmUp()" title="Up">↑</button>
+                    <div class="fm-path" id="fmPath">/</div>
                 </div>
+                <div class="file-grid" id="fileGrid"></div>
             </div>
         </div>
         
@@ -1412,6 +1414,85 @@
                 }
             } catch(_){}
         }
+
+        // ---------- File Manager (Simulated FS) ----------
+        const FS = {
+            '/': [
+                { name: 'Applications', type: 'folder' },
+                { name: 'Documents', type: 'folder' },
+                { name: 'Downloads', type: 'folder' },
+                { name: 'Corridor', type: 'folder' },
+                { name: 'Config', type: 'folder' },
+                { name: 'Systems', type: 'folder' },
+                { name: 'Network', type: 'folder' },
+                { name: 'Sandbox', type: 'folder' }
+            ],
+            '/Applications': [
+                { name: 'Text Editor', type: 'app', target: 'textEditor', icon: '📝' },
+                { name: 'Image Viewer', type: 'app', target: 'imageViewer', icon: '🖼️' },
+                { name: 'Music Player', type: 'app', target: 'musicPlayer', icon: '🎵' }
+            ],
+            '/Documents': [
+                { name: 'Readme.txt', type: 'file', ext: 'txt', icon: '📄', content: 'Welcome to CorridorOS Documents.' }
+            ],
+            '/Downloads': [
+                { name: 'sample.png', type: 'image', icon: '🖼️' }
+            ],
+            '/Corridor': [
+                { name: 'allocations.log', type: 'file', ext: 'log', icon: '📜', content: 'p99, pj/bit, gbps...' }
+            ],
+            '/Config': [
+                { name: 'corrd.conf', type: 'file', ext: 'conf', icon: '⚙️', content: '# corrd config' },
+                { name: 'memqosd.service', type: 'file', ext: 'service', icon: '⚙️', content: '# memqosd service' }
+            ],
+            '/Systems': [], '/Network': [], '/Sandbox': []
+        };
+
+        const fmState = { path: '/', history: ['/'], idx: 0, selected: null };
+
+        function initFileManager(){ renderDir('/'); }
+
+        function fmBack(){ if (fmState.idx>0){ fmState.idx--; renderDir(fmState.history[fmState.idx], false); } }
+        function fmUp(){ if (fmState.path !== '/') { const up = fmState.path.replace(/\/?[^\/]+$/, '') || '/'; fmOpen(up); } }
+        function fmOpen(path){ fmState.path = path; fmState.history = fmState.history.slice(0, fmState.idx+1).concat(path); fmState.idx = fmState.history.length-1; renderDir(path); }
+
+        function renderDir(path, pushHist=true){
+            const grid = document.getElementById('fileGrid'); const pathEl = document.getElementById('fmPath'); if (!grid||!pathEl) return;
+            pathEl.textContent = path;
+            grid.innerHTML = '';
+            const entries = FS[path] || [];
+            for (const item of entries){
+                const el = document.createElement('div'); el.className='file-item'; el.tabIndex=0;
+                const icon = document.createElement('div'); icon.className='file-icon'; icon.textContent = item.icon || (item.type==='folder'?'📁': item.type==='image'?'🖼️':'📄');
+                const name = document.createElement('div'); name.className='file-name'; name.textContent = item.name;
+                el.dataset.name = item.name; el.dataset.type = item.type; if (item.target) el.dataset.target=item.target; if (item.ext) el.dataset.ext=item.ext;
+                el.appendChild(icon); el.appendChild(name);
+                el.addEventListener('click', ()=>{ selectFileItem(el); });
+                el.addEventListener('dblclick', ()=>{ openFileItem(el); });
+                grid.appendChild(el);
+            }
+        }
+
+        function selectFileItem(el){
+            document.querySelectorAll('#fileGrid .file-item').forEach(i=>i.classList.remove('selected'));
+            el.classList.add('selected'); fmState.selected = el.dataset.name;
+        }
+
+        function openFileItem(el){
+            const type = el.dataset.type; const name = el.dataset.name; const base = fmState.path.endsWith('/')? fmState.path+name : `${fmState.path}/${name}`;
+            if (type==='folder'){ fmOpen(base); return; }
+            if (type==='app' && el.dataset.target){ openWindow(el.dataset.target); return; }
+            if (type==='image'){ openWindow('imageViewer'); return; }
+            // files
+            if (type==='file'){
+                openWindow('textEditor');
+                // Load basic content if present
+                const txt = Array.from((FS[fmState.path]||[])).find(i=>i.name===name)?.content || `${name}`;
+                const ta = document.querySelector('#textEditor textarea'); if (ta) ta.value = txt;
+                return;
+            }
+            showNotificationDetailed('Open', `Cannot open ${name}`);
+        }
         
         function updateTime() {
             const now = new Date();
@@ -1472,6 +1553,11 @@
             if (!activeWindows.includes(windowId)) {
                 activeWindows.push(windowId);
                 updateTaskbarIcons();
+            }
+
+            // Initialize file manager on first open
+            if (windowId === 'fileManager') {
+                if (!window.__fmInited) { initFileManager(); window.__fmInited = true; }
             }
         }
         
