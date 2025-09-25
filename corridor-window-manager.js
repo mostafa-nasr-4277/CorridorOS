@@ -933,12 +933,11 @@ input:checked + .toggle-slider:before {
     font-family: inherit;
     font-size: inherit;
     flex: 1;
+    direction: ltr;
+    text-align: left;
 }
 
-.terminal-cursor {
-    animation: blink 1s infinite;
-    margin-left: 2px;
-}
+.terminal-cursor { display: none; }
 
 @keyframes blink {
     0%, 50% { opacity: 1; }
