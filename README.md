@@ -16,3 +16,15 @@ This pack includes:
 3. Use `cli/corridor_cli.py ffm-alloc --bytes $((256*1024*1024*1024)) --tier T2 --bw-floor 150`.
 
 > NOTE: These are **skeletons** for you to complete with real device SDKs (CXL, photonic kits), Linux CXL tooling (cxl-cli/ndctl/daxctl), and security plumbing (TPM/SPDM/PQC).
+
+## Simulator + Dashboard
+- Detailed simulator (mobile‑friendly, auto corridor + 256 GB memory allocation): `corridoros_detailed.html`
+- Engineering Dashboard (SLO dials: BER, pJ/bit, GB/s vs floor, p99): `corridoros_dashboard.html`
+
+## Visual System
+Canonical SVG diagrams (docs/visual):
+- Architecture: `docs/visual/architecture.svg`
+- Corridor lifecycle: `docs/visual/corridor_lifecycle.svg`
+- FFM tiering: `docs/visual/ffm_tiering.svg`
+
+Observability thresholds are documented in `docs/OBSERVABILITY.md`. See `docs/HARDENING.md` for pre‑pilot hardening and governance docs in `docs/GOVERNANCE.md`.

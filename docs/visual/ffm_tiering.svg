@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 320">
+  <rect width="100%" height="100%" fill="#0b1220"/>
+  <g font-family="Inter, Arial" fill="#dbeafe">
+    <rect x="60" y="50" width="180" height="200" rx="10" fill="#24304f"/>
+    <text x="110" y="80" font-size="14">T0 · HBM</text>
+    <text x="100" y="100" font-size="12" fill="#9fb3d9">low p99</text>
+
+    <rect x="260" y="50" width="180" height="200" rx="10" fill="#24304f"/>
+    <text x="315" y="80" font-size="14">T1 · DRAM</text>
+
+    <rect x="460" y="50" width="180" height="200" rx="10" fill="#24304f"/>
+    <text x="510" y="80" font-size="14">T2 · CXL</text>
+
+    <rect x="660" y="50" width="180" height="200" rx="10" fill="#24304f"/>
+    <text x="700" y="80" font-size="14">T3 · Persist</text>
+
+    <text x="60" y="280" font-size="12" fill="#9fb3d9">Lower latency →</text>
+    <text x="680" y="280" font-size="12" fill="#9fb3d9">→ Higher capacity</text>
+  </g>
+</svg>

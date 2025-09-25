@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 320">
+  <rect width="100%" height="100%" fill="#0b1220"/>
+  <g font-family="Inter, Arial" fill="#dbeafe" stroke="#7aa2ff" stroke-opacity=".35" stroke-width="1.5">
+    <rect x="40" y="40" width="160" height="60" rx="10" fill="#1a2540"/>
+    <text x="60" y="75" font-size="14">Request</text>
+
+    <rect x="240" y="40" width="160" height="60" rx="10" fill="#1a2540"/>
+    <text x="260" y="75" font-size="14">Plan (DRF)</text>
+
+    <rect x="440" y="40" width="160" height="60" rx="10" fill="#1a2540"/>
+    <text x="452" y="75" font-size="14">Reserve λ + GB/s</text>
+
+    <rect x="640" y="40" width="160" height="60" rx="10" fill="#1a2540"/>
+    <text x="660" y="75" font-size="14">Observe</text>
+
+    <path d="M200 70 H240" stroke="#26E6FF"/>
+    <path d="M400 70 H440" stroke="#26E6FF"/>
+    <path d="M600 70 H640" stroke="#26E6FF"/>
+
+    <rect x="240" y="160" width="160" height="60" rx="10" fill="#1a2540"/>
+    <text x="252" y="195" font-size="14">Degrade/Back‑off</text>
+    <path d="M720 100 V190 H400" stroke="#ffb300"/>
+  </g>
+</svg>

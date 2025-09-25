@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 480">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#1e3c72"/>
+      <stop offset="1" stop-color="#2a5298"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="#0b1220"/>
+  <g font-family="Inter, Arial" fill="#dbeafe" stroke="#7aa2ff" stroke-opacity=".35">
+    <rect x="40" y="40" width="780" height="120" rx="12" fill="url(#g)" opacity=".25"/>
+    <text x="50" y="75" font-size="16">Applications</text>
+    <text x="50" y="105" font-size="12" fill="#9fb3d9">Quantum Lab · Photonic Studio · Files · Terminal · Settings</text>
+
+    <rect x="40" y="190" width="780" height="120" rx="12" fill="url(#g)" opacity=".25"/>
+    <text x="50" y="225" font-size="16">CorridorOS Services</text>
+    <text x="50" y="255" font-size="12" fill="#9fb3d9">Scheduler (DRF) · memqosd · corrd · Observability · Security</text>
+
+    <rect x="40" y="340" width="780" height="100" rx="12" fill="url(#g)" opacity=".25"/>
+    <text x="50" y="375" font-size="16">Hardware</text>
+    <text x="50" y="405" font-size="12" fill="#9fb3d9">CXL Memory · Photonic Lanes (λ 1500–1600nm) · HELIOPASS Sensors</text>
+
+    <path d="M430 160v30" stroke="#26E6FF"/><circle cx="430" cy="160" r="4" fill="#26E6FF"/>
+    <path d="M430 310v30" stroke="#26E6FF"/><circle cx="430" cy="310" r="4" fill="#26E6FF"/>
+  </g>
+</svg>
