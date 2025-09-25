@@ -228,6 +228,10 @@
             border-left: 4px solid #28a745;
             color: #28a745;
         }
+        /* Dials */
+        .dial{position:relative;height:180px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px}
+        .dial canvas{position:absolute;inset:0}
+        .dial .value{position:relative;font-weight:700;color:#2a5298}
     </style>
     <link rel="stylesheet" href="brand/corridoros-brand.css">
 </head>
@@ -344,6 +348,17 @@
             <div class="metric">
                 <span>Allocated Memory</span>
                 <span class="metric-value" id="allocated-memory">0 GB</span>
+            </div>
+        </div>
+
+        <!-- SLO Dials -->
+        <div class="card" id="card-slos">
+            <h2>Service SLOs</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;">
+                <div class="dial" id="dial-ber"></div>
+                <div class="dial" id="dial-pj"></div>
+                <div class="dial" id="dial-gbps"></div>
+                <div class="dial" id="dial-p99"></div>
             </div>
         </div>
     </div>
@@ -709,6 +724,37 @@
         // Initialize
         checkServiceStatus();
         setInterval(checkServiceStatus, 10000); // Check every 10 seconds
+
+        // SLO dials
+        function drawDial(el, val, min, max, green, yellow, formatter){
+            const canvas = document.createElement('canvas'); canvas.width=180; canvas.height=180; el.innerHTML=''; el.appendChild(canvas);
+            const ctx=canvas.getContext('2d'); const cx=90, cy=90, r=70;
+            const norm=(v)=>Math.max(0,Math.min(1,(v-min)/(max-min)));
+            const angle=norm(val)*Math.PI*1.5+Math.PI*0.75;
+            // bg arc
+            ctx.strokeStyle='rgba(42,82,152,.2)'; ctx.lineWidth=12; ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI*0.75,Math.PI*2.25); ctx.stroke();
+            // thresholds
+            let color='#28a745'; if (yellow(val)) color='#ffb300'; if (!green(val) && !yellow(val)) color='#dc3545';
+            ctx.strokeStyle=color; ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI*0.75,angle); ctx.stroke();
+            const value=document.createElement('div'); value.className='value'; value.textContent=formatter(val); el.appendChild(value);
+        }
+
+        function updateDials(){
+            // Replace with real telemetry once API is hooked
+            const ber=1.2e-12;
+            const pj=2.1;
+            const floor=150; const achieved=floor*1.04;
+            const p99=240;
+            drawDial(document.getElementById('dial-ber'), ber, 1e-13, 1e-10,
+                v=>v<1e-12, v=>v>=1e-12 && v<1e-11, v=>v.toExponential(1));
+            drawDial(document.getElementById('dial-pj'), pj, 0, 6,
+                v=>v<=3.0, v=>v>3.0 && v<=4.0, v=>`${v.toFixed(1)} pJ/bit`);
+            drawDial(document.getElementById('dial-gbps'), achieved, 0, floor*1.3,
+                v=>v>=floor, v=>v>=floor*0.9 && v<floor, v=>`${Math.round(v)} GB/s`);
+            drawDial(document.getElementById('dial-p99'), p99, 0, 800,
+                v=>v<=300, v=>v>300 && v<=500, v=>`${Math.round(v)} ns`);
+        }
+        updateDials();
 
         // Auto-activate a corridor once per session using default form values
         (async function autoActivateOnce(){
