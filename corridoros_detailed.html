@@ -202,7 +202,7 @@
         /* Dock (center-floating) */
         .taskbar {
             position: fixed;
-            bottom: 12px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
             width: auto;
@@ -733,7 +733,7 @@
         .notif-panel { position: fixed; right: -360px; top: 16px; width: 340px; height: calc(100vh - 32px); background: rgba(20,20,30,.97); border-left: 1px solid rgba(255,255,255,.1); box-shadow: 0 10px 30px rgba(0,0,0,.35); border-radius: 12px 0 0 12px; z-index: 2100; display:flex; flex-direction:column; transition: right .25s ease; }
         .notif-panel.open { right: 16px; }
         .notif-header { display:flex; align-items:center; justify-content:space-between; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
-        .notif-header .title { font-weight:700; }
+        .notif-header .title { font-weight:700; display:flex; align-items:center; gap:8px; }
         .notif-header .actions { display:flex; gap:8px; }
         .notif-header .actions button { background: transparent; color:#ccc; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:6px 10px; cursor:pointer; }
         .notif-header .actions button:hover { background: rgba(255,255,255,.06); color:#fff; }
@@ -867,24 +867,24 @@
             <div class="wallpaper"></div>
             <!-- Desktop Icons (essential apps) -->
             <div class="desktop-icons" style="position:absolute;inset:0;pointer-events:none;z-index:50;">
-                <div style="position:absolute;left:24px;top:28px;display:grid;grid-auto-rows:minmax(86px,auto);gap:18px;">
-                    <button class="desktop-icon" onclick="openWindow('fileManager')" ondblclick="openWindow('fileManager')" title="Files" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                <div id="desktopIconColumn" style="position:absolute;left:24px;top:28px;display:grid;grid-auto-rows:minmax(86px,auto);gap:18px;">
+                    <button class="desktop-icon" data-id="files" draggable="true" onclick="openWindow('fileManager')" ondblclick="openWindow('fileManager')" title="Files" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
                         <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">📁</span>
                         <span style="font-size:12px;">Files</span>
                     </button>
-                    <button class="desktop-icon" onclick="openWindow('terminal')" ondblclick="openWindow('terminal')" title="Terminal" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                    <button class="desktop-icon" data-id="terminal" draggable="true" onclick="openWindow('terminal')" ondblclick="openWindow('terminal')" title="Terminal" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
                         <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">💻</span>
                         <span style="font-size:12px;">Terminal</span>
                     </button>
-                    <button class="desktop-icon" onclick="openWindow('systemMonitor')" ondblclick="openWindow('systemMonitor')" title="System Monitor" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                    <button class="desktop-icon" data-id="monitor" draggable="true" onclick="openWindow('systemMonitor')" ondblclick="openWindow('systemMonitor')" title="System Monitor" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
                         <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">📊</span>
                         <span style="font-size:12px;">Monitor</span>
                     </button>
-                    <button class="desktop-icon" onclick="openWindow('browser')" ondblclick="openWindow('browser')" title="Browser" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                    <button class="desktop-icon" data-id="browser" draggable="true" onclick="openWindow('browser')" ondblclick="openWindow('browser')" title="Browser" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
                         <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">🌐</span>
                         <span style="font-size:12px;">Browser</span>
                     </button>
-                    <button class="desktop-icon" onclick="openWindow('settings')" ondblclick="openWindow('settings')" title="Settings" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                    <button class="desktop-icon" data-id="settings" draggable="true" onclick="openWindow('settings')" ondblclick="openWindow('settings')" title="Settings" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
                         <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">⚙️</span>
                         <span style="font-size:12px;">Settings</span>
                     </button>
@@ -1283,11 +1283,15 @@
     <!-- Notification Center Panel -->
     <aside id="notificationsPanelDetailed" class="notif-panel" aria-hidden="true">
         <div class="notif-header">
-            <div class="title">Notifications</div>
+            <div class="title">Notifications <button id="notifSettingsBtn" title="Notification Settings" style="background:transparent;border:1px solid rgba(255,255,255,.12);color:#ccc;border-radius:8px;padding:4px 8px;cursor:pointer">⚙️</button></div>
             <div class="actions">
                 <button onclick="clearAllNotificationsDetailed()">Clear All</button>
                 <button onclick="toggleNotificationsPanelDetailed()" title="Close">×</button>
             </div>
+        </div>
+        <div id="notifSettingsPanel" style="display:none;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.08);color:#bbb;font-size:13px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="prefToasts"/> Enable toasts</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="prefPersist"/> Persist to center</label>
         </div>
         <div id="notifListDetailed" class="notif-list" role="list"></div>
         <div id="notifEmptyDetailed" class="notif-empty" style="display:none;">No notifications</div>
@@ -1390,6 +1394,9 @@
             const nt = document.querySelector('.notif-toggle');
             if (nt){ nt.addEventListener('click', toggleNotificationsPanelDetailed); }
             loadNotificationsDetailed();
+
+            // Desktop icon drag ordering
+            initDesktopIconDrag(); loadDesktopIconOrder();
         }
 
         function autoActivateCorridorOnce(){
@@ -1494,6 +1501,18 @@
                 return;
             }
             showNotificationDetailed('Open', `Cannot open ${name}`);
+        }
+
+        // ---------- Desktop icons drag & order ----------
+        function initDesktopIconDrag(){
+            const col = document.getElementById('desktopIconColumn'); if (!col) return;
+            let dragEl=null;
+            col.addEventListener('dragstart', e=>{ const t=e.target.closest('.desktop-icon'); if (!t) return; dragEl=t; e.dataTransfer.effectAllowed='move';});
+            col.addEventListener('dragover', e=>{ e.preventDefault(); const t=e.target.closest('.desktop-icon'); if (!dragEl||!t||t===dragEl) return; const children=[...col.children]; const dragIdx=children.indexOf(dragEl); const overIdx=children.indexOf(t); if (dragIdx<overIdx) col.insertBefore(dragEl, t.nextSibling); else col.insertBefore(dragEl, t);});
+            col.addEventListener('drop', ()=>{ saveDesktopIconOrder(); });
+        }
+        function saveDesktopIconOrder(){ const col=document.getElementById('desktopIconColumn'); if(!col) return; const order=[...col.children].map(el=>el.dataset.id); localStorage.setItem('co-desktop-order', JSON.stringify(order)); }
+        function loadDesktopIconOrder(){ const col=document.getElementById('desktopIconColumn'); if(!col) return; try{ const order=JSON.parse(localStorage.getItem('co-desktop-order')||'[]'); if(order.length){ const map={}; [...col.children].forEach(el=>map[el.dataset.id]=el); order.forEach(id=>{ if(map[id]) col.appendChild(map[id]); }); } }catch(_){}
         }
         
         function updateTime() {
@@ -1644,6 +1663,8 @@
         const NOTIF_KEY_DETAILED = 'corridor-detailed-notifications-v1';
         let notifStoreDetailed = [];
         let unreadDetailed = 0;
+        const NOTIF_PREF_KEY = 'corridor-detailed-notif-prefs';
+        let notifPrefs = { toasts: true, persist: true };
 
         function loadNotificationsDetailed(){
             try {
@@ -1653,6 +1674,9 @@
                 renderNotifListDetailed();
                 updateNotifBadgeDetailed();
             } catch(e){ notifStoreDetailed=[]; }
+            try { const p = JSON.parse(localStorage.getItem(NOTIF_PREF_KEY)||'{}'); notifPrefs = { ...notifPrefs, ...p }; } catch(_){ }
+            const btn=document.getElementById('notifSettingsBtn'); const panel=document.getElementById('notifSettingsPanel'); if(btn&&panel){ btn.onclick=()=>{ panel.style.display = panel.style.display==='none'?'block':'none'; }; }
+            const cbT=document.getElementById('prefToasts'); const cbP=document.getElementById('prefPersist'); if(cbT&&cbP){ cbT.checked=!!notifPrefs.toasts; cbP.checked=!!notifPrefs.persist; cbT.onchange=()=>{ notifPrefs.toasts=cbT.checked; localStorage.setItem(NOTIF_PREF_KEY, JSON.stringify(notifPrefs)); }; cbP.onchange=()=>{ notifPrefs.persist=cbP.checked; localStorage.setItem(NOTIF_PREF_KEY, JSON.stringify(notifPrefs)); }; }
         }
         function saveNotificationsDetailed(){
             try { localStorage.setItem(NOTIF_KEY_DETAILED, JSON.stringify(notifStoreDetailed)); } catch(_){}
@@ -1698,14 +1722,16 @@
         function clearAllNotificationsDetailed(){ notifStoreDetailed = []; unreadDetailed=0; saveNotificationsDetailed(); renderNotifListDetailed(); updateNotifBadgeDetailed(); }
         function showNotificationDetailed(title, body, duration=4000){
             const n = { id:'n_'+Date.now()+'_'+Math.random().toString(36).slice(2,5), title, body, ts:Date.now(), read:false };
-            notifStoreDetailed.unshift(n); unreadDetailed++; saveNotificationsDetailed(); renderNotifListDetailed(); updateNotifBadgeDetailed();
-            const toasts = document.getElementById('toast-notifications');
-            const toast = document.createElement('div'); toast.className='notification';
-            toast.innerHTML = `<div class=\"title\"><span>${title}</span><button class=\"close\" aria-label=\"Dismiss\">×</button></div><div class=\"body\">${body}</div>`;
-            toast.querySelector('.close').addEventListener('click',()=>{ toast.remove(); });
-            toasts.appendChild(toast);
-            if (duration>0){ setTimeout(()=>{ toast.remove(); }, duration); }
-            if (toasts.children.length>5){ toasts.firstElementChild?.remove(); }
+            if (notifPrefs.persist){ notifStoreDetailed.unshift(n); unreadDetailed++; saveNotificationsDetailed(); renderNotifListDetailed(); updateNotifBadgeDetailed(); }
+            if (notifPrefs.toasts){
+                const toasts = document.getElementById('toast-notifications');
+                const toast = document.createElement('div'); toast.className='notification';
+                toast.innerHTML = `<div class=\"title\"><span>${title}</span><button class=\"close\" aria-label=\"Dismiss\">×</button></div><div class=\"body\">${body}</div>`;
+                toast.querySelector('.close').addEventListener('click',()=>{ toast.remove(); });
+                toasts.appendChild(toast);
+                if (duration>0){ setTimeout(()=>{ toast.remove(); }, duration); }
+                if (toasts.children.length>5){ toasts.firstElementChild?.remove(); }
+            }
         }
         
         function showShutdown() {
