@@ -7,6 +7,8 @@ class CorridorOS {
         this.openWindows = new Map();
         this.windowZIndex = 1000;
         this.notifications = [];
+        this.unreadCount = 0;
+        this.notificationsKey = 'corridor-os-notifications-v1';
         this.systemTime = new Date();
         
         // System state
@@ -37,6 +39,7 @@ class CorridorOS {
     
     init() {
         this.setupEventListeners();
+        this.loadNotificationsFromStorage();
         this.startBootSequence();
         this.updateClock();
         setInterval(() => this.updateClock(), 1000);
@@ -291,30 +294,155 @@ class CorridorOS {
     
     showNotification(title, content, type = 'info', duration = 5000) {
         if (!this.preferences.notifications) return;
-        
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <div class="notification-title">${title}</div>
+        // Persist to notification center
+        const notif = {
+            id: 'n_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+            title,
+            content,
+            type,
+            timestamp: Date.now(),
+            read: false
+        };
+        this.notifications.unshift(notif);
+        this.unreadCount++;
+        this.saveNotificationsToStorage();
+        this.renderNotificationList();
+        this.updateNotificationBadge();
+
+        // Also show ephemeral toast with a close button
+        const container = document.getElementById('notifications');
+        const toast = document.createElement('div');
+        toast.className = `notification ${type}`;
+        toast.innerHTML = `
+            <div class="notification-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                <span>${title}</span>
+                <button aria-label="Dismiss" style="background:transparent;border:none;color:inherit;cursor:pointer;font-size:16px;line-height:1;">×</button>
+            </div>
             <div class="notification-content">${content}</div>
         `;
-        
-        const container = document.getElementById('notifications');
-        container.appendChild(notification);
-        
-        // Auto-remove notification
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.style.animation = 'slideOutRight 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }
-        }, duration);
-        
-        // Limit number of notifications
-        const notifications = container.children;
-        if (notifications.length > 5) {
-            notifications[0].remove();
+        const closeBtn = toast.querySelector('button');
+        closeBtn.addEventListener('click', () => {
+            toast.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => toast.remove(), 280);
+        });
+        container.appendChild(toast);
+
+        // Auto-remove toast
+        if (duration > 0) {
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => toast.remove(), 280);
+                }
+            }, duration);
         }
+        // Limit number of concurrent toasts
+        const toasts = container.children;
+        if (toasts.length > 5) {
+            toasts[0].remove();
+        }
+    }
+
+    // Notification Center helpers
+    loadNotificationsFromStorage() {
+        try {
+            const raw = localStorage.getItem(this.notificationsKey);
+            this.notifications = raw ? JSON.parse(raw) : [];
+            // Unread count from items marked read:false
+            this.unreadCount = this.notifications.reduce((acc, n) => acc + (n.read ? 0 : 1), 0);
+            this.renderNotificationList();
+            this.updateNotificationBadge();
+        } catch (e) {
+            console.error('Failed to load notifications', e);
+            this.notifications = [];
+        }
+    }
+
+    saveNotificationsToStorage() {
+        try {
+            localStorage.setItem(this.notificationsKey, JSON.stringify(this.notifications));
+        } catch (e) {
+            console.error('Failed to save notifications', e);
+        }
+    }
+
+    renderNotificationList() {
+        const list = document.getElementById('notifications-list');
+        const empty = document.getElementById('notifications-empty');
+        if (!list) return;
+
+        list.innerHTML = '';
+        if (!this.notifications.length) {
+            if (empty) empty.style.display = 'block';
+            return;
+        }
+        if (empty) empty.style.display = 'none';
+
+        this.notifications.forEach((n) => {
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            item.setAttribute('role', 'listitem');
+            const time = new Date(n.timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+            item.innerHTML = `
+                <div class="title">${n.title}</div>
+                <button class="close-btn" title="Dismiss">×</button>
+                <div class="meta">${time}</div>
+                <div class="body">${n.content}</div>
+            `;
+            item.querySelector('.close-btn').addEventListener('click', () => this.dismissNotification(n.id));
+            list.appendChild(item);
+        });
+    }
+
+    updateNotificationBadge() {
+        const badge = document.getElementById('notificationsBadge');
+        if (!badge) return;
+        if (this.unreadCount > 0) {
+            badge.textContent = String(this.unreadCount);
+            badge.style.display = 'inline-flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    toggleNotificationsPanel() {
+        const panel = document.getElementById('notifications-panel');
+        if (!panel) return;
+        const isOpen = panel.classList.toggle('open');
+        panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        if (isOpen) {
+            // Mark all as read when opening
+            let changed = false;
+            this.notifications.forEach(n => { if (!n.read) { n.read = true; changed = true; } });
+            if (changed) {
+                this.unreadCount = 0;
+                this.saveNotificationsToStorage();
+                this.updateNotificationBadge();
+                this.renderNotificationList();
+            }
+        }
+    }
+
+    dismissNotification(id) {
+        const idx = this.notifications.findIndex(n => n.id === id);
+        if (idx !== -1) {
+            // Adjust unread count if still unread
+            if (this.notifications[idx].read === false && this.unreadCount > 0) {
+                this.unreadCount--;
+            }
+            this.notifications.splice(idx, 1);
+            this.saveNotificationsToStorage();
+            this.renderNotificationList();
+            this.updateNotificationBadge();
+        }
+    }
+
+    clearAllNotifications() {
+        this.notifications = [];
+        this.unreadCount = 0;
+        this.saveNotificationsToStorage();
+        this.renderNotificationList();
+        this.updateNotificationBadge();
     }
     
     lockScreen() {
@@ -517,6 +645,15 @@ function openTerminalHere() {
 
 function openSettings() {
     window.corridorOS.openApp('settings');
+}
+
+// Notification Center global bindings
+function toggleNotificationsPanel() {
+    window.corridorOS.toggleNotificationsPanel();
+}
+
+function clearAllNotifications() {
+    window.corridorOS.clearAllNotifications();
 }
 
 // Initialize Corridor OS when DOM is loaded

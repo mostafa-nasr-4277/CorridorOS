@@ -12,7 +12,7 @@
 
 [[redirects]]
   from = "/"
-  to = "/corridoros_advanced.html"
+  to = "/index.html"
   status = 200
 
 [[redirects]]
@@ -20,6 +20,15 @@
   to = "/corridoros_dashboard.html"
   status = 200
 
+[[redirects]]
+  from = "/advanced"
+  to = "/corridoros_detailed.html"
+  status = 200
+
+[[redirects]]
+  from = "/detailed"
+  to = "/corridoros_detailed.html"
+  status = 200
 [[redirects]]
   from = "/simulator"
   to = "/corridoros_simulator.html"

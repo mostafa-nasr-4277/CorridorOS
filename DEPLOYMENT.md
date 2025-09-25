@@ -49,7 +49,7 @@ netlify login
 ```
 COS/
 ├── index.html              # Landing page
-├── corridoros_advanced.html # Main OS simulator
+├── corridoros_detailed.html # Main OS simulator (renamed from advanced)
 ├── corridoros_dashboard.html # Engineering dashboard
 ├── corridoros_simulator.html # Quick demo
 ├── netlify.toml            # Netlify configuration
@@ -74,7 +74,7 @@ COS/
 
 ## 🎯 URLs After Deployment
 - **Main Site**: `https://your-site.netlify.app/`
-- **OS Simulator**: `https://your-site.netlify.app/corridoros_advanced.html`
+- **OS Simulator**: `https://your-site.netlify.app/corridoros_detailed.html`
 - **Dashboard**: `https://your-site.netlify.app/dashboard`
 <!-- Quick Demo removed in v4: simulator page no longer linked. -->
 

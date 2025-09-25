@@ -31,6 +31,10 @@
 .co-back{position:relative;display:inline-flex;gap:.5rem;align-items:center;padding:.45rem .8rem;border-radius:999px;background:rgba(38,230,255,.08);border:1px solid rgba(38,230,255,.35);color:var(--co-text);text-decoration:none;font-weight:600;transition:all .2s ease}
 .co-back:hover{background:rgba(38,230,255,.16);box-shadow:0 0 16px rgba(38,230,255,.25);transform:translateY(-1px)}
 
+/* High-contrast variant for light headers */
+.co-back--solid{background:linear-gradient(135deg,#2a5298 0%, #1e3c72 100%);color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(42,82,152,.35)}
+.co-back--solid:hover{filter:brightness(1.05);box-shadow:0 8px 22px rgba(42,82,152,.45)}
+
 /* Boot icons row */
 .co-boot-icons{display:flex;gap:18px;align-items:center;justify-content:center;margin-top:14px}
 .co-boot-icons img{height:28px;width:28px;opacity:.95;filter:drop-shadow(0 0 8px rgba(38,230,255,.4))}

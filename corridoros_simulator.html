@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CorridorOS - Photonic Operating System</title>
+    <link rel="stylesheet" href="brand/corridoros-brand.css">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -91,7 +92,7 @@
         }
         
         .install-btn {
-            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            background: var(--co-prism);
             border: none;
             color: white;
             padding: 1rem 3rem;
@@ -488,6 +489,7 @@
     </style>
 </head>
 <body>
+    <a href="index.html" class="co-back co-back--solid co-exit" title="Back to Home">Home</a>
     <!-- Boot/Installation Screen -->
     <div class="boot-screen" id="bootScreen">
         <div class="corridor-backdrop"></div>

@@ -55,6 +55,10 @@
                 <div class="clock" id="desktop-clock"></div>
             </div>
             <div class="panel-right">
+                <button class="panel-button" id="notificationsToggle" title="Notifications" onclick="toggleNotificationsPanel()">
+                    <span class="icon">🔔</span>
+                    <span class="badge" id="notificationsBadge" style="display:none;">0</span>
+                </button>
                 <button class="panel-button" onclick="openApp('network-manager')">
                     <span class="icon">📶</span>
                 </button>
@@ -221,8 +225,21 @@
             </div>
         </div>
 
-        <!-- Notifications -->
+        <!-- Toast Notifications (ephemeral) -->
         <div id="notifications" class="notifications"></div>
+
+        <!-- Notifications Panel (persistent) -->
+        <aside id="notifications-panel" class="notifications-panel" aria-hidden="true">
+            <div class="notifications-header">
+                <div class="title">Notifications</div>
+                <div class="actions">
+                    <button class="clear-all" onclick="clearAllNotifications()" title="Clear all">Clear All</button>
+                    <button class="close-panel" onclick="toggleNotificationsPanel()" title="Close">×</button>
+                </div>
+            </div>
+            <div id="notifications-list" class="notifications-list" role="list"></div>
+            <div id="notifications-empty" class="notifications-empty" style="display:none;">No notifications</div>
+        </aside>
     </div>
 
     <!-- Lock Screen -->

@@ -238,7 +238,7 @@
             <p>Photonic Interconnect & Free-Form Memory Management Console</p>
         </div>
         <div>
-            <a href="index.html" class="co-back" title="Back to Home">← Exit Dashboard</a>
+            <a href="index.html" class="co-back co-back--solid" title="Back to Home">← Exit Dashboard</a>
         </div>
     </div>
     
@@ -370,7 +370,7 @@
       </nav>
     </div>
     <!-- Optional floating back button -->
-    <a href="index.html" class="co-back co-exit" title="Back to Home">Home</a>
+    <a href="index.html" class="co-back co-back--solid co-exit" title="Back to Home">Home</a>
     
     <script>
         // Environment + service endpoints
@@ -709,6 +709,20 @@
         // Initialize
         checkServiceStatus();
         setInterval(checkServiceStatus, 10000); // Check every 10 seconds
+
+        // Auto-activate a corridor once per session using default form values
+        (async function autoActivateOnce(){
+            try {
+                const already = sessionStorage.getItem('autoCorridorActivated');
+                if (!already) {
+                    await allocateCorridor();
+                    sessionStorage.setItem('autoCorridorActivated', '1');
+                }
+            } catch (e) {
+                // Non-fatal
+                console.warn('Auto corridor activation failed:', e);
+            }
+        })();
     </script>
 </body>
 </html>

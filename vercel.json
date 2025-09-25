@@ -22,7 +22,11 @@
     },
     {
       "src": "/advanced",
-      "dest": "/corridoros_advanced.html"
+      "dest": "/corridoros_detailed.html"
+    },
+    {
+      "src": "/detailed",
+      "dest": "/corridoros_detailed.html"
     }
   ],
   "headers": [
