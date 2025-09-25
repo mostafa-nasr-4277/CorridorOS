@@ -38,11 +38,16 @@ class CorridorOSProfessional {
             }
         };
         
+        this.bootSpeedKey = 'corridoros-boot-speed';
+        this.fastBootKey = 'corridoros-fast-boot';
+        this.bootSpeedFactor = this.readBootSpeedFactor();
+
         this.init();
     }
     
     init() {
         this.setupEventListeners();
+        this.wireFastBootToggle();
         this.startBootSequence();
         this.updateClock();
         setInterval(() => this.updateClock(), 1000);
@@ -66,16 +71,17 @@ class CorridorOSProfessional {
     }
     
     async startBootSequence() {
+        const SPEED = this.bootSpeedFactor || 0.5; // default twice as fast
         const bootSteps = [
-            { message: 'Initializing quantum substrate...', duration: 600 },
-            { message: 'Loading photonic drivers...', duration: 400 },
-            { message: 'Calibrating optical pathways...', duration: 500 },
-            { message: 'Starting memory mesh...', duration: 400 },
-            { message: 'Initializing heliopass sensors...', duration: 300 },
-            { message: 'Loading thermal equilibrium model...', duration: 400 },
-            { message: 'Starting professional services...', duration: 400 },
-            { message: 'Loading user environment...', duration: 300 },
-            { message: 'Corridor OS Professional ready!', duration: 400 }
+            { message: 'Initializing quantum substrate...', duration: 600 * SPEED },
+            { message: 'Loading photonic drivers...', duration: 400 * SPEED },
+            { message: 'Calibrating optical pathways...', duration: 500 * SPEED },
+            { message: 'Starting memory mesh...', duration: 400 * SPEED },
+            { message: 'Initializing heliopass sensors...', duration: 300 * SPEED },
+            { message: 'Loading thermal equilibrium model...', duration: 400 * SPEED },
+            { message: 'Starting professional services...', duration: 400 * SPEED },
+            { message: 'Loading user environment...', duration: 300 * SPEED },
+            { message: 'Corridor OS Professional ready!', duration: 400 * SPEED }
         ];
         
         const progressFill = document.getElementById('boot-progress-fill');
@@ -90,8 +96,53 @@ class CorridorOSProfessional {
         }
         
         // Boot complete
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, Math.max(100, 150 * SPEED)));
         this.completeBootSequence();
+    }
+
+    readBootSpeedFactor() {
+        try {
+            const url = new URL(window.location.href);
+            const q = url.searchParams;
+            if (q.get('instant') === '1') return 0.05;
+            const fromParam = q.get('bootFactor') || q.get('speed');
+            if (fromParam) {
+                const f = Math.max(0.05, Math.min(1, parseFloat(fromParam)));
+                if (!isNaN(f)) {
+                    localStorage.setItem(this.bootSpeedKey, String(f));
+                    return f;
+                }
+            }
+            if (q.get('fastboot') === '1' || q.get('fast') === '1') {
+                localStorage.setItem(this.fastBootKey, '1');
+            }
+            const storedFactor = parseFloat(localStorage.getItem(this.bootSpeedKey) || '');
+            if (!isNaN(storedFactor)) return Math.max(0.05, Math.min(1, storedFactor));
+            const fast = localStorage.getItem(this.fastBootKey) === '1';
+            return fast ? 0.2 : 0.3; // default: reasonably fast
+        } catch (_) {
+            return 0.3;
+        }
+    }
+
+    wireFastBootToggle() {
+        const el = document.getElementById('fast-boot-toggle');
+        if (!el) return;
+        const isFast = (this.bootSpeedFactor || 0.5) <= 0.2;
+        el.checked = isFast;
+        el.addEventListener('change', () => {
+            const fast = el.checked;
+            if (fast) {
+                localStorage.setItem(this.fastBootKey, '1');
+                localStorage.setItem(this.bootSpeedKey, '0.2');
+                this.bootSpeedFactor = 0.2;
+            } else {
+                localStorage.removeItem(this.fastBootKey);
+                localStorage.setItem(this.bootSpeedKey, '0.5');
+                this.bootSpeedFactor = 0.5;
+            }
+            // No toast here to keep Pro splash clean
+        });
     }
     
     completeBootSequence() {
@@ -562,4 +613,3 @@ const professionalCSS = `
 const professionalStyle = document.createElement('style');
 professionalStyle.textContent = professionalCSS;
 document.head.appendChild(professionalStyle);
-

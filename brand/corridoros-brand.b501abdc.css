@@ -1,0 +1,51 @@
+/* CorridorOS Brand System */
+:root{
+  /* Base */
+  --co-bg-900:#0B1220; --co-bg-800:#111827; --co-panel-700:#141B2D;
+  --co-text:#DBEAFE; --co-text-dim:#9FB3D9;
+
+  /* Accents */
+  --co-cyan:#26E6FF; --co-teal:#00C8E6; --co-orange:#FF7A1A;
+  --co-magenta:#FF2E6E; --co-violet:#7B5CFF; --co-lime:#A6FF3C;
+
+  /* Status */
+  --co-ok:#28A745; --co-warn:#FFC14A; --co-err:#DC3545;
+
+  --co-radius:16px; --co-gap:16px;
+  --co-border:1px solid rgba(255,255,255,.08);
+  --co-glow:0 0 24px rgba(38,230,255,.25);
+  --co-prism:linear-gradient(90deg,#FF2E6E 0%,#FF7A1A 20%,#FFC14A 40%,#A6FF3C 60%,#26E6FF 80%,#7B5CFF 100%);
+}
+
+/* General helpers */
+.co-card{background:rgba(20,27,45,.96);border:var(--co-border);border-radius:var(--co-radius);box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.co-card:focus-within{box-shadow:var(--co-glow)}
+
+.co-btn{background:linear-gradient(135deg,#1e3c72 0%, #2a5298 100%);color:#fff;border-radius:10px;padding:.65rem 1.05rem;font-weight:600;border:0;cursor:pointer}
+.co-btn--accent{background:var(--co-prism);color:#0B1220}
+
+.co-icon{filter:drop-shadow(0 0 8px rgba(38,230,255,.45));color:var(--co-cyan)}
+.co-icon-s{height:22px;width:22px;vertical-align:middle;margin-right:8px;filter:drop-shadow(0 0 6px rgba(38,230,255,.35))}
+
+/* Back/Exit chip */
+.co-back{position:relative;display:inline-flex;gap:.5rem;align-items:center;padding:.45rem .8rem;border-radius:999px;background:rgba(38,230,255,.08);border:1px solid rgba(38,230,255,.35);color:var(--co-text);text-decoration:none;font-weight:600;transition:all .2s ease}
+.co-back:hover{background:rgba(38,230,255,.16);box-shadow:0 0 16px rgba(38,230,255,.25);transform:translateY(-1px)}
+
+/* High-contrast variant for light headers */
+.co-back--solid{background:linear-gradient(135deg,#2a5298 0%, #1e3c72 100%);color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(42,82,152,.35)}
+.co-back--solid:hover{filter:brightness(1.05);box-shadow:0 8px 22px rgba(42,82,152,.45)}
+
+/* Boot icons row */
+.co-boot-icons{display:flex;gap:18px;align-items:center;justify-content:center;margin-top:14px}
+.co-boot-icons img{height:28px;width:28px;opacity:.95;filter:drop-shadow(0 0 8px rgba(38,230,255,.4))}
+
+/* Floating exit button for pages */
+.co-exit{position:fixed;right:18px;bottom:18px;z-index:9999}
+
+/* Global bottom dock */
+.co-dock{position:fixed;left:0;right:0;bottom:0;z-index:9998;display:flex;justify-content:center;pointer-events:none}
+.co-dock-inner{pointer-events:auto;display:flex;gap:14px;align-items:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(20,27,45,.55);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:8px 12px;margin:10px auto;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.co-dock-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;text-decoration:none;color:var(--co-text-dim);min-width:60px;transition:transform .18s ease, background .18s ease, box-shadow .18s ease}
+.co-dock-item:hover{transform:translateY(-4px);background:rgba(255,255,255,.06);box-shadow:0 0 18px rgba(38,230,255,.25)}
+.co-dock-item img{width:26px;height:26px;filter:drop-shadow(0 0 8px rgba(38,230,255,.4))}
+.co-dock-item span{font-size:11px;font-weight:600;letter-spacing:.02em}

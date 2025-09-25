@@ -319,6 +319,14 @@
             user-select: none;
             box-shadow: inset 0 -1px 0 rgba(0,0,0,.4), 0 8px 20px rgba(0,0,0,.25);
         }
+
+        /* Contextual toolbar in Settings header */
+        .settings-toolbar { margin-left: 12px; display: none; align-items: center; gap: 10px; }
+        .settings-toolbar.show { display: flex; }
+        .toolbar-select { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); color:#e6e6e6; border-radius:8px; padding:6px 8px; font-size: 12px; cursor: default; }
+        .toolbar-slider { width: 120px; accent-color: #00d4ff; cursor: default; }
+        .icon-btn { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color:#e6e6e6; border-radius:8px; padding:6px 8px; cursor:pointer; }
+        .icon-btn:hover { background: rgba(255,255,255,.16); }
         
         .window-title {
             flex: 1;
@@ -853,6 +861,9 @@
         </div>
         
         <div class="install-section">
+            <label style="display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;color:#bbb;">
+                <input type="checkbox" id="fastInstallToggle" style="accent-color:#00d4ff;"> ⚡ Fast Boot
+            </label>
             <button class="install-btn" id="installBtn" onclick="startInstallation()">
                 INITIALIZE SYSTEM
             </button>
@@ -884,6 +895,10 @@
                     <button class="desktop-icon" data-id="settings" draggable="true" onclick="openWindow('settings')" ondblclick="openWindow('settings')" title="Settings" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
                         <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">⚙️</span>
                         <span style="font-size:12px;">Settings</span>
+                    </button>
+                    <button class="desktop-icon" data-id="trash" draggable="true" onclick="openWindow('trash')" ondblclick="openWindow('trash')" title="Trash" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                        <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">🗑️</span>
+                        <span style="font-size:12px;">Trash</span>
                     </button>
                 </div>
             </div>
@@ -1008,6 +1023,28 @@
                 <div style="font-size:12px;color:#9aa5b1;">Now Playing: Photonic Suite in C♯</div>
             </div>
         </div>
+
+        <!-- Trash / Recycling Bin -->
+        <div class="window" id="trash" style="top:18%;left:44%;display:none;min-width:520px;min-height:340px;">
+            <div class="window-header">
+                <div class="window-title">🗑️ Trash</div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('trash')"></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div id="trashBody" style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="display:flex;align-items:center;gap:10px; border-bottom:1px solid rgba(255,255,255,.1); padding-bottom:8px;">
+                        <button id="emptyTrashBtn" class="fm-btn" style="cursor:pointer;">Empty Trash</button>
+                        <span id="trashCount" style="color:#9aa5b1; font-size:12px;">0 items</span>
+                    </div>
+                    <div id="trashList" class="file-grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));"></div>
+                    <div id="trashEmptyState" style="text-align:center;color:#9aa5b1;margin-top:20px;">Trash is empty</div>
+                </div>
+            </div>
+        </div>
         
         <div class="window system-monitor" id="systemMonitor">
             <div class="window-header">
@@ -1047,6 +1084,7 @@
         <div class="window settings" id="settings">
             <div class="window-header">
                 <div class="window-title">⚙️ System Preferences</div>
+                <div class="settings-toolbar" id="settingsToolbar" aria-label="Context actions"></div>
                 <div class="window-controls">
                     <div class="window-control minimize"></div>
                     <div class="window-control maximize"></div>
@@ -1213,6 +1251,7 @@
                 <div class="app-icon" onclick="openWindow('textEditor')" title="Text Editor">📝</div>
                 <div class="app-icon" onclick="openWindow('imageViewer')" title="Image Viewer">🖼️</div>
                 <div class="app-icon" onclick="openWindow('musicPlayer')" title="Music Player">🎵</div>
+                <div class="app-icon" onclick="openWindow('trash')" title="Trash">🗑️</div>
                 <div class="app-icon" onclick="openWindow('settings')" title="System Preferences">⚙️</div>
             </div>
         </div>
@@ -1347,9 +1386,16 @@
                 progressLabel.textContent = step.label;
                 
                 installationStep++;
-                setTimeout(installCorridorOS, 1500 + Math.random() * 1000);
+                // Speed factor from toggle/URL/localStorage
+                const fast = document.getElementById('fastInstallToggle')?.checked || new URLSearchParams(location.search).get('fastboot')==='1' || localStorage.getItem('corridoros-fast-boot')==='1';
+                const instant = new URLSearchParams(location.search).get('instant')==='1';
+                let delay = 600 + Math.random() * 400; // reasonably fast baseline
+                if (fast) delay = 350 + Math.random() * 250; // much faster
+                if (instant) delay = 60; // nearly instant sweep
+                setTimeout(installCorridorOS, delay);
             } else {
-                setTimeout(completeInstallation, 1000);
+                const instant = new URLSearchParams(location.search).get('instant')==='1';
+                setTimeout(completeInstallation, instant ? 100 : 400);
             }
         }
         
@@ -1580,6 +1626,18 @@
             if (windowId === 'fileManager') {
                 if (!window.__fmInited) { initFileManager(); window.__fmInited = true; }
             }
+            if (windowId === 'trash') {
+                const btn = document.getElementById('emptyTrashBtn');
+                if (btn && !btn.__bound) {
+                    btn.addEventListener('click', ()=>{
+                        document.getElementById('trashList').innerHTML='';
+                        const c = document.getElementById('trashCount'); if (c) c.textContent = '0 items';
+                        const empty = document.getElementById('trashEmptyState'); if (empty) empty.style.display='block';
+                        showNotificationDetailed('Trash', 'Emptied successfully');
+                    });
+                    btn.__bound = true;
+                }
+            }
         }
         
         function autoSizeWindow(window, windowId) {
@@ -1592,7 +1650,8 @@
                 'settings': { width: '700px', height: '550px' },
                 'textEditor': { width: '700px', height: '460px' },
                 'imageViewer': { width: '620px', height: '420px' },
-                'musicPlayer': { width: '620px', height: '280px' }
+                'musicPlayer': { width: '620px', height: '280px' },
+                'trash': { width: '600px', height: '380px' }
             };
             
             if (sizes[windowId]) {
@@ -1623,18 +1682,21 @@
             });
             
             activeWindows.forEach(windowId => {
-                const iconMap = {
-                    'fileManager': 0,
-                    'terminal': 1,
-                    'browser': 2,
-                    'systemMonitor': 3,
-                    'settings': 4
+                const icons = Array.from(document.querySelectorAll('.taskbar .app-icon'));
+                const titleMap = {
+                    'fileManager': 'File Manager',
+                    'terminal': 'Terminal',
+                    'browser': 'Browser',
+                    'systemMonitor': 'System Monitor',
+                    'textEditor': 'Text Editor',
+                    'imageViewer': 'Image Viewer',
+                    'musicPlayer': 'Music Player',
+                    'trash': 'Trash',
+                    'settings': 'System Preferences'
                 };
-                
-                const iconIndex = iconMap[windowId];
-                if (iconIndex !== undefined) {
-                    document.querySelectorAll('.app-icon')[iconIndex].classList.add('active');
-                }
+                const title = titleMap[windowId];
+                const el = icons.find(i => i.getAttribute('title') === title);
+                if (el) el.classList.add('active');
             });
         }
         
@@ -1825,8 +1887,66 @@
                     e.target.classList.add('active');
                     const panelId = e.target.dataset.category + 'Panel';
                     document.getElementById(panelId).classList.add('active');
+                    // Update header toolbar for the selected category
+                    renderSettingsToolbar(e.target.dataset.category);
                 });
             });
+            // Initial toolbar state (based on default active category)
+            const activeCat = document.querySelector('.settings-category.active')?.dataset.category || 'general';
+            renderSettingsToolbar(activeCat);
+        }
+
+        // Contextual actions next to the Settings title
+        function renderSettingsToolbar(category){
+            const tb = document.getElementById('settingsToolbar');
+            if (!tb) return;
+            tb.innerHTML = '';
+            tb.classList.remove('show');
+
+            if (category === 'audio') {
+                const currentVol = parseInt(document.getElementById('masterVolume')?.value || '75', 10);
+                const currentOut = document.getElementById('audioOutput')?.value || 'speakers';
+                tb.innerHTML = `
+                    <button class="icon-btn" id="toolbarMute" title="Mute">🔇</button>
+                    <input type="range" id="toolbarVolume" class="toolbar-slider" min="0" max="100" value="${currentVol}"/>
+                    <select id="toolbarOutput" class="toolbar-select">
+                        <option value=\"speakers\">Built-in Speakers</option>
+                        <option value=\"headphones\">Headphones</option>
+                        <option value=\"bluetooth\">Bluetooth Audio</option>
+                    </select>
+                `;
+                tb.classList.add('show');
+                // Sync output device
+                const sel = tb.querySelector('#toolbarOutput');
+                if (sel) sel.value = currentOut;
+                sel?.addEventListener('change', (e)=>{
+                    const val = e.target.value; const out = document.getElementById('audioOutput'); if (out){ out.value = val; }
+                    showNotificationDetailed('Audio Output', `Switched to ${val.replace(/^./,c=>c.toUpperCase())}`);
+                });
+                // Sync volume
+                const vol = tb.querySelector('#toolbarVolume');
+                vol?.addEventListener('input', (e)=>{
+                    const v = parseInt(e.target.value,10);
+                    const mv = document.getElementById('masterVolume');
+                    if (mv) { mv.value = String(v); }
+                    const mvLabel = document.getElementById('masterVolumeValue'); if (mvLabel) mvLabel.textContent = `${v}%`;
+                });
+                vol?.addEventListener('change', (e)=>{
+                    const v = parseInt(e.target.value,10); changeVolume('master', v);
+                });
+                // Mute toggle preserves last volume
+                let lastVol = currentVol;
+                tb.querySelector('#toolbarMute')?.addEventListener('click', ()=>{
+                    const mv = document.getElementById('masterVolume');
+                    const volInput = tb.querySelector('#toolbarVolume');
+                    if (!mv || !volInput) return;
+                    const now = parseInt(mv.value,10);
+                    if (now > 0) { lastVol = now; mv.value = '0'; volInput.value = '0'; changeVolume('master', 0); }
+                    else { mv.value = String(lastVol); volInput.value = String(lastVol); changeVolume('master', lastVol); }
+                });
+                // Prevent window-drag when interacting
+                tb.addEventListener('mousedown', (e)=>{ e.stopPropagation(); });
+            }
         }
         
         function changeTheme(theme) {

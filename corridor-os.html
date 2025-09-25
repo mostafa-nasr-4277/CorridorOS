@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corridor OS v4 - Hybrid Quantum-Photonic Operating System</title>
     <meta name="corridoros-version" content="v4">
-    <link rel="stylesheet" href="corridor-os-styles.css">
-    <link rel="stylesheet" href="brand/corridoros-brand.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Ubuntu:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="corridor-os-styles.84d8f5a3.css">
+    <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.css">
+    <!-- Removed remote Google Fonts to avoid offline render blocking; rely on system fallbacks -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%2300d4ff'/></svg>">
 </head>
 <body>
@@ -29,6 +29,9 @@
                 <div class="progress-fill" id="boot-progress-fill"></div>
             </div>
             <div class="boot-status" id="boot-status">Initializing quantum substrate...</div>
+            <label for="fast-boot-toggle" style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;color:rgba(255,255,255,.85);font-size:13px;">
+                <input type="checkbox" id="fast-boot-toggle" style="accent-color:#00d4ff;"> ⚡ Fast Boot
+            </label>
         </div>
     </div>
 
@@ -257,24 +260,32 @@
     </div>
 
     <!-- Scripts -->
-    <script src="corridor-os.js"></script>
-    <script src="corridor-apps.js"></script>
-    <script src="corridor-settings.js"></script>
-    <script src="corridor-window-manager.js"></script>
+    <script src="corridor-os.e62b5411.js"></script>
+    <script src="corridor-apps.80c3fc57.js"></script>
+    <script src="corridor-settings.c33d2c77.js"></script>
+    <script src="corridor-window-manager.ce86a1db.js"></script>
     
     <!-- Include existing Corridor Computer scripts -->
-    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
-    <script src="ui-tilt.js"></script>
-    <script src="ui-menu.js"></script>
-    <script src="navigation.js"></script>
-    <script src="three-hero.js"></script>
-    <script src="auto-cycle.js"></script>
-    <script src="quantum.js"></script>
-    <script src="photon.js"></script>
-    <script src="memory.js"></script>
-    <script src="orchestrator.js"></script>
-    <script src="heliopass.js"></script>
-    <script src="thermal-model.js"></script>
-    <script src="main.js"></script>
+    <script src="https://unpkg.com/three@0.158.0/build/three.min.js" defer></script>
+    <script src="ui-tilt.b51314b6.js" defer></script>
+    <script src="ui-menu.81b02d2d.js" defer></script>
+    <script src="navigation.86de970c.js" defer></script>
+    <script src="three-hero.3cc2b982.js" defer></script>
+    <script src="auto-cycle.4e9369db.js" defer></script>
+    <script src="quantum.c1f0f509.js"></script>
+    <script src="photon.97ae7c85.js"></script>
+    <script src="memory.6733243c.js"></script>
+    <script src="orchestrator.d7eef59f.js"></script>
+    <script src="heliopass.3ddbc0d6.js"></script>
+    <script src="thermal-model.38b09692.js"></script>
+    <script src="main.8ebdafca.js"></script>
 </body>
+<script>
+  // Register service worker for offline support even when landing directly on OS page
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+    });
+  }
+</script>
 </html>

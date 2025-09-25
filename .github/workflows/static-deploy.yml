@@ -29,20 +29,29 @@ jobs:
       - name: Create curated deployment package
         run: |
           set -euo pipefail
-          echo "📦 Preparing _site/ for GitHub Pages"
+          echo "📦 Preparing _site/ for GitHub Pages from dist/"
           SITE_DIR="_site"
           rm -rf "$SITE_DIR" && mkdir "$SITE_DIR"
-          # Use cp -a to avoid rsync dependency; prune heavy/dev folders
-          shopt -s dotglob
-          for f in *; do
-            case "$f" in
-              .git|.github|node_modules|dist|deploy_artifact|_site) ;; # skip
-              daemon)              # remove built targets within daemon
-                cp -a "$f" "$SITE_DIR/" && find "$SITE_DIR/$f" -name target -type d -prune -exec rm -rf {} + || true ;;
-              *) cp -a "$f" "$SITE_DIR/" ;;
-            esac
-          done
-          shopt -u dotglob
+          
+          # Check if dist directory exists and has content
+          if [ -d "dist" ] && [ "$(ls -A dist)" ]; then
+            echo "✅ Using dist/ directory as source"
+            cp -a dist/* "$SITE_DIR/"
+          else
+            echo "⚠️  dist/ directory not found or empty, falling back to root files"
+            # Use cp -a to avoid rsync dependency; prune heavy/dev folders
+            shopt -s dotglob
+            for f in *; do
+              case "$f" in
+                .git|.github|node_modules|dist|deploy_artifact|_site) ;; # skip
+                daemon)              # remove built targets within daemon
+                  cp -a "$f" "$SITE_DIR/" && find "$SITE_DIR/$f" -name target -type d -prune -exec rm -rf {} + || true ;;
+                *) cp -a "$f" "$SITE_DIR/" ;;
+              esac
+            done
+            shopt -u dotglob
+          fi
+          
           # Additional pruning
           find "$SITE_DIR" -name "Cargo.lock" -delete || true
           find "$SITE_DIR" -name "*.rlib" -o -name "*.rmeta" -o -name "*.d" -delete || true
