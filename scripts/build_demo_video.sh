@@ -35,8 +35,9 @@ if [ -z "$FONT" ]; then
   echo "Warning: Could not find a standard font. If ffmpeg has fontconfig, it will use a default." >&2
 fi
 
-RES="1280x720"
+RES="1280x720"  # 16:9 exact to avoid any AR differences
 FPS=30
+ AUDIO_FILE="${AUDIO_FILE:-${1:-}}"
 
 # Slide text content
 cat > "$tmp_dir/s1_title.txt" <<'TXT'
@@ -99,6 +100,17 @@ cat > "$tmp_dir/s6_body.txt" <<'TXT'
 CorridorOS unifies photonic corridors, calibrated by HELIOPASS, with QoS memory and safe, pin‑free power delivery — observable and schedulable from day one.
 TXT
 
+# Soft-wrap helper to prevent text rendering outside frame
+wrapf() { local f="$1"; local w="$2"; fold -s -w "$w" "$f" > "$f.w" && mv "$f.w" "$f"; }
+
+# Wrap all text files to safe widths (empirically tuned for 1280x720 @ fontsizes below)
+wrapf "$tmp_dir/s1_title.txt" 36; wrapf "$tmp_dir/s1_sub.txt" 44; wrapf "$tmp_dir/s1_body.txt" 68
+wrapf "$tmp_dir/s2_title.txt" 36; wrapf "$tmp_dir/s2_sub.txt" 44; wrapf "$tmp_dir/s2_body.txt" 68
+wrapf "$tmp_dir/s3_title.txt" 36; wrapf "$tmp_dir/s3_sub.txt" 44; wrapf "$tmp_dir/s3_body.txt" 68
+wrapf "$tmp_dir/s4_title.txt" 36; wrapf "$tmp_dir/s4_sub.txt" 44; wrapf "$tmp_dir/s4_body.txt" 68
+wrapf "$tmp_dir/s5_title.txt" 36; wrapf "$tmp_dir/s5_sub.txt" 44; wrapf "$tmp_dir/s5_body.txt" 68
+wrapf "$tmp_dir/s6_title.txt" 36; wrapf "$tmp_dir/s6_sub.txt" 44; wrapf "$tmp_dir/s6_body.txt" 68
+
 make_slide() {
   local id="$1"; shift
   local dur="$1"; shift
@@ -115,9 +127,9 @@ make_slide() {
   ffmpeg -v error -y \
     -f lavfi -i "color=c=${bg}:s=${RES}:d=${dur},format=yuv420p" \
     -vf "\
-      drawtext=textfile='${title}'${font_opt}:fontcolor=white:fontsize=48:x=(w-text_w)/2:y=h*0.28:borderw=1:bordercolor=black@0.4,\
-      drawtext=textfile='${sub}'${font_opt}:fontcolor=0x99bbdd:fontsize=32:x=(w-text_w)/2:y=h*0.38:borderw=1:bordercolor=black@0.35,\
-      drawtext=textfile='${body}'${font_opt}:fontcolor=0xE8E8F0:fontsize=26:line_spacing=8:x=(w-text_w)/2:y=h*0.50:box=1:boxcolor=black@0.20:boxborderw=16" \
+      drawtext=textfile='${title}'${font_opt}:fontcolor=white:fontsize=48:x=(w-text_w)/2:y=h*0.32:borderw=1.5:bordercolor=black@0.45,\
+      drawtext=textfile='${sub}'${font_opt}:fontcolor=0x99bbdd:fontsize=30:x=(w-text_w)/2:y=h*0.42:borderw=1.2:bordercolor=black@0.35,\
+      drawtext=textfile='${body}'${font_opt}:fontcolor=0xE8E8F0:fontsize=24:line_spacing=6:x=(w-text_w)/2:y=h*0.60:box=1:boxcolor=black@0.20:boxborderw=12" \
     -r ${FPS} -c:v libx264 -pix_fmt yuv420p -profile:v high -movflags +faststart -crf 20 -preset veryfast \
     "$out"
 }
@@ -138,22 +150,29 @@ ffmpeg -v error -y \
   -c:v libx264 -pix_fmt yuv420p -profile:v high -movflags +faststart -crf 20 -preset veryfast \
   "$out_dir/corridoros-demo.mp4"
 
-echo "[3/4] Synthesizing background music (ambient)"
-# Procedural ambient pad: layered sines + gentle tremolo + pink noise texture
-ffmpeg -v error -y -filter_complex "\
-  sine=frequency=220:duration=180:sample_rate=48000:beep_factor=0 [a1];\
-  sine=frequency=261.63:duration=180:sample_rate=48000:beep_factor=0,volume=0.8 [a2];\
-  sine=frequency=329.63:duration=180:sample_rate=48000:beep_factor=0,volume=0.7 [a3];\
-  sine=frequency=440:duration=180:sample_rate=48000:beep_factor=0,tremolo=f=0.2:d=0.6,volume=0.6 [a4];\
-  anoisesrc=color=pink:duration=180:sample_rate=48000,lowpass=f=800,volume=0.03 [n];\
-  [a1][a2][a3][a4][n]amix=inputs=5:normalize=0,volume=0.25,\
-  afade=t=in:st=0:d=3,afade=t=out:st=177:d=3,\
-  aformat=sample_rates=48000:channel_layouts=stereo" \
-  -c:a aac -b:a 128k "$tmp_dir/music.m4a"
+audio_src=""
+if [ -n "$AUDIO_FILE" ] && [ -f "$AUDIO_FILE" ]; then
+  echo "[3/4] Using provided audio: $AUDIO_FILE"
+  audio_src="$AUDIO_FILE"
+else
+  echo "[3/4] Synthesizing background music (ambient)"
+  # Procedural ambient pad: layered sines + gentle tremolo + pink noise texture
+  ffmpeg -v error -y -filter_complex "\
+    sine=frequency=220:duration=180:sample_rate=48000:beep_factor=0 [a1];\
+    sine=frequency=261.63:duration=180:sample_rate=48000:beep_factor=0,volume=0.8 [a2];\
+    sine=frequency=329.63:duration=180:sample_rate=48000:beep_factor=0,volume=0.7 [a3];\
+    sine=frequency=440:duration=180:sample_rate=48000:beep_factor=0,tremolo=f=0.2:d=0.6,volume=0.6 [a4];\
+    anoisesrc=color=pink:duration=180:sample_rate=48000,lowpass=f=800,volume=0.03 [n];\
+    [a1][a2][a3][a4][n]amix=inputs=5:normalize=0,volume=0.25,\
+    afade=t=in:st=0:d=3,afade=t=out:st=177:d=3,\
+    aformat=sample_rates=48000:channel_layouts=stereo" \
+    -c:a aac -b:a 128k "$tmp_dir/music.m4a"
+  audio_src="$tmp_dir/music.m4a"
+fi
 
 echo "[4/4] Muxing music into video and producing WebM"
 # Mux audio into MP4
-ffmpeg -v error -y -i "$out_dir/corridoros-demo.mp4" -i "$tmp_dir/music.m4a" \
+ffmpeg -v error -y -i "$out_dir/corridoros-demo.mp4" -i "$audio_src" \
   -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 128k -shortest \
   "$out_dir/corridoros-demo.tmp.mp4" && mv "$out_dir/corridoros-demo.tmp.mp4" "$out_dir/corridoros-demo.mp4"
 
