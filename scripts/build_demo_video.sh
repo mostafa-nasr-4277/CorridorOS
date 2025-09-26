@@ -47,7 +47,7 @@ cat > "$tmp_dir/s1_sub.txt" <<'TXT'
 Reserve Light. Guarantee Memory.
 TXT
 cat > "$tmp_dir/s1_body.txt" <<'TXT'
-A three-minute walkthrough: photonic corridors (λ lanes), Free‑Form Memory (CXL) with bandwidth floors, HELIOPASS calibration, and system safety.
+A 2‑minute tour: photonic corridors (λ lanes), Free‑Form Memory (CXL) with bandwidth floors, HELIOPASS calibration, and system safety.
 TXT
 
 cat > "$tmp_dir/s2_title.txt" <<'TXT'

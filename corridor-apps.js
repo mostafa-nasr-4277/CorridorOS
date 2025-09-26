@@ -184,7 +184,7 @@ class CorridorApps {
                         id: 'intro',
                         title: 'CorridorOS: Theory of Compute',
                         subtitle: 'Reserve Light. Guarantee Memory.',
-                        content: 'A two‑minute walkthrough: photonic corridors (λ lanes), Free‑Form Memory (CXL) with bandwidth floors, HELIOPASS calibration, and system safety.',
+                        content: 'A 2‑minute tour: photonic corridors (λ lanes), Free‑Form Memory (CXL) with bandwidth floors, HELIOPASS calibration, and system safety.',
                         bg: 'linear-gradient(135deg, #0a0412, #1a0a2e)',
                         durationMs: 12000
                     },
