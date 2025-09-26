@@ -203,12 +203,12 @@ class CorridorApps {
                                     for (const [k, v] of Object.entries(d.sensors)) {
                                         lines.push(`${k}: ${v.value.toFixed(3)} ${v.unit}`);
                                     }
-                                    return `<div class=\"heliopass-banner\"><span>${
+                                    return `<div class="heliopass-banner"><span>${
                                         `HELIOPASS offset: ${d.backgroundOffset.toFixed(3)} · ` + lines.join(' · ')
                                     }</span></div>`;
                                 }
                             } catch (e) {}
-                            return '<div class=\"heliopass-banner\"><span>HELIOPASS live data unavailable — running static demo.</span></div>';
+                            return '<div class="heliopass-banner"><span>HELIOPASS live data unavailable — running static demo.</span></div>';
                         }
                     },
                     {
@@ -234,23 +234,23 @@ class CorridorApps {
                         content: 'Corridor-class devices can receive power without exposed pins: 1) Capacitive/inductive (contactless) couplers with pre-charge; 2) Flush conductive pads with current sharing. The included tactile-power-toolkit helps size pads, pre-charge, and compensation networks.',
                         bg: 'linear-gradient(135deg, #1a1a1a, #2b2b2b)',
                         durationMs: 35000,
-                        extra: `<div class=\"tp-diagram\">
-  <div class=\"tp-row\">
-    <div class=\"tile\">
-      <div class=\"magnet\">N</div>
-      <div class=\"pad a\"></div>
-      <div class=\"pad b\"></div>
-      <div class=\"magnet\">S</div>
+                        extra: `<div class="tp-diagram">
+  <div class="tp-row">
+    <div class="tile">
+      <div class="magnet">N</div>
+      <div class="pad a"></div>
+      <div class="pad b"></div>
+      <div class="magnet">S</div>
     </div>
-    <div class=\"gap\">≈1–3mm</div>
-    <div class=\"tile\">
-      <div class=\"magnet\">S</div>
-      <div class=\"pad a\"></div>
-      <div class=\"pad b\"></div>
-      <div class=\"magnet\">N</div>
+    <div class="gap">≈1–3mm</div>
+    <div class="tile">
+      <div class="magnet">S</div>
+      <div class="pad a"></div>
+      <div class="pad b"></div>
+      <div class="magnet">N</div>
     </div>
   </div>
-  <div class=\"tp-caption\">Pin-free: magnet alignment + dual pads (or IPT/CPT couplers) with pre-charge for inrush safety.</div>
+  <div class="tp-caption">Pin-free: magnet alignment + dual pads (or IPT/CPT couplers) with pre-charge for inrush safety.</div>
 </div>`
                     },
                     {
@@ -297,20 +297,20 @@ class CorridorApps {
               .gap { color: #9aa; font-size: 12px; }
               .tp-caption { margin-top: 8px; font-size: 12px; color: #bcd; text-align: center; }
             </style>
-            <div class=\"vp-app\" id=\"vp-${appId}\">
-              <div class=\"vp-stage\" id=\"vp-stage-${appId}\">
+            <div class="vp-app" id="vp-${appId}">
+              <div class="vp-stage" id="vp-stage-${appId}">
                 ${this._renderSlide(this._presentation.slides[0])}
               </div>
-              <div class=\"vp-footer\">
-                <div class=\"vp-controls\">
-                  <button class=\"vp-btn\" onclick=\"corridorApps._prevSlide()\">⟨ Prev</button>
-                  <button class=\"vp-btn\" id=\"vp-playbtn\" onclick=\"corridorApps._togglePlay()\">▶ Play</button>
-                  <button class=\"vp-btn\" onclick=\"corridorApps._nextSlide()\">Next ⟩</button>
-                  <button class=\"vp-btn\" onclick=\"corridorApps._resetPresentation()\">⟲ Restart</button>
+              <div class="vp-footer">
+                <div class="vp-controls">
+                  <button class="vp-btn" onclick="corridorApps._prevSlide()">⟨ Prev</button>
+                  <button class="vp-btn" id="vp-playbtn" onclick="corridorApps._togglePlay()">▶ Play</button>
+                  <button class="vp-btn" onclick="corridorApps._nextSlide()">Next ⟩</button>
+                  <button class="vp-btn" onclick="corridorApps._resetPresentation()">⟲ Restart</button>
                 </div>
-                <div style=\"display:flex;align-items:center;gap:8px;min-width:40%;\">
-                  <div class=\"vp-progress\"><div id=\"vp-progress-bar\"></div></div>
-                  <div id=\"vp-time\" style=\"width:84px;text-align:right;\">0:00 / 3:00</div>
+                <div style="display:flex;align-items:center;gap:8px;min-width:40%;">
+                  <div class="vp-progress"><div id="vp-progress-bar"></div></div>
+                  <div id="vp-time" style="width:84px;text-align:right;">0:00 / 3:00</div>
                 </div>
               </div>
             </div>
@@ -320,11 +320,11 @@ class CorridorApps {
     _renderSlide(slide) {
         const extra = slide.render ? slide.render() : (slide.extra || '');
         return `
-          <div class=\"vp-slide\" style=\"background:${slide.bg}\">
-            <div class=\"vp-title\">${slide.title}</div>
-            <div class=\"vp-sub\">${slide.subtitle || ''}</div>
-            <div class=\"vp-body\">${slide.content || ''}${extra}</div>
-            <div style=\"opacity:.75;font-size:12px;\">Slide ${this._presentation.slides.indexOf(slide)+1} of ${this._presentation.slides.length}</div>
+          <div class="vp-slide" style="background:${slide.bg}">
+            <div class="vp-title">${slide.title}</div>
+            <div class="vp-sub">${slide.subtitle || ''}</div>
+            <div class="vp-body">${slide.content || ''}${extra}</div>
+            <div style="opacity:.75;font-size:12px;">Slide ${this._presentation.slides.indexOf(slide)+1} of ${this._presentation.slides.length}</div>
           </div>
         `;
     }
@@ -426,8 +426,6 @@ class CorridorApps {
         const r = (s % 60).toString().padStart(2, '0');
         return `${m}:${r}`;
     }
-
-    // Application Implementations
     createSettingsApp() {
         return window.corridorSettings.createSettingsWindow();
     }
