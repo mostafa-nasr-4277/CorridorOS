@@ -45,7 +45,7 @@ A revolutionary hybrid quantum-photonic operating system that combines classical
 ## 🚀 Quick Start
 
 ### Option 1: Web Browser (Recommended)
-1. Visit [https://redseaportal.com](https://redseaportal.com)
+1. Visit https://mostafa-nasr-4277.github.io/CorridorOS/
 2. The full Corridor OS will load automatically
 3. Use the Activities button or `Ctrl+Space` to explore applications
 
@@ -129,13 +129,10 @@ python3 create-bootable-iso.py
 # Files will be created in ./dist/
 ```
 
-### Firebase Deployment
 ```bash
-# Deploy to Firebase Hosting
 ./deploy-corridor-os.sh
 
 # Or manually:
-firebase deploy
 ```
 
 ## 📱 Applications
@@ -166,8 +163,6 @@ firebase deploy
 
 ## 🌐 Deployment
 
-### Firebase Hosting
-The project is configured for Firebase Hosting with:
 - Automatic routing (`/` → Corridor OS, `/computer` → Original Demo)
 - Optimized caching headers
 - Security headers
@@ -229,8 +224,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Website**: [https://redseaportal.com](https://redseaportal.com)
-- **Email**: info@redseaportal.com
+- **Website**: https://mostafa-nasr-4277.github.io/CorridorOS/
+- **Email**: info@corridoros.example
 - **Issues**: GitHub Issues (if applicable)
 
 ## 🗺️ Roadmap

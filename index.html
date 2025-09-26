@@ -15,14 +15,15 @@
   <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.css">
   <style>
     :root{
-      --bg-0:#0a0412; /* darker base */
-      --bg-1:#1a0a2e; /* deep magenta */
-      --bg-2:#2d1b69; /* rich magenta */
-      --magenta:#ff0080; /* real magenta */
-      --purple:#8b00ff;  /* vibrant purple */
-      --accent:#ff40a0;  /* bright magenta accent */
+      /* Vista‑style palette */
+      --bg-0:#0b1020;
+      --bg-1:#0e1a2b;
+      --bg-2:#13283f;
+      --cyan:#00c8ff;
+      --teal:#00ffd5;
+      --accent:#00a2ff;
       --gold:#FFD700;
-      --green:#00FF7F;
+      --green:#00E28F;
       --text:#FFFFFF;
       --text-secondary:#E0E0E0;
     }
@@ -35,12 +36,12 @@
     }
     a{color:inherit}
     /* Nav */
-    .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:18px 48px;background:linear-gradient(180deg, rgba(26,10,46,.85), rgba(26,10,46,.65));backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,0,128,.3)}
-    .nav .brand{font-weight:800;letter-spacing:.02em;background:linear-gradient(45deg,var(--magenta),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:18px 48px;background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));backdrop-filter:saturate(140%) blur(18px);border-bottom:1px solid rgba(255,255,255,.18)}
+    .nav .brand{font-weight:800;letter-spacing:.02em;background:linear-gradient(45deg,var(--cyan),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
     .nav .links{display:flex;gap:18px;align-items:center}
     .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:.85rem 1.2rem;border-radius:10px;border:1.5px solid rgba(255,64,160,.6);text-decoration:none;font-weight:700;letter-spacing:.01em;transition:all .2s ease;color:var(--text)}
     .btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,0,128,.3)}
-    .btn.primary{border:none;background:linear-gradient(135deg,var(--magenta),var(--purple));color:#fff;box-shadow:0 4px 16px rgba(255,0,128,.4)}
+    .btn.primary{border:none;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#001b2e;box-shadow:0 4px 16px rgba(0,200,255,.4)}
     .btn.ghost{background:transparent;border-color:rgba(255,64,160,.4)}
     main{max-width:1200px;margin:0 auto;padding:48px 24px}
     /* Hero */
@@ -52,9 +53,9 @@
     .chips{display:flex;flex-wrap:wrap;gap:10px;color:var(--text)}
     .chip{background:rgba(255,64,160,.2);color:var(--accent);border:1px solid rgba(255,64,160,.5);padding:6px 10px;border-radius:999px;font-size:13px}
     .chip.gold{background:rgba(255,215,0,.15);color:var(--gold);border-color:rgba(255,215,0,.4)}
-    .hero-visual{grid-column:span 6;background:rgba(255,0,128,.08);border:1px solid rgba(255,64,160,.3);border-radius:16px;min-height:340px;position:relative;overflow:hidden;box-shadow:0 18px 54px rgba(255,0,128,.2)}
-    .hero-visual::before{content:"";position:absolute;inset:-40% -20%;background:repeating-linear-gradient( 70deg, rgba(255,0,128,.3), rgba(255,0,128,.3) 2px, transparent 2px, transparent 28px );filter:blur(4px);opacity:.4}
-    .hero-left{grid-column:span 6;background:rgba(255,0,128,.06);border:1px solid rgba(255,64,160,.2);border-radius:16px;padding:22px;backdrop-filter:blur(6px)}
+    .hero-visual{grid-column:span 6;background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.3);border-radius:16px;min-height:340px;position:relative;overflow:hidden;box-shadow:0 18px 54px rgba(0,200,255,.2)}
+    .hero-visual::before{content:"";position:absolute;inset:-40% -20%;background:repeating-linear-gradient( 70deg, rgba(0,200,255,.3), rgba(0,200,255,.3) 2px, transparent 2px, transparent 28px );filter:blur(4px);opacity:.4}
+    .hero-left{grid-column:span 6;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.2);border-radius:16px;padding:22px;backdrop-filter:blur(6px)}
     /* Demo block */
     .demo{margin:36px auto 12px;max-width:960px}
     .demo-frame{aspect-ratio:16/9;background:linear-gradient(135deg, #000, #1a0a2e);border-radius:16px;border:2px solid rgba(255,0,128,.4);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 54px rgba(255,0,128,.3);cursor:pointer;transition:all .3s ease}
