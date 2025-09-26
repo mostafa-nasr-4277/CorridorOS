@@ -58,6 +58,20 @@ jobs:
           touch "$SITE_DIR/.nojekyll"
           test -f "$SITE_DIR/index.html" || { echo "❌ index.html missing in _site"; ls -la "$SITE_DIR"; exit 1; }
           echo "✅ _site prepared"
+
+      - name: Inject cache-busted SW version
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHA=${GITHUB_SHA::8}
+          SW="_site/service-worker.js"
+          if [ -f "$SW" ]; then
+            echo "⚙️  Bumping SW CACHE_NAME to corridoros-cache-$SHA"
+            sed -E -i "s/const CACHE_NAME = 'corridoros-cache-[^']+';/const CACHE_NAME = 'corridoros-cache-$SHA';/" "$SW" || true
+            grep -n "CACHE_NAME" "$SW" || true
+          else
+            echo "ℹ️  No service-worker.js in _site; skipping bump"
+          fi
         
       - name: Verify deployment package
         run: |
