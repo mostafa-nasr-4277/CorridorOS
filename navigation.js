@@ -48,7 +48,7 @@
       // Create mailto link
       const subject = encodeURIComponent('Contact from Corridor Computer Website');
       const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-      const mailtoLink = `mailto:info@redseaportal.com?subject=${subject}&body=${body}`;
+      const mailtoLink = `mailto:info@corridoros.example?subject=${subject}&body=${body}`;
       
       window.location.href = mailtoLink;
     });

@@ -467,7 +467,7 @@ FEATURES:
 - Comprehensive settings panel
 - Built-in applications (Terminal, File Manager, Text Editor, etc.)
 
-For more information, visit: https://redseaportal.com
+For more information, visit: https://example.org
 
 © 2024 Mostafa Nasr - Corridor Computer Concept
 EOF
@@ -491,11 +491,7 @@ echo Starting Corridor OS in your default browser...
 echo.
 
 REM Try to open in different browsers
-if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" (
-    start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --new-window --app="%~dp0corridor-os-launcher.html"
-) else if exist "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" (
-    start "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --new-window --app="%~dp0corridor-os-launcher.html"
-) else if exist "C:\Program Files\Mozilla Firefox\firefox.exe" (
+if exist "C:\Program Files\Mozilla Firefox\firefox.exe" (
     start "" "C:\Program Files\Mozilla Firefox\firefox.exe" -new-window "%~dp0corridor-os-launcher.html"
 ) else if exist "C:\Program Files (x86)\Mozilla Firefox\firefox.exe" (
     start "" "C:\Program Files (x86)\Mozilla Firefox\firefox.exe" -new-window "%~dp0corridor-os-launcher.html"

@@ -120,6 +120,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Allow pages propagation before probing
+          sleep 8
           echo "🔎 Base URL: $BASE_URL"
           # Add cache-buster to avoid stale CDNs
           BUST=$RANDOM

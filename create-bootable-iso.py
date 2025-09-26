@@ -91,7 +91,7 @@ class CorridorOSISOBuilder:
             "ui-tilt.js",
             "ui-menu.js",
             "navigation.js",
-            "firebase.json"
+            
         ]
         
         # Copy files
@@ -422,7 +422,7 @@ Corridor OS is a hybrid quantum-photonic operating system that combines classica
 - Try refreshing the page
 
 ## Support
-For support and updates, visit: https://redseaportal.com
+For support and updates, visit: https://example.org
 
 ## License
 MIT License - See LICENSE file for details

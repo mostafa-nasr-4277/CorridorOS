@@ -776,13 +776,13 @@ def create_bell_state():
                     <button class="browser-button" onclick="corridorApps.browserForward()">→</button>
                     <button class="browser-button" onclick="corridorApps.browserRefresh()">⟳</button>
                     <div class="address-bar">
-                        <input type="text" placeholder="Enter URL or search..." value="https://redseaportal.com"
+                        <input type="text" placeholder="Enter URL or search..." value="index.html"
                                onkeydown="corridorApps.handleAddressBar(event)">
                     </div>
                     <button class="browser-button" onclick="corridorApps.browserBookmark()">⭐</button>
                 </div>
                 <div class="browser-content">
-                    <iframe src="https://redseaportal.com" style="width: 100%; height: 100%; border: none;">
+                    <iframe src="index.html" style="width: 100%; height: 100%; border: none;">
                     </iframe>
                 </div>
             </div>

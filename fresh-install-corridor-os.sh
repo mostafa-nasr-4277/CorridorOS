@@ -431,9 +431,7 @@ echo "Starting Corridor OS on Ubuntu..."
 echo "Opening web interface..."
 
 # Try different browsers in order of preference
-if command -v google-chrome > /dev/null; then
-    google-chrome --new-window "file://$(pwd)/LAUNCH-CORRIDOR-OS.html"
-elif command -v firefox > /dev/null; then
+if command -v firefox > /dev/null; then
     firefox --new-window "file://$(pwd)/LAUNCH-CORRIDOR-OS.html"
 elif command -v chromium-browser > /dev/null; then
     chromium-browser --new-window "file://$(pwd)/LAUNCH-CORRIDOR-OS.html"
@@ -459,15 +457,7 @@ echo Starting Corridor OS...
 echo.
 
 REM Try different browsers
-if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" (
-    start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --new-window "%~dp0LAUNCH-CORRIDOR-OS.html"
-) else if exist "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" (
-    start "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --new-window "%~dp0LAUNCH-CORRIDOR-OS.html"
-) else if exist "C:\Program Files\Mozilla Firefox\firefox.exe" (
-    start "" "C:\Program Files\Mozilla Firefox\firefox.exe" -new-window "%~dp0LAUNCH-CORRIDOR-OS.html"
-) else (
-    start "" "%~dp0LAUNCH-CORRIDOR-OS.html"
-)
+start "" "%~dp0LAUNCH-CORRIDOR-OS.html"
 
 echo Corridor OS should now be loading...
 pause
@@ -525,7 +515,7 @@ BOOT INSTRUCTIONS:
 4. Select this USB drive from boot menu
 5. Corridor OS will load automatically
 
-For more info: https://redseaportal.com
+For more info: https://example.org
 © 2024 Mostafa Nasr - Corridor Computer Concept
 EOF
 

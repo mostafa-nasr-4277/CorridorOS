@@ -20,7 +20,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 EXCLUDE_DIRS = {
     ".git", ".gocache", ".gomodcache", "node_modules", "dist", "TheKernel",
-    "tactile-power-toolkit", "Lost causes", ".github", ".firebase"
+    "tactile-power-toolkit", "Lost causes", ".github"
 }
 
 # Conservative include extensions (expand as needed)
@@ -123,4 +123,3 @@ def main(argv):
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
-

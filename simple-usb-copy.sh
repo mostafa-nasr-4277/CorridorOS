@@ -262,7 +262,7 @@ SYSTEM REQUIREMENTS:
 - 4GB RAM minimum
 - JavaScript enabled
 
-For more info: https://redseaportal.com
+For more info: https://example.org
 © 2024 Mostafa Nasr - Corridor Computer Concept
 EOF
 
