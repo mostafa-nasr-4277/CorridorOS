@@ -178,7 +178,7 @@ class CorridorApps {
         // Initialize state holder once
         if (!this._presentation) {
             this._presentation = {
-                totalMs: 180000,
+                totalMs: 120000,
                 slides: [
                     {
                         id: 'intro',
@@ -186,15 +186,15 @@ class CorridorApps {
                         subtitle: 'Reserve Light. Guarantee Memory.',
                         content: 'A three-minute walkthrough of the Corridor model: photonic corridors (λ lanes), Free-Form Memory (CXL) with bandwidth floors, HELIOPASS calibration, and system safety.',
                         bg: 'linear-gradient(135deg, #0a0412, #1a0a2e)',
-                        durationMs: 20000
+                        durationMs: 12000
                     },
                     {
                         id: 'heliopass',
                         title: 'HELIOPASS — Photonic Environment Calibration',
                         subtitle: 'Stabilize BER and eye with minimal power',
-                        content: 'HELIOPASS estimates background offset from lunar, zodiacal, airglow, galactic, and skyglow contributions and tunes bias/λ to hold error targets.',
+                        content: 'HELIOPASS estimates background offset from lunar, airglow, galactic, and skyglow contributions and tunes bias/λ to hold error targets.',
                         bg: 'linear-gradient(135deg, #001018, #032b3a)',
-                        durationMs: 40000,
+                        durationMs: 18000,
                         render: () => {
                             try {
                                 if (window.heliopassSystem && typeof window.heliopassSystem.getSensorData === 'function') {
@@ -217,7 +217,7 @@ class CorridorApps {
                         subtitle: 'Reserve wavelength sets per workload',
                         content: 'Corridors allocate WDM lanes with policy: shaping, preemption guards, and power-aware bias tuning via HELIOPASS integration.',
                         bg: 'linear-gradient(135deg, #160a3a, #2d1b69)',
-                        durationMs: 35000
+                        durationMs: 16000
                     },
                     {
                         id: 'ffm',
@@ -225,7 +225,7 @@ class CorridorApps {
                         subtitle: 'GB/s floors as first-class resources',
                         content: 'Pooled memory carved into QoS bundles with floor guarantees and latency classes; exposed to schedulers via CRDs and attested at boot.',
                         bg: 'linear-gradient(135deg, #0f1535, #1f2a6e)',
-                        durationMs: 30000
+                        durationMs: 14000
                     },
                     {
                         id: 'tactile-power',
@@ -233,7 +233,7 @@ class CorridorApps {
                         subtitle: 'Pad-to-pad, magnet-aligned, or contactless',
                         content: 'Corridor-class devices can receive power without exposed pins: 1) Capacitive/inductive (contactless) couplers with pre-charge; 2) Flush conductive pads with current sharing. The included tactile-power-toolkit helps size pads, pre-charge, and compensation networks.',
                         bg: 'linear-gradient(135deg, #1a1a1a, #2b2b2b)',
-                        durationMs: 35000,
+                        durationMs: 16000,
                         extra: `<div class=\"tp-diagram\">
   <div class=\"tp-row\">
     <div class=\"tile\">
@@ -252,6 +252,22 @@ class CorridorApps {
   </div>
   <div class=\"tp-caption\">Pin-free: magnet alignment + dual pads (or IPT/CPT couplers) with pre-charge for inrush safety.</div>
 </div>`
+                    },
+                    {
+                        id: 'observability',
+                        title: 'Observability — Proof, Not Promises',
+                        subtitle: 'Grafana Pack · Floors · BER · Energy/Bit',
+                        content: 'CorridorOS exports floors, lane utilization, BER, and energy/bit out‑of‑the‑box. Golden dashboards ship day one — pilots see p99 drop, floors hold.',
+                        bg: 'linear-gradient(135deg, #052235, #0a3a50)',
+                        durationMs: 16000
+                    },
+                    {
+                        id: 'security',
+                        title: 'Security & Integrity — Built‑In',
+                        subtitle: 'Measured Boot · SPDM · PQC Ready',
+                        content: 'Attested startup, signed components, SPDM policy lanes, and PQC‑ready crypto harden the plane — production stays safe; Labs stays sandboxed.',
+                        bg: 'linear-gradient(135deg, #081a2e, #10263e)',
+                        durationMs: 14000
                     },
                     {
                         id: 'wrap',
