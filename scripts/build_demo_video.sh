@@ -122,7 +122,7 @@ make_slide() {
     "$out"
 }
 
-echo "[1/3] Rendering slides → MP4 segments"
+echo "[1/4] Rendering slides → MP4 segments"
 make_slide s1 20 0x1a0a2e
 make_slide s2 40 0x032b3a
 make_slide s3 35 0x2d1b69
@@ -130,7 +130,7 @@ make_slide s4 30 0x1f2a6e
 make_slide s5 35 0x2b2b2b
 make_slide s6 20 0x2d1b69
 
-echo "[2/3] Concatenating segments → demo/corridoros-demo.mp4"
+echo "[2/4] Concatenating segments → demo/corridoros-demo.mp4"
 ls "$tmp_dir"/s*.mp4 | sort | sed "s/.*/file '&'/" > "$tmp_dir/concat.txt"
 
 ffmpeg -v error -y \
@@ -138,17 +138,36 @@ ffmpeg -v error -y \
   -c:v libx264 -pix_fmt yuv420p -profile:v high -movflags +faststart -crf 20 -preset veryfast \
   "$out_dir/corridoros-demo.mp4"
 
-# Try to build a VP9 webm if encoder is present
+echo "[3/4] Synthesizing background music (ambient)"
+# Procedural ambient pad: layered sines + gentle tremolo + pink noise texture
+ffmpeg -v error -y -filter_complex "\
+  sine=frequency=220:duration=180:sample_rate=48000:beep_factor=0 [a1];\
+  sine=frequency=261.63:duration=180:sample_rate=48000:beep_factor=0,volume=0.8 [a2];\
+  sine=frequency=329.63:duration=180:sample_rate=48000:beep_factor=0,volume=0.7 [a3];\
+  sine=frequency=440:duration=180:sample_rate=48000:beep_factor=0,tremolo=f=0.2:d=0.6,volume=0.6 [a4];\
+  anoisesrc=color=pink:duration=180:sample_rate=48000,lowpass=f=800,volume=0.03 [n];\
+  [a1][a2][a3][a4][n]amix=inputs=5:normalize=0,volume=0.25,\
+  afade=t=in:st=0:d=3,afade=t=out:st=177:d=3,\
+  aformat=sample_rates=48000:channel_layouts=stereo" \
+  -c:a aac -b:a 128k "$tmp_dir/music.m4a"
+
+echo "[4/4] Muxing music into video and producing WebM"
+# Mux audio into MP4
+ffmpeg -v error -y -i "$out_dir/corridoros-demo.mp4" -i "$tmp_dir/music.m4a" \
+  -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 128k -shortest \
+  "$out_dir/corridoros-demo.tmp.mp4" && mv "$out_dir/corridoros-demo.tmp.mp4" "$out_dir/corridoros-demo.mp4"
+
+# Build a VP9 webm if encoder is present
 if ffmpeg -hide_banner -encoders 2>/dev/null | grep -q libvpx-vp9; then
-  echo "[3/3] Also producing VP9 WebM → demo/corridoros-demo.webm"
+  echo "      → Producing VP9 WebM"
   ffmpeg -v error -y -i "$out_dir/corridoros-demo.mp4" \
     -c:v libvpx-vp9 -b:v 1.5M -crf 32 -row-mt 1 \
     -c:a libopus -b:a 96k -ac 2 \
     "$out_dir/corridoros-demo.webm" || true
 else
-  echo "[3/3] Skipping WebM: libvpx-vp9 encoder not found"
+  echo "      → Skipping WebM: libvpx-vp9 encoder not found"
 fi
 
 echo "Done. Outputs:"
-echo "  • $out_dir/corridoros-demo.mp4"
+echo "  • $out_dir/corridoros-demo.mp4 (with music)"
 if [ -f "$out_dir/corridoros-demo.webm" ]; then echo "  • $out_dir/corridoros-demo.webm"; fi
