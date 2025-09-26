@@ -113,3 +113,26 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Smoke check (Pages availability)
+        env:
+          BASE_URL: ${{ steps.deployment.outputs.page_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "🔎 Base URL: $BASE_URL"
+          # Add cache-buster to avoid stale CDNs
+          BUST=$RANDOM
+          # 1) index.html contains our version marker
+          echo "→ Checking index.html content"
+          curl -sS --retry 5 --retry-delay 2 --retry-all-errors -H "Cache-Control: no-cache" \
+            "${BASE_URL}?v=${BUST}" | grep -q 'corridoros-version' || { echo "index.html missing version marker"; exit 1; }
+          # 2) OS page is reachable
+          echo "→ Checking corridor-os.html (200)"
+          curl -sS -I --retry 5 --retry-delay 2 --retry-all-errors -H "Cache-Control: no-cache" \
+            "${BASE_URL}corridor-os.html?v=${BUST}" | grep -Eq 'HTTP/.+ 200' || { echo "corridor-os.html not 200"; exit 1; }
+          # 3) Demo video is reachable (HEAD)
+          echo "→ Checking demo video (200)"
+          curl -sS -I --retry 5 --retry-delay 2 --retry-all-errors -H "Cache-Control: no-cache" \
+            "${BASE_URL}demo/corridoros-demo.mp4?v=${BUST}" | grep -Eq 'HTTP/.+ 200' || { echo "demo video not 200"; exit 1; }
+          echo "✅ Smoke checks passed"
