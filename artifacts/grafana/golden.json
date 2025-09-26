@@ -1,0 +1,9 @@
+{
+  "title": "CorridorOS — Golden Pack",
+  "panels": [
+    { "title": "BER (per lane)", "type": "graph", "targets": ["heliopass_ber"] },
+    { "title": "FFM Floors vs Achieved (GB/s)", "type": "graph", "targets": ["ffm_floor", "ffm_achieved_gbps"] },
+    { "title": "Energy per bit (pJ/bit)", "type": "graph", "targets": ["energy_per_bit"] }
+  ],
+  "tags": ["corridoros", "observability"]
+}
