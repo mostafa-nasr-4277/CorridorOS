@@ -100,6 +100,27 @@ cat > "$tmp_dir/s6_body.txt" <<'TXT'
 CorridorOS unifies photonic corridors, calibrated by HELIOPASS, with QoS memory and safe, pin‑free power delivery — observable and schedulable from day one.
 TXT
 
+# Extra slides — features
+cat > "$tmp_dir/s7_title.txt" <<'TXT'
+Observability — Proof, Not Promises
+TXT
+cat > "$tmp_dir/s7_sub.txt" <<'TXT'
+Grafana Pack · Floors · BER · Energy/Bit
+TXT
+cat > "$tmp_dir/s7_body.txt" <<'TXT'
+CorridorOS exports floors, lane util, BER, and energy/bit out‑of‑the‑box. Golden dashboards ship day one — pilots see p99 drop, floors hold.
+TXT
+
+cat > "$tmp_dir/s8_title.txt" <<'TXT'
+Security & Integrity — Built‑In
+TXT
+cat > "$tmp_dir/s8_sub.txt" <<'TXT'
+Measured Boot · SPDM · PQC Ready
+TXT
+cat > "$tmp_dir/s8_body.txt" <<'TXT'
+Attested startup, signed components, SPDM policy lanes, and PQC‑ready crypto harden the plane — production stays safe; Labs stays sandboxed.
+TXT
+
 # Soft-wrap helper to prevent text rendering outside frame
 wrapf() { local f="$1"; local w="$2"; fold -s -w "$w" "$f" > "$f.w" && mv "$f.w" "$f"; }
 
@@ -110,6 +131,8 @@ wrapf "$tmp_dir/s3_title.txt" 36; wrapf "$tmp_dir/s3_sub.txt" 44; wrapf "$tmp_di
 wrapf "$tmp_dir/s4_title.txt" 36; wrapf "$tmp_dir/s4_sub.txt" 44; wrapf "$tmp_dir/s4_body.txt" 68
 wrapf "$tmp_dir/s5_title.txt" 36; wrapf "$tmp_dir/s5_sub.txt" 44; wrapf "$tmp_dir/s5_body.txt" 68
 wrapf "$tmp_dir/s6_title.txt" 36; wrapf "$tmp_dir/s6_sub.txt" 44; wrapf "$tmp_dir/s6_body.txt" 68
+wrapf "$tmp_dir/s7_title.txt" 36; wrapf "$tmp_dir/s7_sub.txt" 44; wrapf "$tmp_dir/s7_body.txt" 68
+wrapf "$tmp_dir/s8_title.txt" 36; wrapf "$tmp_dir/s8_sub.txt" 44; wrapf "$tmp_dir/s8_body.txt" 68
 
 make_slide() {
   local id="$1"; shift
@@ -125,8 +148,8 @@ make_slide() {
   if [ -n "$FONT" ]; then font_opt=":fontfile=${FONT}"; fi
 
   # Pre-calc fade-out start to avoid inline bc dependency
-  local FADE_IN=0.6
-  local FADE_OUT=0.6
+  local FADE_IN=0.3
+  local FADE_OUT=0.3
   local ST_OUT
   ST_OUT=$(awk -v d="$dur" -v o="$FADE_OUT" 'BEGIN{printf "%.2f", d-o}')
 
@@ -143,12 +166,15 @@ make_slide() {
 }
 
 echo "[1/4] Rendering slides → MP4 segments"
-make_slide s1 20 0x1a0a2e
-make_slide s2 40 0x032b3a
-make_slide s3 35 0x2d1b69
-make_slide s4 30 0x1f2a6e
-make_slide s5 35 0x2b2b2b
-make_slide s6 20 0x2d1b69
+# ≤120s total: 12+18+16+14+16+12+16+14 = 118s
+make_slide s1 12 0x1a0a2e
+make_slide s2 18 0x032b3a
+make_slide s3 16 0x2d1b69
+make_slide s4 14 0x1f2a6e
+make_slide s5 16 0x2b2b2b
+make_slide s6 12 0x2d1b69
+make_slide s7 16 0x0b2a3a
+make_slide s8 14 0x0f1e32
 
 echo "[2/4] Concatenating segments → demo/corridoros-demo.mp4"
 ls "$tmp_dir"/s*.mp4 | sort | sed "s/.*/file '&'/" > "$tmp_dir/concat.txt"
