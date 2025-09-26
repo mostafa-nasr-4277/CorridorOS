@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
+  <defs>
+    <linearGradient id="corner" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff0080"/>
+      <stop offset="1" stop-color="#8b00ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="320" fill="#0a0412"/>
+  <g opacity="0.35" stroke="url(#corner)" stroke-width="10">
+    <path d="M-40 40 L 200 280"/>
+    <path d="M-20 20 L 220 260"/>
+    <path d="M0 0 L 240 240"/>
+    <path d="M20 -20 L 260 220"/>
+    <path d="M40 -40 L 280 200"/>
+  </g>
+</svg>
+

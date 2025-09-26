@@ -10,6 +10,8 @@
   <meta property="og:description" content="CorridorOS turns photonic interconnect and pooled memory into schedulable OS resources.">
   <meta property="og:image:alt" content="CorridorOS dashboard showing reserved photonic corridors and Free-Form Memory bandwidth floors.">
   <meta name="corridoros-version" content="v4">
+  <meta name="theme-color" content="#ff0080">
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.css">
   <style>
     :root{
@@ -104,6 +106,7 @@
           <div class="chip" role="listitem">✅ BER stable ≤ 1e‑12 (HELIOPASS calibrated)</div>
           <div class="chip gold" role="listitem">✅ 150–200 GB/s memory floors on CXL</div>
           <div class="chip" role="listitem">✅ p99 latency ↓ 25–40% in pilot tests</div>
+          <div id="webgpu-chip" class="chip gold" role="listitem" style="display:none"></div>
         </div>
         <div style="margin-top:10px;color:rgba(247,243,232,.8);font-size:14px">Open core · Kubernetes‑ready · Attestation & PQC built‑in</div>
       </div>
@@ -194,6 +197,7 @@
     </section>
   </main>
 
+  <script src="webgpu-check.js" defer></script>
   <script>
     function scrollToDemo(){
       const el=document.getElementById('demo'); if(!el) return; el.scrollIntoView({behavior:'smooth'});

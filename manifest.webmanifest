@@ -1,0 +1,21 @@
+{
+  "name": "CorridorOS",
+  "short_name": "CorridorOS",
+  "description": "CorridorOS — schedule photonic corridors and guarantee Free-Form Memory floors.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0412",
+  "theme_color": "#ff0080",
+  "categories": ["utilities", "productivity", "developer-tools"],
+  "icons": [
+    {
+      "src": "/brand/icons/logo-cube.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

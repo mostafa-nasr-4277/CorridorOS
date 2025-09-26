@@ -36,6 +36,13 @@ self.addEventListener('activate', (event) => {
     (async () => {
       const keys = await caches.keys();
       await Promise.all(keys.map((k) => (k === CACHE_NAME ? Promise.resolve() : caches.delete(k))));
+      try {
+        if (self.registration.navigationPreload) {
+          await self.registration.navigationPreload.enable();
+        }
+      } catch (e) {
+        // ignore
+      }
       await self.clients.claim();
     })()
   );
@@ -53,6 +60,8 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       (async () => {
         try {
+          const preload = await event.preloadResponse;
+          if (preload) return preload;
           const network = await fetch(req);
           return network;
         } catch (e) {
