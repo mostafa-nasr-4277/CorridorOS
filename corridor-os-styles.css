@@ -1,19 +1,20 @@
 /* Corridor OS - Modern Operating System Styles */
 :root {
-    /* Ubuntu-inspired color scheme with quantum enhancements */
-    --primary-orange: #E95420;
-    --primary-purple: #772953;
-    --primary-blue: #0073e6;
-    --primary-green: #17B06B;
-    --primary-cyan: #00d4ff;
+    /* Vista‑inspired glass + aurora palette */
+    --primary-orange: #FF8A00; /* legacy accent for warnings */
+    --primary-purple: #6e4aff; /* secondary glow */
+    --primary-blue: #00a2ff;   /* Vista cyan */
+    --primary-green: #00e28f;  /* status/ok */
+    --primary-cyan: #00c8ff;   /* default accent */
+    --primary-teal: #00ffd5;   /* glow accent */
     
-    /* Dark theme colors */
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #1a1a2e;
-    --bg-tertiary: #2d2d44;
-    --bg-panel: rgba(26, 26, 46, 0.95);
-    --bg-glass: rgba(255, 255, 255, 0.08);
-    --bg-glass-hover: rgba(255, 255, 255, 0.12);
+    /* Dark glass theme colors */
+    --bg-primary: #0b1020;     /* deep blue/black */
+    --bg-secondary: #0e1a2b;   /* pane */
+    --bg-tertiary: #13283f;    /* titlebar */
+    --bg-panel: rgba(12, 26, 44, 0.55);
+    --bg-glass: rgba(255, 255, 255, 0.10);
+    --bg-glass-hover: rgba(255, 255, 255, 0.16);
     
     /* Text colors */
     --text-primary: #ffffff;
@@ -22,15 +23,15 @@
     --text-disabled: rgba(255, 255, 255, 0.4);
     
     /* Border and shadow */
-    --border-color: rgba(255, 255, 255, 0.15);
+    --border-color: rgba(255, 255, 255, 0.22);
     --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-medium: 0 8px 28px rgba(0, 0, 0, 0.45);
+    --shadow-large: 0 16px 48px rgba(0, 0, 0, 0.6);
     
     /* Quantum glow effects */
-    --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.3);
-    --glow-purple: 0 0 20px rgba(119, 41, 83, 0.3);
-    --glow-orange: 0 0 20px rgba(233, 84, 32, 0.3);
+    --glow-cyan: 0 0 24px rgba(0, 200, 255, 0.40);
+    --glow-purple: 0 0 24px rgba(110, 74, 255, 0.35);
+    --glow-orange: 0 0 24px rgba(255, 138, 0, 0.35);
     
     /* Animations */
     --transition-fast: 0.15s ease;
@@ -167,11 +168,11 @@ body {
 .desktop-background {
     position: absolute;
     inset: 0;
-    background: 
-        radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(119, 41, 83, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 40% 60%, rgba(233, 84, 32, 0.06) 0%, transparent 50%),
-        linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+    background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(0, 200, 255, 0.20), transparent 60%),
+        radial-gradient(900px 500px at 80% 70%, rgba(0, 255, 213, 0.14), transparent 60%),
+        radial-gradient(800px 400px at 40% 80%, rgba(110, 74, 255, 0.12), transparent 65%),
+        linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 55%, var(--bg-tertiary) 100%);
     animation: backgroundFlow 30s ease-in-out infinite;
 }
 
@@ -189,16 +190,23 @@ body {
     left: 0;
     right: 0;
     height: 48px;
-    background: var(--bg-panel);
-    backdrop-filter: var(--blur-medium);
-    -webkit-backdrop-filter: var(--blur-medium);
-    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06));
+    background-color: var(--bg-panel);
+    backdrop-filter: saturate(140%) blur(18px);
+    -webkit-backdrop-filter: saturate(140%) blur(18px);
+    border-bottom: 1px solid rgba(255,255,255,0.18);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
     z-index: 1000;
     box-shadow: var(--shadow-small);
+}
+.top-panel::after {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 0; height: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent);
+    pointer-events: none;
 }
 
 .panel-left {
@@ -208,9 +216,10 @@ body {
 }
 
 .activities-button {
-    background: var(--primary-orange);
+    background: linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
+    color: #00253f;
+    border: 1px solid rgba(255,255,255,0.35);
     color: white;
-    border: none;
     padding: 8px 16px;
     border-radius: var(--radius-medium);
     font-weight: 600;
@@ -222,9 +231,9 @@ body {
 }
 
 .activities-button:hover {
-    background: #d14b1f;
+    background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.16));
     transform: translateY(-1px);
-    box-shadow: var(--glow-orange);
+    box-shadow: 0 0 0 2px rgba(0,200,255,0.25), var(--glow-cyan);
 }
 
 .corridor-logo {
@@ -304,14 +313,19 @@ body {
     bottom: 16px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--bg-panel);
-    backdrop-filter: var(--blur-medium);
-    -webkit-backdrop-filter: var(--blur-medium);
-    border: 1px solid var(--border-color);
+    background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.08));
+    backdrop-filter: saturate(140%) blur(18px);
+    -webkit-backdrop-filter: saturate(140%) blur(18px);
+    border: 1px solid rgba(255,255,255,0.28);
     border-radius: var(--radius-xl);
     padding: 12px;
     box-shadow: var(--shadow-large);
     z-index: 1000;
+}
+.dock::before {
+    content: '';
+    position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
 }
 
 .dock-apps {
@@ -492,8 +506,8 @@ body {
 
 .window {
     position: absolute;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    background: linear-gradient(180deg, rgba(18,30,50,0.72), rgba(15,24,40,0.58));
+    border: 1px solid rgba(255,255,255,0.22);
     border-radius: var(--radius-medium);
     box-shadow: var(--shadow-large);
     min-width: 400px;
@@ -516,13 +530,17 @@ body {
 
 .window-titlebar {
     height: 40px;
-    background: var(--bg-tertiary);
-    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.06));
+    border-bottom: 1px solid rgba(255,255,255,0.28);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
     cursor: move;
+}
+.window-titlebar::after{
+    content:''; position:absolute; left:0; right:0; top:0; height:20px; pointer-events:none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent);
 }
 
 .window-title {
@@ -543,17 +561,10 @@ body {
     transition: var(--transition-fast);
 }
 
-.window-control.close {
-    background: #ff5f56;
-}
-
-.window-control.minimize {
-    background: #ffbd2e;
-}
-
-.window-control.maximize {
-    background: #27ca3f;
-}
+.window-control { background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.18)); border:1px solid rgba(255,255,255,0.35);} 
+.window-control.close { box-shadow: 0 0 0 2px rgba(255,0,0,0.15) inset; }
+.window-control.minimize { box-shadow: 0 0 0 2px rgba(255,200,0,0.15) inset; }
+.window-control.maximize { box-shadow: 0 0 0 2px rgba(0,255,120,0.15) inset; }
 
 .window-control:hover {
     transform: scale(1.1);
