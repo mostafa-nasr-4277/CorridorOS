@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorridorOS v4 • Dashboard</title>
+    <meta name="corridoros-version" content="v4">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            color: #2a5298;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card h2 {
+            color: #2a5298;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(42, 82, 152, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #2a5298;
+        }
+        
+        .result pre {
+            white-space: pre-wrap;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            color: #2a5298;
+        }
+        
+        .wavelength-viz {
+            display: flex;
+            gap: 2px;
+            margin: 1rem 0;
+        }
+        
+        .wavelength-bar {
+            width: 24px;
+            height: 45px;
+            border-radius: 6px;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            font-size: 9px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wavelength-bar:hover {
+            transform: translateY(-3px) scale(1.1);
+            filter: brightness(1.2);
+        }
+        
+        .wavelength-bar .wl-label {
+            position: absolute;
+            bottom: 2px;
+            font-size: 8px;
+            text-shadow: 0 0 3px rgba(0,0,0,0.8);
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+        }
+        
+        .advanced-bar {
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.15); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .info {
+            background: #e6f3ff;
+            border-left: 4px solid #2196F3;
+            color: #1976D2;
+        }
+        
+        .error {
+            background: #ffe6e6;
+            border-left: 4px solid #dc3545;
+            color: #dc3545;
+        }
+        
+        .success {
+            background: #e6ffe6;
+            border-left: 4px solid #28a745;
+            color: #28a745;
+        }
+        /* Dials */
+        .dial{position:relative;height:180px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px}
+        .dial canvas{position:absolute;inset:0}
+        .dial .value{position:relative;font-weight:700;color:#2a5298}
+    </style>
+    <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.css">
+</head>
+<body>
+    <div class="header" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+        <div>
+            <h1>CorridorOS Dashboard</h1>
+            <p>Photonic Interconnect & Free-Form Memory Management Console</p>
+        </div>
+        <div>
+            <a href="index.html" class="co-back co-back--solid" title="Back to Home">← Exit Dashboard</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="grid">
+            <!-- Photonic Corridors -->
+            <div class="card" id="card-corridor">
+                <h2>
+                    <span class="status-indicator"></span>
+                    Photonic Corridors
+                </h2>
+                
+                <form id="corridor-form">
+                    <div class="form-group">
+                        <label>Number of Lanes:</label>
+                        <input type="number" id="lanes" value="8" min="1" max="16">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Starting Wavelength (nm):</label>
+                        <input type="number" id="lambda-start" value="1550" min="1500" max="1600">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Minimum Bandwidth (Gbps):</label>
+                        <input type="number" id="min-gbps" value="400" min="100" max="1000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Latency Budget (ns):</label>
+                        <input type="number" id="latency-ns" value="250" min="50" max="1000">
+                    </div>
+                    
+                    <button type="submit" class="btn">Allocate Corridor</button>
+                    <button type="button" class="btn" onclick="clearResults('corridor-result')">Clear</button>
+                </form>
+                
+                <div id="corridor-result" class="result" style="display: none;"></div>
+                <div id="wavelength-viz"></div>
+            </div>
+            
+            <!-- Free-Form Memory -->
+            <div class="card" id="card-ffm">
+                <h2>
+                    <span class="status-indicator"></span>
+                    Free-Form Memory (FFM)
+                </h2>
+                
+                <form id="ffm-form">
+                    <div class="form-group">
+                        <label>Memory Size:</label>
+                        <select id="memory-size">
+                            <option value="1073741824">1 GB</option>
+                            <option value="8589934592">8 GB</option>
+                            <option value="17179869184">16 GB</option>
+                            <option value="34359738368">32 GB</option>
+                            <option value="68719476736">64 GB</option>
+                            <option value="137438953472">128 GB</option>
+                            <option value="274877906944" selected>256 GB</option>
+                            <option value="549755813888">512 GB</option>
+                            <option value="1099511627776">1 TB</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Latency Tier:</label>
+                        <select id="tier">
+                            <option value="T0">T0 - HBM (Ultra-low latency)</option>
+                            <option value="T1">T1 - DRAM (Low latency)</option>
+                            <option value="T2" selected>T2 - CXL (Medium latency)</option>
+                            <option value="T3">T3 - Persistent (High latency)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Bandwidth Floor (Gbps):</label>
+                        <input type="number" id="bw-floor" value="150" min="10" max="1000">
+                    </div>
+                    
+                    <button type="submit" class="btn">Allocate Memory</button>
+                    <button type="button" class="btn" onclick="clearResults('ffm-result')">Clear</button>
+                </form>
+                
+                <div id="ffm-result" class="result" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="card" id="card-status">
+            <h2>System Status</h2>
+            <div class="metric">
+                <span>corrd Service</span>
+                <span class="metric-value" id="corrd-status">Checking...</span>
+            </div>
+            <div class="metric">
+                <span>memqosd Service</span>
+                <span class="metric-value" id="memqosd-status">Checking...</span>
+            </div>
+            <div class="metric">
+                <span>Active Corridors</span>
+                <span class="metric-value" id="active-corridors">0</span>
+            </div>
+            <div class="metric">
+                <span>Allocated Memory</span>
+                <span class="metric-value" id="allocated-memory">0 GB</span>
+            </div>
+        </div>
+
+        <!-- SLO Dials -->
+        <div class="card" id="card-slos">
+            <h2>Service SLOs</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;">
+                <div class="dial" id="dial-ber"></div>
+                <div class="dial" id="dial-pj"></div>
+                <div class="dial" id="dial-gbps"></div>
+                <div class="dial" id="dial-p99"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Global Dock (Dashboard) -->
+    <div class="co-dock">
+      <nav class="co-dock-inner" aria-label="CorridorOS Dock">
+        <a class="co-dock-item" href="index.html" title="Home">
+          <img src="brand/icons/logo-cube.svg" alt="Home">
+          <span>Home</span>
+        </a>
+        <a class="co-dock-item" href="#" onclick="scrollToCorridor();return false;" title="Photonic Corridors">
+          <img src="brand/icons/icon-quantum.svg" alt="Corridors">
+          <span>Corridors</span>
+        </a>
+        <a class="co-dock-item" href="#" onclick="scrollToFFM();return false;" title="Free‑Form Memory">
+          <img src="brand/icons/icon-memory.svg" alt="FFM">
+          <span>FFM</span>
+        </a>
+        <a class="co-dock-item" href="#" onclick="scrollToStatus();return false;" title="Status">
+          <img src="brand/icons/icon-analytics.svg" alt="Status">
+          <span>Status</span>
+        </a>
+      </nav>
+    </div>
+    <!-- Optional floating back button -->
+    <a href="index.html" class="co-back co-back--solid co-exit" title="Back to Home">Home</a>
+    
+    <script>
+        // Environment + service endpoints
+        const IS_LOCAL = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
+        // Optional overrides via query params: ?corrd=https://api.example.com&memqosd=https://mem.example.com
+        const _q = new URLSearchParams(window.location.search);
+        const CORRD_OVERRIDE = _q.get('corrd');
+        const MEMQOSD_OVERRIDE = _q.get('memqosd');
+        // corrd (photonic) and memqosd (FFM) run on different ports locally
+        const CORRD_BASE_URL = CORRD_OVERRIDE || (IS_LOCAL ? 'http://localhost:7080' : '');
+        const MEMQOSD_BASE_URL = MEMQOSD_OVERRIDE || (IS_LOCAL ? 'http://localhost:7070' : '');
+
+        let corridorCount = 0;
+        let totalMemory = 0;
+
+        // Helper: safe JSON parse with fallback to text
+        async function parseJsonSafe(response) {
+            const ct = response.headers.get('content-type') || '';
+            if (!ct.includes('application/json')) {
+                const text = await response.text();
+                throw new Error(`Unexpected response (status ${response.status}): ${text.slice(0, 120)}...`);
+            }
+            return response.json();
+        }
+        
+        // Form handlers
+        document.getElementById('corridor-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await allocateCorridor();
+        });
+        
+        document.getElementById('ffm-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await allocateFFM();
+        });
+        
+        // Enhanced corridor allocation with validation
+        async function allocateCorridor() {
+            const lanes = parseInt(document.getElementById('lanes').value);
+            const lambdaStart = parseInt(document.getElementById('lambda-start').value);
+            const minGbps = parseInt(document.getElementById('min-gbps').value);
+            const latencyNs = parseInt(document.getElementById('latency-ns').value);
+            
+            // Validate inputs
+            if (lanes < 1 || lanes > 16) {
+                showResult('corridor-result', 'Error: Lanes must be between 1 and 16', 'error');
+                return;
+            }
+            
+            if (lambdaStart < 1500 || lambdaStart > 1600) {
+                showResult('corridor-result', 'Error: Wavelength must be between 1500-1600nm', 'error');
+                return;
+            }
+            
+            const payload = {
+                corridor_type: "SiCorridor",
+                lanes: lanes,
+                lambda_nm: Array.from({length: lanes}, (_, i) => lambdaStart + i),
+                min_gbps: minGbps,
+                latency_budget_ns: latencyNs,
+                reach_mm: 75,
+                mode: "waveguide",
+                qos: {pfc: true, priority: "gold"},
+                attestation_required: true,
+                attestation_ticket: generateMockTicket()
+            };
+            
+            try {
+                showResult('corridor-result', 'Allocating corridor...', 'info');
+                
+                let response, result;
+                if (IS_LOCAL) {
+                    // Real API call
+                    response = await fetch(`${CORRD_BASE_URL}/v1/corridors`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    result = await parseJsonSafe(response);
+                } else {
+                    // Mock API for production
+                    await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
+                    result = generateMockCorridorResponse(payload);
+                }
+                
+                showResult('corridor-result', result, 'success');
+                updateWavelengthViz(result.lambda_nm || payload.lambda_nm);
+                corridorCount++;
+                updateStatus();
+                
+                // Add visual feedback
+                document.getElementById('corridor-result').style.animation = 'slideIn 0.3s ease';
+                
+            } catch (error) {
+                showResult('corridor-result', `Error: Failed to allocate corridor - ${error.message}`, 'error');
+            }
+        }
+        
+        // Generate mock corridor response for production
+        function generateMockCorridorResponse(request) {
+            const id = `cor-${Math.random().toString(16).substr(2, 4)}`;
+            return {
+                id: id,
+                corridor_type: request.corridor_type,
+                lanes: request.lanes,
+                lambda_nm: request.lambda_nm,
+                min_gbps: request.min_gbps,
+                achievable_gbps: Math.round(request.min_gbps * 1.04), // 4% margin
+                latency_budget_ns: request.latency_budget_ns,
+                reach_mm: request.reach_mm,
+                mode: request.mode,
+                qos: request.qos,
+                ber: 1.2e-12,
+                eye_margin: "optimal",
+                status: "Active",
+                created_at: new Date().toISOString(),
+                telemetry: {
+                    ber: 1.2e-12,
+                    temp_c: 47.3,
+                    power_pj_per_bit: 2.1,
+                    drift: "stable",
+                    utilization_percent: 67.8,
+                    error_count: 0
+                }
+            };
+        }
+        
+        // Generate mock attestation ticket
+        function generateMockTicket() {
+            return `ATT-${Date.now().toString(36)}-${Math.random().toString(36).substr(2, 8)}`;
+        }
+        
+        // Enhanced FFM allocation with production support
+        async function allocateFFM() {
+            // The select stores bytes in the value attribute
+            const bytes = parseInt(document.getElementById('memory-size').value, 10);
+            const tier = document.getElementById('tier').value;
+            const bwFloor = parseInt(document.getElementById('bw-floor').value);
+            
+            // Validate inputs
+            if (bytes < 1024 * 1024 * 1024 || bytes > 1024 * 1024 * 1024 * 1024) { // 1GB to 1TB
+                showResult('ffm-result', 'Error: Memory size must be between 1GB and 1TB', 'error');
+                return;
+            }
+            
+            if (bwFloor < 1 || bwFloor > 1000) {
+                showResult('ffm-result', 'Error: Bandwidth floor must be between 1-1000 Gbps', 'error');
+                return;
+            }
+            
+            const payload = {
+                bytes: bytes,
+                latency_class: tier,
+                bandwidth_floor_GBs: bwFloor,
+                persistence: "none",
+                shareable: true,
+                security_domain: "tenantA"
+            };
+            
+            try {
+                showResult('ffm-result', 'Allocating memory...', 'info');
+                
+                let response, result;
+                if (IS_LOCAL) {
+                    // Real API call
+                    response = await fetch(`${MEMQOSD_BASE_URL}/v1/ffm/alloc`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    result = await parseJsonSafe(response);
+                } else {
+                    // Mock API for production
+                    await new Promise(resolve => setTimeout(resolve, 600)); // Simulate network delay
+                    result = generateMockFFMResponse(payload);
+                }
+                
+                showResult('ffm-result', result, 'success');
+                totalMemory += bytes / (1024**3); // Convert to GB
+                updateStatus();
+                
+                // Add visual feedback
+                document.getElementById('ffm-result').style.animation = 'slideIn 0.3s ease';
+                
+            } catch (error) {
+                showResult('ffm-result', `Error: Failed to allocate memory - ${error.message}`, 'error');
+            }
+        }
+        
+        // Generate mock FFM response for production
+        function generateMockFFMResponse(request) {
+            const id = `ffm-${Math.random().toString(16).substr(2, 6)}`;
+            const tierNames = {
+                'T1': 'HBM (Low latency)',
+                'T2': 'CXL (Medium latency)', 
+                'T3': 'DDR (High latency)'
+            };
+            
+            return {
+                id: id,
+                bytes: request.bytes,
+                latency_class: request.latency_class,
+                latency_class_name: tierNames[request.latency_class] || request.latency_class,
+                bandwidth_floor_GBs: request.bandwidth_floor_GBs,
+                achievable_bandwidth_GBs: Math.round(request.bandwidth_floor_GBs * 1.08), // 8% margin
+                persistence: request.persistence,
+                shareable: request.shareable,
+                security_domain: request.security_domain,
+                status: "Allocated",
+                created_at: new Date().toISOString(),
+                telemetry: {
+                    utilization_percent: Math.round(Math.random() * 30 + 20), // 20-50%
+                    latency_us: Math.round(Math.random() * 100 + 50), // 50-150μs
+                    bandwidth_actual_GBs: Math.round(request.bandwidth_floor_GBs * (0.9 + Math.random() * 0.2)),
+                    error_rate: 0,
+                    migration_status: "stable"
+                }
+            };
+        }
+        
+        // Show result
+        function showResult(elementId, data, type) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${type}`;
+            element.innerHTML = `<pre>${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}</pre>`;
+        }
+        
+        // Clear results
+        function clearResults(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'none';
+        }
+        
+        // Enhanced wavelength visualization with telemetry
+        function updateWavelengthViz(wavelengths, telemetry = null) {
+            const viz = document.getElementById('wavelength-viz');
+            if (!viz) return;
+            
+            viz.innerHTML = wavelengths.map((wl, i) => {
+                const hue = ((wl - 1500) / 100) * 280; // Map 1500-1600nm to 0-280 hue
+                const intensity = telemetry ? (100 - telemetry.utilization_percent || 50) : 70;
+                const quality = telemetry && telemetry.ber < 1e-11 ? 'optimal' : 'good';
+                
+                return `
+                    <div class="wavelength-bar advanced-bar" 
+                         style="background: hsl(${hue}, ${intensity}%, 50%); 
+                                height: ${30 + Math.random() * 20}px;
+                                box-shadow: 0 0 ${quality === 'optimal' ? '8px' : '4px'} hsl(${hue}, 70%, 60%);" 
+                         title="λ${wl}nm - Lane ${i+1}&#10;Quality: ${quality}&#10;BER: ${telemetry?.ber || '1.2e-12'}"
+                         data-wavelength="${wl}"
+                         data-lane="${i}">
+                        <span class="wl-label">${wl}</span>
+                    </div>`;
+            }).join('');
+            
+            // Add interaction
+            viz.querySelectorAll('.wavelength-bar').forEach(bar => {
+                bar.addEventListener('click', () => {
+                    const wl = bar.dataset.wavelength;
+                    const lane = bar.dataset.lane;
+                    showWavelengthDetails(wl, lane);
+                });
+            });
+        }
+        
+        // Show detailed wavelength information
+        function showWavelengthDetails(wavelength, lane) {
+            const details = {
+                wavelength: `${wavelength}nm`,
+                lane: `Lane ${parseInt(lane) + 1}`,
+                frequency: `${(299792458 / (wavelength * 1e-9) / 1e12).toFixed(3)} THz`,
+                channel_spacing: "0.8nm (100 GHz)",
+                power_budget: "2.1 pJ/bit",
+                eye_margin: "4.2 dB",
+                jitter: "< 1 ps RMS",
+                status: "Active"
+            };
+            
+            showResult('corridor-result', details, 'info');
+        }
+        
+        // Enhanced service status checking with production support
+        async function checkServiceStatus() {
+            // When local, hit real health endpoints; on Pages, synthesize healthy status
+            const checks = [
+                { id: 'corrd-status', url: `${CORRD_BASE_URL}/health`, name: 'corrd' },
+                { id: 'memqosd-status', url: `${MEMQOSD_BASE_URL}/health`, name: 'memqosd' }
+            ];
+
+            for (const svc of checks) {
+                try {
+                    let result;
+                    if (IS_LOCAL) {
+                        const resp = await fetch(svc.url);
+                        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                        result = await parseJsonSafe(resp);
+                    } else {
+                        result = {
+                            status: 'healthy',
+                            version: 'v4.0.0',
+                            uptime: Math.floor(Math.random() * 86400),
+                            active_corridors: corridorCount
+                        };
+                    }
+
+                    const el = document.getElementById(svc.id);
+                    const isHealthy = result.status === 'healthy';
+                    el.textContent = isHealthy ? 'Online' : 'Degraded';
+                    el.style.color = isHealthy ? '#28a745' : '#ff9800';
+                    el.title = isHealthy
+                        ? `${svc.name} v${result.version || '4.0.0'} - Active corridors: ${result.active_corridors || corridorCount}`
+                        : `${svc.name} - Service degraded`;
+                } catch (e) {
+                    const el = document.getElementById(svc.id);
+                    el.textContent = 'Offline';
+                    el.style.color = '#dc3545';
+                    el.title = `${svc.name} - ${e.message}`;
+                }
+            }
+        }
+        
+        // Update system status
+        function updateStatus() {
+            document.getElementById('active-corridors').textContent = corridorCount;
+            document.getElementById('allocated-memory').textContent = `${totalMemory.toFixed(1)} GB`;
+        }
+        
+        // Smooth scroll helpers for dock
+        function scrollToCorridor(){ document.getElementById('card-corridor')?.scrollIntoView({behavior:'smooth'}); }
+        function scrollToFFM(){ document.getElementById('card-ffm')?.scrollIntoView({behavior:'smooth'}); }
+        function scrollToStatus(){ document.getElementById('card-status')?.scrollIntoView({behavior:'smooth'}); }
+
+        // Initialize
+        checkServiceStatus();
+        setInterval(checkServiceStatus, 10000); // Check every 10 seconds
+
+        // SLO dials
+        function drawDial(el, val, min, max, green, yellow, formatter){
+            const canvas = document.createElement('canvas'); canvas.width=180; canvas.height=180; el.innerHTML=''; el.appendChild(canvas);
+            const ctx=canvas.getContext('2d'); const cx=90, cy=90, r=70;
+            const norm=(v)=>Math.max(0,Math.min(1,(v-min)/(max-min)));
+            const angle=norm(val)*Math.PI*1.5+Math.PI*0.75;
+            // bg arc
+            ctx.strokeStyle='rgba(42,82,152,.2)'; ctx.lineWidth=12; ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI*0.75,Math.PI*2.25); ctx.stroke();
+            // thresholds
+            let color='#28a745'; if (yellow(val)) color='#ffb300'; if (!green(val) && !yellow(val)) color='#dc3545';
+            ctx.strokeStyle=color; ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI*0.75,angle); ctx.stroke();
+            const value=document.createElement('div'); value.className='value'; value.textContent=formatter(val); el.appendChild(value);
+        }
+
+        function computeTelemetry(){
+            let ber=1.2e-12, pj=2.1, floor=150, achieved=floor*1.04, p99=240;
+            try{
+                if (window.hostOrchestrator){
+                    const s = window.hostOrchestrator.getStats();
+                    const q = s.schedulingQueue || 0;
+                    const kernels = (s.kernels||[]).filter(k=>k.status==='running').length;
+                    const load = Math.min(1, (kernels + q) / 8);
+                    p99 = 220 + Math.round(load*300 + Math.random()*40);
+                    pj = 1.9 + load*1.8 + Math.random()*0.2;
+                    achieved = floor * (1.02 - load*0.12 + Math.random()*0.02);
+                    ber = 8e-13 + load*4e-13 + (Math.random()*2e-13);
+                }
+            }catch(e){}
+            return { ber, pj, floor, achieved, p99 };
+        }
+
+        function updateDials(){
+            const t = computeTelemetry();
+            drawDial(document.getElementById('dial-ber'), t.ber, 1e-13, 1e-10,
+                v=>v<1e-12, v=>v>=1e-12 && v<1e-11, v=>v.toExponential(1));
+            drawDial(document.getElementById('dial-pj'), t.pj, 0, 6,
+                v=>v<=3.0, v=>v>3.0 && v<=4.0, v=>`${v.toFixed(1)} pJ/bit`);
+            drawDial(document.getElementById('dial-gbps'), t.achieved, 0, t.floor*1.3,
+                v=>v>=t.floor, v=>v>=t.floor*0.9 && v<t.floor, v=>`${Math.round(v)} GB/s`);
+            drawDial(document.getElementById('dial-p99'), t.p99, 0, 800,
+                v=>v<=300, v=>v>300 && v<=500, v=>`${Math.round(v)} ns`);
+        }
+        updateDials();
+        setInterval(updateDials, 2000);
+
+        // Auto-activate a corridor once per session using default form values
+        (async function autoActivateOnce(){
+            try {
+                const already = sessionStorage.getItem('autoCorridorActivated');
+                if (!already) {
+                    await allocateCorridor();
+                    sessionStorage.setItem('autoCorridorActivated', '1');
+                }
+            } catch (e) {
+                // Non-fatal
+                console.warn('Auto corridor activation failed:', e);
+            }
+        })();
+    </script>
+    <script src="orchestrator.d7eef59f.js"></script>
+</body>
+</html>

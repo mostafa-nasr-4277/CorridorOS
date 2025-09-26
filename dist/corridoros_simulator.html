@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CorridorOS - Photonic Operating System</title>
+    <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.css">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .corridor-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('corridor_screen_2560x1600.png') center/cover no-repeat;
+            opacity: 0.15;
+            filter: blur(1px);
+            z-index: -1;
+        }
+        
+        .boot-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .corridoros-logo {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff, #ffff00);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .install-section {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+        
+        .install-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #00d4ff;
+        }
+        
+        .install-section p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #ccc;
+        }
+        
+        .install-btn {
+            background: var(--co-prism);
+            border: none;
+            color: white;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+        
+        .install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
+        }
+        
+        .install-btn:disabled {
+            background: #333;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .progress-container {
+            width: 100%;
+            max-width: 320px;
+            margin: 2.5rem auto 0;
+            display: none;
+            align-items: center;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        
+        .circular-progress {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .circular-progress::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.35);
+        }
+        
+        .circular-progress::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(
+                #00d4ff calc(var(--install-progress, 0) * 360deg),
+                rgba(0, 212, 255, 0.15) 0deg
+            );
+            filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.45));
+        }
+        
+        .progress-core {
+            position: relative;
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            background: radial-gradient(circle at top, rgba(0, 212, 255, 0.45), rgba(0, 212, 255, 0));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+        }
+        
+        .progress-label {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.82);
+            text-align: center;
+            max-width: 280px;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        .main-interface {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        
+        .navbar {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .navbar-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #333;
+        }
+        
+        .card h3 {
+            color: #2a5298;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: blink 2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            color: #2a5298;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(42, 82, 152, 0.3);
+        }
+        
+        .action-btn h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .action-btn p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+        
+        .console {
+            background: #000;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin-top: 1rem;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .console-line {
+            margin-bottom: 0.25rem;
+        }
+        
+        .typing {
+            border-right: 2px solid #00ff00;
+            animation: blink-cursor 1s infinite;
+        }
+        
+        @keyframes blink-cursor {
+            0%, 50% { border-color: #00ff00; }
+            51%, 100% { border-color: transparent; }
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-4px);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card h4 {
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.5;
+        }
+        
+        .deployment-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .deployment-section h3 {
+            color: #00d4ff;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .deployment-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .deployment-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .deployment-card:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .deployment-card h4 {
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+        
+        .deployment-card ul {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+        
+        .deployment-card li {
+            margin-bottom: 0.5rem;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        
+        .deployment-card li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .deployment-btn {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .deployment-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .corridoros-logo {
+                font-size: 2.5rem;
+            }
+            
+            .install-section {
+                padding: 1rem;
+            }
+            
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="co-back co-back--solid co-exit" title="Back to Home">Home</a>
+    <!-- Boot/Installation Screen -->
+    <div class="boot-screen" id="bootScreen">
+        <div class="corridor-backdrop"></div>
+        <div class="corridoros-logo">CorridorOS</div>
+        <div class="install-section">
+            <h2>Photonic Operating System</h2>
+            <p>
+                Revolutionary OS for photonic interconnects and free-form memory management. 
+                Experience next-generation computing with wavelength-division multiplexing 
+                and CXL-backed memory pools.
+            </p>
+            <button class="install-btn" id="installBtn" onclick="startInstallation()">
+                🚀 Install CorridorOS
+            </button>
+            
+            <div class="progress-container" id="progressContainer">
+                <div class="circular-progress" id="circularProgress">
+                    <div class="progress-core" id="progressCore">0%</div>
+                </div>
+                <div class="progress-label" id="progressLabel">Preparing installation...</div>
+                <div class="progress-text" id="progressText">Initializing...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Interface -->
+    <div class="main-interface" id="mainInterface">
+        <nav class="navbar">
+            <div class="navbar-brand">CorridorOS v4.0</div>
+            <div class="navbar-actions">
+                <button class="nav-btn" onclick="showConsole()">Console</button>
+                <button class="nav-btn" onclick="showFeatures()">Features</button>
+                <button class="nav-btn" onclick="showDeployment()">Deploy</button>
+                <button class="nav-btn" onclick="reboot()">Reboot</button>
+            </div>
+        </nav>
+        
+        <div class="container">
+            <!-- System Overview -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3><span class="status-dot"></span> System Status</h3>
+                    <div class="metric">
+                        <span>corrd Service</span>
+                        <span class="metric-value" id="corrdStatus">Online</span>
+                    </div>
+                    <div class="metric">
+                        <span>memqosd Service</span>
+                        <span class="metric-value" id="memqosdStatus">Online</span>
+                    </div>
+                    <div class="metric">
+                        <span>Photonic Lanes</span>
+                        <span class="metric-value" id="photonicLanes">0</span>
+                    </div>
+                    <div class="metric">
+                        <span>Memory Pools</span>
+                        <span class="metric-value" id="memoryPools">0 GB</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3><span class="status-dot"></span> Resource Monitor</h3>
+                    <div class="metric">
+                        <span>CPU Usage</span>
+                        <span class="metric-value" id="cpuUsage">12%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Memory Usage</span>
+                        <span class="metric-value" id="memoryUsage">34%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Photonic BER</span>
+                        <span class="metric-value" id="photonicBER">1.2e-12</span>
+                    </div>
+                    <div class="metric">
+                        <span>Temperature</span>
+                        <span class="metric-value" id="temperature">47.3°C</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3><span class="status-dot"></span> Network Status</h3>
+                    <div class="metric">
+                        <span>Corridors Active</span>
+                        <span class="metric-value" id="corridorsActive">0</span>
+                    </div>
+                    <div class="metric">
+                        <span>Bandwidth</span>
+                        <span class="metric-value" id="bandwidth">0 Gbps</span>
+                    </div>
+                    <div class="metric">
+                        <span>Latency</span>
+                        <span class="metric-value" id="latency">0.25 ms</span>
+                    </div>
+                    <div class="metric">
+                        <span>Uptime</span>
+                        <span class="metric-value" id="uptime">00:00:01</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-btn" onclick="allocateCorridor()">
+                    <h4>🌈 Allocate Corridor</h4>
+                    <p>Create photonic wavelength lanes</p>
+                </button>
+                <button class="action-btn" onclick="allocateMemory()">
+                    <h4>💾 Allocate Memory</h4>
+                    <p>Provision FFM memory pools</p>
+                </button>
+                <button class="action-btn" onclick="runDiagnostics()">
+                    <h4>🔍 Run Diagnostics</h4>
+                    <p>System health check</p>
+                </button>
+                <button class="action-btn" onclick="openDashboard()">
+                    <h4>📊 Full Dashboard</h4>
+                    <p>Advanced management console</p>
+                </button>
+            </div>
+            
+            <!-- Console Output -->
+            <div class="console" id="console" style="display: none;">
+                <div class="console-line">CorridorOS v4.0 - Photonic Operating System</div>
+                <div class="console-line">Initializing photonic subsystem...</div>
+                <div class="console-line">Loading CXL memory drivers...</div>
+                <div class="console-line">Starting network services...</div>
+                <div class="console-line">System ready.</div>
+                <div class="console-line typing" id="consoleCursor">root@corridoros:~$ </div>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="feature-grid" id="featuresSection" style="display: none;">
+                <div class="feature-card">
+                    <div class="feature-icon">🌊</div>
+                    <h4>Photonic Corridors</h4>
+                    <p>Wavelength-division multiplexing with dynamic lane allocation and HELIOPASS calibration</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h4>Free-Form Memory</h4>
+                    <p>CXL-backed memory pools with tier-based allocation and QoS guarantees</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h4>Security & Attestation</h4>
+                    <p>TPM-based measured boot, SPDM device attestation, and PQC encryption</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h4>Real-time Monitoring</h4>
+                    <p>BER tracking, eye monitoring, thermal management, and performance metrics</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔬</div>
+                    <h4>CorridorLabs</h4>
+                    <p>Physics simulation, HELIOPASS modeling, and educational tools</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h4>High Performance</h4>
+                    <p>Ultra-low latency, high bandwidth photonic interconnects with adaptive routing</p>
+                </div>
+            </div>
+            
+            <!-- Deployment Section -->
+            <div class="deployment-section" id="deploymentSection" style="display: none;">
+                <h3>🚀 Deploy CorridorOS</h3>
+                <p style="color: #ccc; margin-bottom: 2rem;">
+                    Choose your deployment option to run CorridorOS in production environments
+                </p>
+                
+                <div class="deployment-options">
+                    <div class="deployment-card">
+                        <h4>🌐 Web Demo (Current)</h4>
+                        <ul>
+                            <li>Mock backend services</li>
+                            <li>Full UI experience</li>
+                            <li>No hardware required</li>
+                            <li>Perfect for testing</li>
+                        </ul>
+                        <button class="deployment-btn" onclick="openDashboard()">
+                            Open Dashboard
+                        </button>
+                    </div>
+                    
+                    <div class="deployment-card">
+                        <h4>☁️ Cloud Deployment</h4>
+                        <ul>
+                            <li>Kubernetes orchestration</li>
+                            <li>HTTPS with SSL/TLS</li>
+                            <li>Auto-scaling services</li>
+                            <li>Production monitoring</li>
+                        </ul>
+                        <button class="deployment-btn" onclick="prepareCloudDeploy()">
+                            Prepare Deployment
+                        </button>
+                    </div>
+                    
+                    <div class="deployment-card">
+                        <h4>🏠 On-Premises</h4>
+                        <ul>
+                            <li>Real CXL hardware</li>
+                            <li>Photonic I/O devices</li>
+                            <li>High-security environment</li>
+                            <li>Full feature set</li>
+                        </ul>
+                        <button class="deployment-btn" onclick="showHardwareGuide()">
+                            Hardware Guide
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let installationStep = 0;
+        let uptimeStart = Date.now();
+        let photonicLanes = 0;
+        let memoryPools = 0;
+        let corridorsActive = 0;
+        
+        const installSteps = [
+            "Checking system requirements...",
+            "Downloading CorridorOS kernel...",
+            "Installing photonic drivers...",
+            "Configuring CXL subsystem...", 
+            "Setting up security framework...",
+            "Initializing network services...",
+            "Loading user interface...",
+            "Finalizing installation..."
+        ];
+        
+        function startInstallation() {
+            const installBtn = document.getElementById('installBtn');
+            installBtn.disabled = true;
+            installBtn.textContent = 'Installing...';
+            
+            const container = document.getElementById('progressContainer');
+            container.style.display = 'flex';
+            container.style.setProperty('--install-progress', 0);
+            document.getElementById('progressCore').textContent = '0%';
+            document.getElementById('progressLabel').textContent = 'Preparing installation...';
+            document.getElementById('progressText').textContent = `Step 0 of ${installSteps.length}`;
+            
+            installationStep = 0;
+            installCorridorOS();
+        }
+        
+        function installCorridorOS() {
+            if (installationStep < installSteps.length) {
+                const progress = ((installationStep + 1) / installSteps.length);
+                const percentage = Math.round(progress * 100);
+                document.getElementById('progressContainer').style.setProperty('--install-progress', progress);
+                document.getElementById('progressCore').textContent = `${percentage}%`;
+                document.getElementById('progressLabel').textContent = installSteps[installationStep];
+                document.getElementById('progressText').textContent = `Step ${installationStep + 1} of ${installSteps.length}`;
+                
+                installationStep++;
+                setTimeout(installCorridorOS, 900 + Math.random() * 900);
+            } else {
+                completeInstallation();
+            }
+        }
+        
+        function completeInstallation() {
+            document.getElementById('progressContainer').style.setProperty('--install-progress', 1);
+            document.getElementById('progressCore').textContent = '100%';
+            document.getElementById('progressLabel').textContent = 'Installation complete!';
+            document.getElementById('progressText').textContent = 'Booting CorridorOS...';
+            setTimeout(() => {
+                document.getElementById('bootScreen').classList.add('hidden');
+                document.getElementById('mainInterface').style.display = 'block';
+                startSystemMonitoring();
+            }, 2000);
+        }
+        
+        function startSystemMonitoring() {
+            // Check service status
+            checkServices();
+            
+            // Update metrics periodically
+            setInterval(updateMetrics, 2000);
+            setInterval(updateUptime, 1000);
+            
+            // Simulate some initial activity
+            setTimeout(() => {
+                simulateSystemActivity();
+            }, 3000);
+        }
+        
+        async function checkServices() {
+            try {
+                const corrdResponse = await fetch('http://localhost:7080/health');
+                document.getElementById('corrdStatus').textContent = 'Online';
+                document.getElementById('corrdStatus').style.color = '#4CAF50';
+            } catch {
+                document.getElementById('corrdStatus').textContent = 'Offline';
+                document.getElementById('corrdStatus').style.color = '#dc3545';
+            }
+            
+            try {
+                const memqosdResponse = await fetch('http://localhost:7070/health');
+                document.getElementById('memqosdStatus').textContent = 'Online';
+                document.getElementById('memqosdStatus').style.color = '#4CAF50';
+            } catch {
+                document.getElementById('memqosdStatus').textContent = 'Offline';
+                document.getElementById('memqosdStatus').style.color = '#dc3545';
+            }
+        }
+        
+        function updateMetrics() {
+            // Simulate realistic system metrics
+            const cpu = Math.floor(Math.random() * 15) + 10;
+            const memory = Math.floor(Math.random() * 20) + 30;
+            const ber = (1.0 + Math.random() * 0.5).toFixed(1) + 'e-12';
+            const temp = (45 + Math.random() * 8).toFixed(1);
+            const bandwidth = photonicLanes * 52; // 52 Gbps per lane
+            
+            document.getElementById('cpuUsage').textContent = cpu + '%';
+            document.getElementById('memoryUsage').textContent = memory + '%';
+            document.getElementById('photonicBER').textContent = ber;
+            document.getElementById('temperature').textContent = temp + '°C';
+            document.getElementById('photonicLanes').textContent = photonicLanes;
+            document.getElementById('memoryPools').textContent = memoryPools + ' GB';
+            document.getElementById('corridorsActive').textContent = corridorsActive;
+            document.getElementById('bandwidth').textContent = bandwidth + ' Gbps';
+        }
+        
+        function updateUptime() {
+            const elapsed = Math.floor((Date.now() - uptimeStart) / 1000);
+            const hours = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('uptime').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        
+        function simulateSystemActivity() {
+            // Add some console activity
+            addConsoleLog('System monitoring started');
+            addConsoleLog('Photonic calibration in progress...');
+            addConsoleLog('All systems nominal');
+        }
+        
+        function addConsoleLog(message) {
+            const console = document.getElementById('console');
+            const newLine = document.createElement('div');
+            newLine.className = 'console-line';
+            newLine.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            const cursor = document.getElementById('consoleCursor');
+            console.insertBefore(newLine, cursor);
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        async function allocateCorridor() {
+            addConsoleLog('Allocating photonic corridor...');
+            
+            try {
+                const response = await fetch('http://localhost:7080/v1/corridors', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        type: "SiCorridor",
+                        lanes: 8,
+                        lambda_nm: [1550,1551,1552,1553,1554,1555,1556,1557],
+                        min_gbps: 400,
+                        latency_budget_ns: 250
+                    })
+                });
+                
+                const result = await response.json();
+                photonicLanes += result.lanes;
+                corridorsActive++;
+                addConsoleLog(`Corridor ${result.id} allocated: ${result.lanes} lanes, ${result.achievable_gbps} Gbps`);
+            } catch (error) {
+                addConsoleLog(`Corridor allocation failed: ${error.message}`);
+            }
+        }
+        
+        async function allocateMemory() {
+            addConsoleLog('Allocating FFM memory pool...');
+            
+            try {
+                const response = await fetch('http://localhost:7070/v1/ffm/alloc', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        bytes: 68719476736, // 64 GB
+                        latency_class: "T2",
+                        bandwidth_floor_GBs: 100
+                    })
+                });
+                
+                const result = await response.json();
+                memoryPools += 64;
+                addConsoleLog(`Memory pool ${result.ffm_handle} allocated: 64 GB`);
+            } catch (error) {
+                addConsoleLog(`Memory allocation failed: ${error.message}`);
+            }
+        }
+        
+        function runDiagnostics() {
+            addConsoleLog('Running system diagnostics...');
+            setTimeout(() => {
+                addConsoleLog('✓ Photonic subsystem: OK');
+                addConsoleLog('✓ Memory subsystem: OK');
+                addConsoleLog('✓ Network services: OK');
+                addConsoleLog('✓ Security framework: OK');
+                addConsoleLog('Diagnostics complete - All systems healthy');
+            }, 1500);
+        }
+        
+        function openDashboard() {
+            // Try to open the enhanced dashboard, fallback to inline if needed
+            const dashboardUrl = window.location.origin + '/corridoros_dashboard.html';
+            const dashboardWindow = window.open(dashboardUrl, '_blank');
+            
+            if (!dashboardWindow) {
+                // Fallback: show inline dashboard
+                showInlineDashboard();
+            }
+        }
+        
+        function showInlineDashboard() {
+            // Create and show an inline dashboard overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="background: #1a1a2e; border-radius: 12px; padding: 2rem; max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="color: #00d4ff; margin: 0;">🔧 CorridorOS Advanced Dashboard</h2>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; margin-left: auto;">✕ Close</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h3 style="color: #00d4ff; margin-bottom: 1rem;">🌈 Photonic Corridors</h3>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <label style="display: block; margin-bottom: 0.5rem;">Lanes: <input type="number" value="8" min="1" max="16" style="width: 60px; margin-left: 0.5rem; padding: 0.25rem;"></label>
+                                <label style="display: block; margin-bottom: 0.5rem;">Wavelength (nm): <input type="number" value="1550" min="1500" max="1600" style="width: 80px; margin-left: 0.5rem; padding: 0.25rem;"></label>
+                                <label style="display: block; margin-bottom: 1rem;">Bandwidth (Gbps): <input type="number" value="400" min="1" max="1000" style="width: 80px; margin-left: 0.5rem; padding: 0.25rem;"></label>
+                                <button onclick="allocateCorridorFromMain()" style="background: #00d4ff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; width: 100%;">Allocate Corridor</button>
+                            </div>
+                            <div id="corridorResult" style="background: rgba(0,212,255,0.1); padding: 1rem; border-radius: 8px; display: none; font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                        <div>
+                            <h3 style="color: #00d4ff; margin-bottom: 1rem;">💾 Free-Form Memory</h3>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <label style="display: block; margin-bottom: 0.5rem;">Size: <select style="margin-left: 0.5rem; padding: 0.25rem;"><option value="268435456">256 GB</option><option value="536870912">512 GB</option><option value="1073741824">1 TB</option></select></label>
+                                <label style="display: block; margin-bottom: 0.5rem;">Tier: <select style="margin-left: 0.5rem; padding: 0.25rem;"><option value="T1">T1 - HBM</option><option value="T2">T2 - CXL</option><option value="T3">T3 - DDR</option></select></label>
+                                <label style="display: block; margin-bottom: 1rem;">Bandwidth (Gbps): <input type="number" value="150" min="1" max="1000" style="width: 80px; margin-left: 0.5rem; padding: 0.25rem;"></label>
+                                <button onclick="allocateMemoryFromMain()" style="background: #00d4ff; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; width: 100%;">Allocate Memory</button>
+                            </div>
+                            <div id="memoryResult" style="background: rgba(0,212,255,0.1); padding: 1rem; border-radius: 8px; display: none; font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <button onclick="window.open('${window.location.origin}/corridoros_dashboard.html', '_blank')" style="background: #4CAF50; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; margin-right: 1rem;">🌐 Open Full Dashboard</button>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: #666; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer;">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+        }
+        
+        // Enhanced allocation functions for inline dashboard
+        async function allocateCorridorFromMain() {
+            const overlay = document.querySelector('[style*="position: fixed"]');
+            if (!overlay) return;
+            
+            const lanes = overlay.querySelector('input[type="number"]').value;
+            const wavelength = overlay.querySelectorAll('input[type="number"]')[1].value;
+            const bandwidth = overlay.querySelectorAll('input[type="number"]')[2].value;
+            
+            const resultDiv = overlay.querySelector('#corridorResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="color: #00d4ff;">Allocating corridor...</div>';
+            
+            try {
+                // Mock allocation for demo
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                const mockResult = {
+                    id: `cor-${Math.random().toString(16).substr(2, 4)}`,
+                    corridor_type: "SiCorridor",
+                    lanes: parseInt(lanes),
+                    lambda_nm: Array.from({length: parseInt(lanes)}, (_, i) => parseInt(wavelength) + i),
+                    min_gbps: parseInt(bandwidth),
+                    achievable_gbps: Math.round(parseInt(bandwidth) * 1.04),
+                    status: "Active",
+                    created_at: new Date().toISOString()
+                };
+                
+                resultDiv.innerHTML = `<pre style="color: #4CAF50;">${JSON.stringify(mockResult, null, 2)}</pre>`;
+                
+                // Update main interface metrics
+                corridorsActive++;
+                document.getElementById('corridorsActive').textContent = corridorsActive;
+                document.getElementById('bandwidth').textContent = `${parseInt(bandwidth) * corridorsActive} Gbps`;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: #dc3545;">Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function allocateMemoryFromMain() {
+            const overlay = document.querySelector('[style*="position: fixed"]');
+            if (!overlay) return;
+            
+            const memorySelect = overlay.querySelector('select');
+            const tierSelect = overlay.querySelectorAll('select')[1];
+            const bandwidthInput = overlay.querySelector('input[type="number"]');
+            
+            const bytes = parseInt(memorySelect.value);
+            const tier = tierSelect.value;
+            const bandwidth = parseInt(bandwidthInput.value);
+            
+            const resultDiv = overlay.querySelector('#memoryResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="color: #00d4ff;">Allocating memory...</div>';
+            
+            try {
+                // Mock allocation for demo
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                const mockResult = {
+                    id: `ffm-${Math.random().toString(16).substr(2, 6)}`,
+                    bytes: bytes,
+                    latency_class: tier,
+                    bandwidth_floor_GBs: bandwidth,
+                    achievable_bandwidth_GBs: Math.round(bandwidth * 1.08),
+                    status: "Allocated",
+                    created_at: new Date().toISOString()
+                };
+                
+                resultDiv.innerHTML = `<pre style="color: #4CAF50;">${JSON.stringify(mockResult, null, 2)}</pre>`;
+                
+                // Update main interface metrics
+                memoryPools += bytes / (1024**3);
+                document.getElementById('memoryPools').textContent = `${memoryPools.toFixed(1)} GB`;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: #dc3545;">Error: ${error.message}</div>`;
+            }
+        }
+        
+        function showConsole() {
+            const console = document.getElementById('console');
+            const features = document.getElementById('featuresSection');
+            const deployment = document.getElementById('deploymentSection');
+            
+            console.style.display = console.style.display === 'none' ? 'block' : 'none';
+            features.style.display = 'none';
+            deployment.style.display = 'none';
+        }
+        
+        function showFeatures() {
+            const console = document.getElementById('console');
+            const features = document.getElementById('featuresSection');
+            const deployment = document.getElementById('deploymentSection');
+            
+            features.style.display = features.style.display === 'none' ? 'grid' : 'none';
+            console.style.display = 'none';
+            deployment.style.display = 'none';
+        }
+        
+        function showDeployment() {
+            const console = document.getElementById('console');
+            const features = document.getElementById('featuresSection');
+            const deployment = document.getElementById('deploymentSection');
+            
+            deployment.style.display = deployment.style.display === 'none' ? 'block' : 'none';
+            console.style.display = 'none';
+            features.style.display = 'none';
+        }
+        
+        function prepareCloudDeploy() {
+            addConsoleLog('Preparing cloud deployment configuration...');
+            addConsoleLog('Generating Kubernetes manifests...');
+            addConsoleLog('Setting up HTTPS certificates...');
+            addConsoleLog('Cloud deployment package ready!');
+            
+            // This would trigger the cloud deployment preparation
+            alert('Cloud deployment configuration generated!\n\nNext steps:\n1. Set up Kubernetes cluster\n2. Configure SSL certificates\n3. Deploy using provided manifests\n\nSee documentation for detailed instructions.');
+        }
+        
+        function showHardwareGuide() {
+            const guideWindow = window.open('', '_blank');
+            guideWindow.document.write(`
+                <html>
+                <head><title>CorridorOS Hardware Guide</title></head>
+                <body style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem;">
+                    <h1>CorridorOS Hardware Requirements</h1>
+                    <h2>Minimum Requirements</h2>
+                    <ul>
+                        <li>Intel Sapphire Rapids or AMD Genoa CPU</li>
+                        <li>32GB DDR5 RAM minimum</li>
+                        <li>CXL 3.0 compatible motherboard</li>
+                        <li>1TB NVMe SSD storage</li>
+                    </ul>
+                    <h2>Photonic Hardware</h2>
+                    <ul>
+                        <li>Photonic I/O development kit</li>
+                        <li>Wavelength management hardware</li>
+                        <li>Optical test equipment (optional)</li>
+                    </ul>
+                    <h2>Recommended Vendors</h2>
+                    <ul>
+                        <li>Ayar Labs - WaveLight optical chiplets</li>
+                        <li>Lightmatter - Passage interconnect</li>
+                        <li>Intel - Co-packaged optics kits</li>
+                    </ul>
+                </body>
+                </html>
+            `);
+        }
+        
+        // Quick action functions for main interface
+        function allocateCorridor() {
+            addConsoleLog('Opening corridor allocation interface...');
+            showInlineDashboard();
+        }
+        
+        function allocateMemory() {
+            addConsoleLog('Opening memory allocation interface...');
+            showInlineDashboard();
+        }
+        
+        function runDiagnostics() {
+            addConsoleLog('Running system diagnostics...');
+            setTimeout(() => {
+                addConsoleLog('✓ Photonic subsystem: OK');
+                addConsoleLog('✓ CXL memory controller: OK');
+                addConsoleLog('✓ Network interfaces: OK');
+                addConsoleLog('✓ Security framework: OK');
+                addConsoleLog('Diagnostics complete - All systems healthy');
+            }, 1500);
+        }
+        
+        function reboot() {
+            if (confirm('Are you sure you want to reboot CorridorOS?')) {
+                document.getElementById('mainInterface').style.display = 'none';
+                document.getElementById('bootScreen').classList.remove('hidden');
+                document.getElementById('installBtn').textContent = '🔄 Rebooting...';
+                document.getElementById('installBtn').disabled = true;
+                document.getElementById('progressContainer').style.display = 'none';
+                
+                setTimeout(() => {
+                    document.getElementById('installBtn').textContent = '🚀 Install CorridorOS';
+                    document.getElementById('installBtn').disabled = false;
+                    uptimeStart = Date.now();
+                    photonicLanes = 0;
+                    memoryPools = 0;
+                    corridorsActive = 0;
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>

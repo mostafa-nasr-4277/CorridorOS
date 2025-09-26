@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corridor OS - Simple Launcher</title>
+    <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            background: rgba(0,0,0,0.8);
+            border-radius: 20px;
+            border: 2px solid #E95420;
+        }
+        h1 {
+            color: #E95420;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 10px 0;
+            background: #E95420;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background: #d14b1f;
+        }
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="co-back co-back--solid co-exit" title="Back to Home">Home</a>
+    <div class="container co-card">
+        <h1>🐧 Corridor OS</h1>
+        <p>Ubuntu-Compatible Quantum-Photonic System</p>
+        
+        <a href="corridor-os/corridor-os.html" class="button">
+            🚀 Launch Full Desktop OS
+        </a>
+        
+        <a href="corridor-os/index.html" class="button">
+            🔬 Launch Computer Demo
+        </a>
+        
+        <a href="corridor-os/corridor-os.html?mode=terminal" class="button">
+            💻 Launch Terminal Mode
+        </a>
+        
+        <a href="corridor-os/corridor-os.html?mode=settings" class="button">
+            ⚙️ Launch Settings Panel
+        </a>
+        
+        <div class="info">
+            <strong>🦊 Mozilla Firefox Users:</strong><br>
+            If links don't work, try:<br>
+            1. Type <code>about:config</code> in address bar<br>
+            2. Search for "security.fileuri.strict_origin_policy"<br>
+            3. Set it to <code>false</code><br>
+            4. Restart Firefox<br><br>
+            
+            <strong>Alternative:</strong><br>
+            Start Firefox with: <code>firefox --allow-file-access-from-files</code>
+        </div>
+    </div>
+</body>
+</html>

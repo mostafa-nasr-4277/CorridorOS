@@ -77,7 +77,6 @@ npm-debug.log*
 
 # Build artifacts
 build/
-dist/
 out/
 
 # Environment variables

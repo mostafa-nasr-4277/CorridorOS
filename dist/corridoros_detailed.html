@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorridorOS - Advanced Photonic Operating System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        /* Boot Screen */
+        .boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 70%, #000000 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 1s ease;
+        }
+        
+        .boot-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .boot-logo {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        
+        .boot-logo h1 {
+            font-size: 3.5rem;
+            font-weight: 100;
+            letter-spacing: 0.2em;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .boot-logo .subtitle {
+            font-size: 1rem;
+            color: #888;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        
+        /* Circular Progress */
+        .progress-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 2rem 0;
+        }
+        
+        .progress-circle {
+            width: 200px;
+            height: 200px;
+            transform: rotate(-90deg);
+        }
+        
+        .progress-background {
+            fill: none;
+            stroke: #2a2a3e;
+            stroke-width: 3;
+        }
+        
+        .progress-bar {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-dasharray: 628;
+            stroke-dashoffset: 628;
+            transition: stroke-dashoffset 0.3s ease;
+            animation: progressGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes progressGlow {
+            0% { 
+                stroke: #00d4ff;
+                filter: drop-shadow(0 0 5px #00d4ff);
+            }
+            25% { 
+                stroke: #00ff88;
+                filter: drop-shadow(0 0 8px #00ff88);
+            }
+            50% { 
+                stroke: #ffff00;
+                filter: drop-shadow(0 0 10px #ffff00);
+            }
+            75% { 
+                stroke: #ff00ff;
+                filter: drop-shadow(0 0 8px #ff00ff);
+            }
+            100% { 
+                stroke: #ff6b00;
+                filter: drop-shadow(0 0 5px #ff6b00);
+            }
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .progress-percent {
+            font-size: 2rem;
+            font-weight: 200;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .install-section {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+            margin-top: -2rem;
+        }
+        
+        .install-btn {
+            background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%);
+            border: 2px solid #444;
+            color: #fff;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 300;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 3rem;
+        }
+        
+        .install-btn:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            background: linear-gradient(135deg, #3a3a4e 0%, #2a2a3e 100%);
+        }
+        
+        .install-btn:disabled {
+            background: #1a1a1a;
+            border-color: #333;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        /* Main OS Interface */
+        .os-interface {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a3a 0%, #2e2e5a 50%, #4a4a7a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wallpaper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 255, 0, 0.05) 0%, transparent 50%);
+            animation: wallpaperShift 20s ease-in-out infinite;
+        }
+        
+        @keyframes wallpaperShift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(60deg); }
+        }
+        
+        /* Dock (center-floating) */
+        .taskbar {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            height: 64px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 14px 40px rgba(0,0,0,.45);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 12px;
+            z-index: 1000;
+        }
+        
+        .start-button {
+            background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+            border: 1px solid #444;
+            color: #fff;
+            height: 52px;
+            padding: 0 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .start-button:hover {
+            background: linear-gradient(135deg, #3a3a4e, #2a2a3e);
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+        
+        .taskbar-apps { display: flex; gap: 12px; align-items: center; }
+        
+        .app-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08);
+        }
+        
+        .app-icon:hover { background: rgba(255, 255, 255, 0.22); border-color: #00d4ff; transform: translateY(-6px) scale(1.05); box-shadow: 0 16px 30px rgba(0,0,0,.45); }
+        
+        .app-icon.active {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: #00d4ff;
+        }
+        
+        .system-tray { position: fixed; left: 14px; bottom: 12px; display: flex; align-items: center; gap: 12px; height: 44px; padding: 6px 10px; background: rgba(0,0,0,.55); backdrop-filter: blur(12px); border:1px solid rgba(255,255,255,.1); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.35); z-index: 1100; }
+        
+        .time { font-size: 0.95rem; color: #ccc; display:flex; align-items:center; height: 44px; }
+        
+        .system-stats {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        /* Windows */
+        .window {
+            position: absolute;
+            background: radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.06) 0%, rgba(20,20,30,.96) 40%, rgba(20,20,30,.96) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,.05);
+            display: none;
+            min-width: 300px;
+            min-height: 200px;
+            z-index: 100;
+            resize: both;
+            overflow: hidden;
+        }
+        
+        .window::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(-45deg, transparent 30%, rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.1) 70%, transparent 70%);
+            cursor: se-resize;
+            pointer-events: auto;
+        }
+        
+        .window.active {
+            z-index: 200;
+            border-color: #00d4ff;
+        }
+        
+        .window-header {
+            height: 40px;
+            background: linear-gradient(135deg, rgba(42, 42, 62, 0.92), rgba(26, 26, 46, 0.88));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            cursor: move;
+            user-select: none;
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,.4), 0 8px 20px rgba(0,0,0,.25);
+        }
+
+        /* Contextual toolbar in Settings header */
+        .settings-toolbar { margin-left: 12px; display: none; align-items: center; gap: 10px; }
+        .settings-toolbar.show { display: flex; }
+        .toolbar-select { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); color:#e6e6e6; border-radius:8px; padding:6px 8px; font-size: 12px; cursor: default; }
+        .toolbar-slider { width: 120px; accent-color: #00d4ff; cursor: default; }
+        .icon-btn { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color:#e6e6e6; border-radius:8px; padding:6px 8px; cursor:pointer; }
+        .icon-btn:hover { background: rgba(255,255,255,.16); }
+        
+        .window-title {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .window-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .window-control.close { background: #ff5f57; }
+        .window-control.minimize { background: #ffbd2e; }
+        .window-control.maximize { background: #28ca42; }
+        
+        .window-control:hover {
+            transform: scale(1.1);
+        }
+        
+        /* File Manager */
+        .file-manager {
+            width: auto;
+            min-width: 500px;
+            max-width: 700px;
+            height: auto;
+            min-height: 400px;
+            max-height: 500px;
+            top: 10%;
+            left: 10%;
+        }
+        
+        .fm-toolbar { display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.1); }
+        .fm-btn { background: rgba(255,255,255,.08); color:#e6e6e6; border:1px solid rgba(255,255,255,.18); border-radius:8px; padding:6px 10px; cursor:pointer }
+        .fm-btn:hover { background: rgba(255,255,255,.16) }
+        .fm-path { font-size:12px; color:#9aa5b1; padding:6px 10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:8px; flex:1 }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        
+        .file-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.04);
+        }
+        
+        .file-item:hover { background: rgba(255,255,255,.1); transform: translateY(-3px); box-shadow: 0 12px 26px rgba(0,0,0,.35); }
+        .file-item.selected { outline:2px solid #26E6FF; background: rgba(38,230,255,.12); }
+        
+        .file-icon { font-size: 2.2rem; margin-bottom: 0.5rem; filter: drop-shadow(0 2px 8px rgba(0,0,0,.35)); }
+        
+        .file-name {
+            font-size: 0.8rem;
+            text-align: center;
+            color: #ccc;
+        }
+        
+        /* Terminal */
+        .terminal {
+            width: auto;
+            min-width: 600px;
+            max-width: 800px;
+            height: auto;
+            min-height: 300px;
+            max-height: 400px;
+            top: 15%;
+            left: 15%;
+            background: rgba(0, 0, 0, 0.95);
+        }
+        
+        .terminal-content {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            padding: 1rem;
+            height: 100%;
+            background: #000;
+            color: #00ff00;
+        }
+        
+        .terminal-line {
+            margin-bottom: 0.25rem;
+        }
+        
+        .terminal-prompt {
+            color: #00d4ff;
+        }
+        
+        .terminal-cursor { display:none; }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Browser */
+        .browser {
+            width: auto;
+            min-width: 700px;
+            max-width: 900px;
+            height: auto;
+            min-height: 500px;
+            max-height: 600px;
+            top: 5%;
+            left: 20%;
+        }
+        
+        .browser-toolbar {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .browser-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .browser-btn {
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .browser-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .address-bar {
+            flex: 1;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        
+        .browser-content {
+            height: calc(100% - 60px);
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+        
+        /* System Monitor */
+        .system-monitor {
+            width: auto;
+            min-width: 500px;
+            max-width: 600px;
+            height: auto;
+            min-height: 350px;
+            max-height: 450px;
+            top: 20%;
+            right: 10%;
+        }
+        
+        /* Settings */
+        .settings {
+            width: auto;
+            min-width: 650px;
+            max-width: 800px;
+            height: auto;
+            min-height: 500px;
+            max-height: 650px;
+            top: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .window-content {
+            padding: 1rem;
+            height: calc(100% - 40px);
+            overflow-y: auto;
+        }
+        
+        .settings .window-content,
+        .browser .window-content {
+            padding: 0;
+            display: block;
+        }
+        
+        .terminal .window-content {
+            padding: 0;
+        }
+        
+        .settings-sidebar {
+            width: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+        }
+        
+        .settings-category {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: #ccc;
+            border-left: 3px solid transparent;
+        }
+        
+        .settings-category:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .settings-category.active {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            border-left-color: #00d4ff;
+        }
+        
+        .settings-content { flex: 1; padding: 2rem; overflow-y: auto; }
+        /* Two-column alignment for individual settings */
+        .setting-group { display: grid; grid-template-columns: 220px minmax(220px,1fr); align-items: center; gap: 12px; margin-bottom: 1rem; }
+        .setting-group label { margin: 0; color: #eaeaea; }
+        .setting-group small { grid-column: 2; color: #9aa5b1; }
+        .setting-group span { grid-column: 2; justify-self: start; margin-left: 0; }
+        
+        .settings-panel {
+            display: none;
+        }
+        
+        .settings-panel.active {
+            display: block;
+        }
+        
+        .settings-panel h3 {
+            color: #00d4ff;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 300;
+        }
+        
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .setting-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .setting-group select,
+        .setting-group input[type="range"] {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        
+        .setting-group input[type="checkbox"] {
+            margin-right: 0.5rem;
+            transform: scale(1.2);
+        }
+        
+        .setting-group small {
+            display: block;
+            color: #888;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+        
+        .setting-group span {
+            margin-left: 0.5rem;
+            color: #00d4ff;
+            font-weight: 500;
+        }
+        
+        .system-info {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-row span:first-child {
+            color: #888;
+        }
+        
+        .info-row span:last-child {
+            color: #00d4ff;
+            font-weight: 500;
+        }
+        
+        .settings-btn {
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .settings-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(42, 82, 152, 0.3);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to top, #00d4ff, #00ff88);
+            animation: chartPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes chartPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        /* Notifications (toasts + panel) */
+        .notifications { position: fixed; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; }
+        .notification { background: rgba(20,20,30,.95); color:#fff; padding: 14px 16px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.1); animation: slideInRight .25s ease; max-width: 340px; }
+        .notification .title { font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .notification .body { color: rgba(255,255,255,.8); font-size: 14px; margin-top: 6px; }
+        .notification .close { background: transparent; border: none; color: #aaa; cursor: pointer; font-size: 16px; }
+        .notification .close:hover { color: #fff; }
+        @keyframes slideInRight { from { transform: translateX(20px); opacity:0; } to { transform: translateX(0); opacity:1; } }
+
+        .notif-panel { position: fixed; right: -360px; top: 16px; width: 340px; height: calc(100vh - 32px); background: rgba(20,20,30,.97); border-left: 1px solid rgba(255,255,255,.1); box-shadow: 0 10px 30px rgba(0,0,0,.35); border-radius: 12px 0 0 12px; z-index: 2100; display:flex; flex-direction:column; transition: right .25s ease; }
+        .notif-panel.open { right: 16px; }
+        .notif-header { display:flex; align-items:center; justify-content:space-between; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
+        .notif-header .title { font-weight:700; display:flex; align-items:center; gap:8px; }
+        .notif-header .actions { display:flex; gap:8px; }
+        .notif-header .actions button { background: transparent; color:#ccc; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:6px 10px; cursor:pointer; }
+        .notif-header .actions button:hover { background: rgba(255,255,255,.06); color:#fff; }
+        .notif-list { flex: 1; overflow:auto; padding: 8px 10px 12px; }
+        .notif-item { display:grid; grid-template-columns: 1fr auto; gap:6px 8px; border:1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03); border-radius:10px; padding:10px; margin:8px 0; }
+        .notif-item .title { font-weight:600; }
+        .notif-item .meta { font-size:12px; color:#999; }
+        .notif-item .body { grid-column:1 / -1; color:#bbb; font-size:14px; }
+        .notif-item .close { background: transparent; border:none; color:#aaa; cursor:pointer; font-size:16px; }
+        .notif-empty { padding: 16px; color: #888; text-align: center; }
+        .notif-badge { background:#e74c3c; color:#fff; border-radius:10px; padding:0 6px; font-size:11px; line-height:18px; height:18px; min-width:18px; display:inline-flex; align-items:center; justify-content:center; }
+
+        /* Mobile adaptations */
+        @media (max-width: 768px) {
+          html, body { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+          body { user-select: auto; }
+          .os-interface { width: 100%; min-height: 100dvh; height: auto; overflow: visible; padding-bottom: 110px; }
+          .wallpaper { position: fixed; }
+          .window { position: relative; left: 50% !important; transform: translateX(-50%); top: auto !important; margin: 12px 0; width: 92vw !important; height: auto !important; max-height: none !important; }
+          .terminal .window-content, .browser .window-content, .settings .window-content { height: auto !important; overflow: visible; }
+          .taskbar { position: sticky; bottom: 10px; left: 50%; transform: translateX(-50%); }
+          .system-tray { left: 12px; bottom: 96px; }
+          .desktop-icons { position: static !important; padding: 14px; pointer-events: auto; }
+          .file-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .settings { left: 50% !important; transform: translateX(-50%); }
+          .settings-sidebar { width: 100%; display: flex; gap: 6px; overflow-x: auto; background: rgba(0,0,0,.35); border-right:0; border-bottom: 1px solid rgba(255,255,255,.1); padding: 8px; }
+          .settings-content { padding: 1rem; }
+          .setting-group { grid-template-columns: 1fr; }
+          .setting-group label, .setting-group small, .setting-group span { grid-column: 1; }
+        }
+        
+        /* Start Menu */
+        .start-menu {
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            width: 400px;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px 8px 0 0;
+            display: none;
+            z-index: 1200;
+        }
+        
+        .start-menu.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .start-menu-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(42, 42, 62, 0.5), rgba(26, 26, 46, 0.5));
+        }
+        
+        .start-menu-apps {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .start-app {
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .start-app:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .start-app-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .start-app-name {
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .window {
+                width: 90vw !important;
+                height: 80vh !important;
+                top: 10vh !important;
+                left: 5vw !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Boot Screen -->
+    <div class="boot-screen" id="bootScreen">
+        <div class="boot-logo">
+            <h1>CORRIDOR COMPUTER</h1>
+            <div class="subtitle">HYBRID QUANTUM-PHOTONIC NODE</div>
+        </div>
+        
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <svg class="progress-circle" width="200" height="200">
+                <circle class="progress-background" cx="100" cy="100" r="90"></circle>
+                <circle class="progress-bar" id="progressBar" cx="100" cy="100" r="90"></circle>
+            </svg>
+            <div class="progress-text">
+                <div class="progress-percent" id="progressPercent">0%</div>
+                <div class="progress-label" id="progressLabel">INITIALIZING</div>
+            </div>
+        </div>
+        
+        <div class="install-section">
+            <label style="display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;color:#bbb;">
+                <input type="checkbox" id="fastInstallToggle" style="accent-color:#00d4ff;"> ⚡ Fast Boot
+            </label>
+            <button class="install-btn" id="installBtn" onclick="startInstallation()">
+                INITIALIZE SYSTEM
+            </button>
+        </div>
+    </div>
+    
+    <!-- OS Interface -->
+        <div class="os-interface" id="osInterface">
+            <div class="wallpaper"></div>
+            <!-- Desktop Icons (essential apps) -->
+            <div class="desktop-icons" style="position:absolute;inset:0;pointer-events:none;z-index:50;">
+                <div id="desktopIconColumn" style="position:absolute;left:24px;top:28px;display:grid;grid-auto-rows:minmax(86px,auto);gap:18px;">
+                    <button class="desktop-icon" data-id="files" draggable="true" onclick="openWindow('fileManager')" ondblclick="openWindow('fileManager')" title="Files" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                        <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">📁</span>
+                        <span style="font-size:12px;">Files</span>
+                    </button>
+                    <button class="desktop-icon" data-id="terminal" draggable="true" onclick="openWindow('terminal')" ondblclick="openWindow('terminal')" title="Terminal" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                        <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">💻</span>
+                        <span style="font-size:12px;">Terminal</span>
+                    </button>
+                    <button class="desktop-icon" data-id="monitor" draggable="true" onclick="openWindow('systemMonitor')" ondblclick="openWindow('systemMonitor')" title="System Monitor" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                        <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">📊</span>
+                        <span style="font-size:12px;">Monitor</span>
+                    </button>
+                    <button class="desktop-icon" data-id="browser" draggable="true" onclick="openWindow('browser')" ondblclick="openWindow('browser')" title="Browser" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                        <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">🌐</span>
+                        <span style="font-size:12px;">Browser</span>
+                    </button>
+                    <button class="desktop-icon" data-id="settings" draggable="true" onclick="openWindow('settings')" ondblclick="openWindow('settings')" title="Settings" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                        <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">⚙️</span>
+                        <span style="font-size:12px;">Settings</span>
+                    </button>
+                    <button class="desktop-icon" data-id="trash" draggable="true" onclick="openWindow('trash')" ondblclick="openWindow('trash')" title="Trash" style="pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90px;padding:12px;color:#e6e6e6;backdrop-filter:blur(8px);box-shadow:0 10px 26px rgba(0,0,0,.35);">
+                        <span style="font-size:26px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35));">🗑️</span>
+                        <span style="font-size:12px;">Trash</span>
+                    </button>
+                </div>
+            </div>
+        
+        <!-- Windows -->
+        <div class="window file-manager" id="fileManager">
+            <div class="window-header">
+                <div class="window-title">📁 File System</div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('fileManager')"></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="fm-toolbar">
+                    <button class="fm-btn" onclick="fmBack()" title="Back">←</button>
+                    <button class="fm-btn" onclick="fmUp()" title="Up">↑</button>
+                    <div class="fm-path" id="fmPath">/</div>
+                </div>
+                <div class="file-grid" id="fileGrid"></div>
+            </div>
+        </div>
+        
+        <div class="window terminal" id="terminal">
+            <div class="window-header">
+                <div class="window-title">💻 Corridor Terminal</div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('terminal')"></div>
+                </div>
+            </div>
+            <div class="terminal-content" id="terminalContent">
+                <div class="terminal-line">CorridorOS Terminal v4.0</div>
+                <div class="terminal-line">Quantum-Photonic Computing Interface</div>
+                <div class="terminal-line">═══════════════════════════════════</div>
+                <div class="terminal-line">&nbsp;</div>
+                <div class="terminal-line"><span class="terminal-prompt">root@corridor:~$</span> <span class="terminal-cursor">&nbsp;</span></div>
+            </div>
+        </div>
+        
+        <div class="window browser" id="browser">
+            <div class="window-header">
+                <div class="window-title">🌐 Corridor Browser</div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('browser')"></div>
+                </div>
+            </div>
+            <div class="window-content" style="padding: 0;">
+                <div class="browser-toolbar">
+                    <div class="browser-nav">
+                        <div class="browser-btn">←</div>
+                        <div class="browser-btn">→</div>
+                        <div class="browser-btn">↻</div>
+                    </div>
+                    <input type="text" class="address-bar" value="https://corridoros.local" readonly>
+                    <div class="browser-btn">🔒</div>
+                </div>
+                <div class="browser-content">
+                    <div>
+                        <div style="font-size: 1.5rem; margin-bottom: 1rem;">🔒 Secure Connection Required</div>
+                        <div>Browser requires HTTPS for web connectivity</div>
+                        <div style="margin-top: 1rem; font-size: 0.9rem; color: #888;">
+                            Current: HTTP (Development Mode)<br>
+                            Upgrade to HTTPS to enable external browsing
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Apps -->
+        <div class="window" id="textEditor" style="top:20%;left:20%;display:none;">
+            <div class="window-header">
+                <div class="window-title">📝 Text Editor</div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('textEditor')"></div>
+                </div>
+            </div>
+            <div class="window-content" style="padding:0;">
+                <textarea style="width:100%;height:100%;background:rgba(0,0,0,.85);color:#e6e6e6;border:0;outline:none;padding:12px;font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:14px;"># CorridorOS Notes\n\n- Welcome to the Text Editor.\n- Type here…</textarea>
+            </div>
+        </div>
+
+        <div class="window" id="imageViewer" style="top:22%;left:32%;display:none;min-width:520px;min-height:360px;">
+            <div class="window-header">
+                <div class="window-title">🖼️ Image Viewer</div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('imageViewer')"></div>
+                </div>
+            </div>
+            <div class="window-content" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.85)">
+                <div style="width:80%;height:70%;background:linear-gradient(135deg,#1e3c72,#2a5298);border-radius:12px;box-shadow:inset 0 0 40px rgba(255,255,255,.06);"></div>
+            </div>
+        </div>
+
+        <div class="window" id="musicPlayer" style="top:26%;left:26%;display:none;min-width:520px;min-height:220px;">
+            <div class="window-header">
+                <div class="window-title">🎵 Music Player</div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('musicPlayer')"></div>
+                </div>
+            </div>
+            <div class="window-content" style="display:flex;flex-direction:column;gap:16px;">
+                <div style="display:flex;gap:12px;align-items:center;">
+                    <button style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff">⏮</button>
+                    <button style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff">▶</button>
+                    <button style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff">⏭</button>
+                    <div style="flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:6px;position:relative;">
+                        <div style="position:absolute;left:0;top:0;bottom:0;width:30%;background:#26E6FF;border-radius:6px;box-shadow:0 0 12px rgba(38,230,255,.6)"></div>
+                    </div>
+                </div>
+                <div style="font-size:12px;color:#9aa5b1;">Now Playing: Photonic Suite in C♯</div>
+            </div>
+        </div>
+
+        <!-- Trash / Recycling Bin -->
+        <div class="window" id="trash" style="top:18%;left:44%;display:none;min-width:520px;min-height:340px;">
+            <div class="window-header">
+                <div class="window-title">🗑️ Trash</div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('trash')"></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div id="trashBody" style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="display:flex;align-items:center;gap:10px; border-bottom:1px solid rgba(255,255,255,.1); padding-bottom:8px;">
+                        <button id="emptyTrashBtn" class="fm-btn" style="cursor:pointer;">Empty Trash</button>
+                        <span id="trashCount" style="color:#9aa5b1; font-size:12px;">0 items</span>
+                    </div>
+                    <div id="trashList" class="file-grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));"></div>
+                    <div id="trashEmptyState" style="text-align:center;color:#9aa5b1;margin-top:20px;">Trash is empty</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="window system-monitor" id="systemMonitor">
+            <div class="window-header">
+                <div class="window-title">📊 System Monitor</div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('systemMonitor')"></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="cpuUsage">12%</div>
+                        <div class="metric-label">CPU Usage</div>
+                        <div class="chart" id="cpuChart"></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="memUsage">34%</div>
+                        <div class="metric-label">Memory</div>
+                        <div class="chart" id="memChart"></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="photonicBER">1.2e-12</div>
+                        <div class="metric-label">Photonic BER</div>
+                        <div class="chart" id="berChart"></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="corridorTemp">47°C</div>
+                        <div class="metric-label">Temperature</div>
+                        <div class="chart" id="tempChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="window settings" id="settings">
+            <div class="window-header">
+                <div class="window-title">⚙️ System Preferences</div>
+                <div class="settings-toolbar" id="settingsToolbar" aria-label="Context actions"></div>
+                <div class="window-controls">
+                    <div class="window-control minimize"></div>
+                    <div class="window-control maximize"></div>
+                    <div class="window-control close" onclick="closeWindow('settings')"></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="settings-sidebar">
+                    <div class="settings-category active" data-category="general">🎨 Appearance</div>
+                    <div class="settings-category" data-category="dock">📍 Dock</div>
+                    <div class="settings-category" data-category="audio">🔊 Audio</div>
+                    <div class="settings-category" data-category="display">🖥️ Display</div>
+                    <div class="settings-category" data-category="security">🔐 Security</div>
+                    <div class="settings-category" data-category="system">⚡ System</div>
+                </div>
+                <div class="settings-content">
+                    <div class="settings-panel active" id="generalPanel">
+                        <h3>Appearance</h3>
+                        <div class="setting-group">
+                            <label>Theme</label>
+                            <select id="themeSelect" onchange="changeTheme(this.value)">
+                                <option value="dark">Dark</option>
+                                <option value="quantum">Quantum</option>
+                                <option value="photonic">Photonic</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label>Transparency Effects</label>
+                            <input type="checkbox" id="transparencyToggle" checked onchange="toggleTransparency(this.checked)">
+                        </div>
+                        <div class="setting-group">
+                            <label>Animations</label>
+                            <input type="checkbox" id="animationsToggle" checked onchange="toggleAnimations(this.checked)">
+                        </div>
+                    </div>
+                    <div class="settings-panel" id="dockPanel">
+                        <h3>Dock & Taskbar</h3>
+                        <div class="setting-group">
+                            <label>Position</label>
+                            <select id="dockPosition" onchange="changeDockPosition(this.value)">
+                                <option value="bottom">Bottom</option>
+                                <option value="top">Top</option>
+                                <option value="left">Left</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label>Auto-hide</label>
+                            <input type="checkbox" id="dockAutoHide" onchange="toggleDockAutoHide(this.checked)">
+                        </div>
+                        <div class="setting-group">
+                            <label>Size</label>
+                            <input type="range" id="dockSize" min="40" max="80" value="60" onchange="changeDockSize(this.value)">
+                            <span id="dockSizeValue">60px</span>
+                        </div>
+                    </div>
+                    <div class="settings-panel" id="audioPanel">
+                        <h3>Audio Settings</h3>
+                        <div class="setting-group">
+                            <label>Master Volume</label>
+                            <input type="range" id="masterVolume" min="0" max="100" value="75" onchange="changeVolume('master', this.value)">
+                            <span id="masterVolumeValue">75%</span>
+                        </div>
+                        <div class="setting-group">
+                            <label>System Sounds</label>
+                            <input type="checkbox" id="systemSounds" checked onchange="toggleSystemSounds(this.checked)">
+                        </div>
+                        <div class="setting-group">
+                            <label>Output Device</label>
+                            <select id="audioOutput">
+                                <option value="speakers">Built-in Speakers</option>
+                                <option value="headphones">Headphones</option>
+                                <option value="bluetooth">Bluetooth Audio</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="settings-panel" id="displayPanel">
+                        <h3>Display Settings</h3>
+                        <div class="setting-group">
+                            <label>Resolution</label>
+                            <select id="displayResolution">
+                                <option value="1920x1080">1920 × 1080</option>
+                                <option value="2560x1440">2560 × 1440</option>
+                                <option value="3840x2160">3840 × 2160</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label>Brightness</label>
+                            <input type="range" id="brightness" min="10" max="100" value="80" onchange="changeBrightness(this.value)">
+                            <span id="brightnessValue">80%</span>
+                        </div>
+                        <div class="setting-group">
+                            <label>Night Mode</label>
+                            <input type="checkbox" id="nightMode" onchange="toggleNightMode(this.checked)">
+                        </div>
+                    </div>
+                    <div class="settings-panel" id="securityPanel">
+                        <h3>Security & Privacy</h3>
+                        <div class="setting-group">
+                            <label>Screen Lock</label>
+                            <input type="checkbox" id="screenLock" checked>
+                            <small>Require password after sleep or screen saver</small>
+                        </div>
+                        <div class="setting-group">
+                            <label>Encryption</label>
+                            <input type="checkbox" id="diskEncryption" checked>
+                            <small>Full disk encryption enabled</small>
+                        </div>
+                        <div class="setting-group">
+                            <label>Firewall</label>
+                            <select id="firewallMode">
+                                <option value="on">Enabled</option>
+                                <option value="stealth">Stealth Mode</option>
+                                <option value="off">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="settings-panel" id="systemPanel">
+                        <h3>System Information</h3>
+                        <div class="system-info">
+                            <div class="info-row">
+                                <span>Version:</span>
+                                <span>CorridorOS 4.0.0</span>
+                            </div>
+                            <div class="info-row">
+                                <span>Kernel:</span>
+                                <span>Quantum-Photonic 5.15.0</span>
+                            </div>
+                            <div class="info-row">
+                                <span>Architecture:</span>
+                                <span>x86_64</span>
+                            </div>
+                            <div class="info-row">
+                                <span>Memory:</span>
+                                <span>32 GB DDR5</span>
+                            </div>
+                            <div class="info-row">
+                                <span>Storage:</span>
+                                <span>1 TB NVMe SSD</span>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <button class="settings-btn" onclick="openEngineeringDashboard()">
+                                🔧 Engineering Dashboard
+                            </button>
+                            <small>Advanced system monitoring and photonic controls</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <div class="start-button" onclick="toggleStartMenu()">
+                <div>⚡</div>
+                <div>CORRIDOR</div>
+            </div>
+            <div class="taskbar-apps">
+                <div class="app-icon" onclick="openWindow('fileManager')" title="File Manager">📁</div>
+                <div class="app-icon" onclick="openWindow('terminal')" title="Terminal">💻</div>
+                <div class="app-icon" onclick="openWindow('browser')" title="Browser">🌐</div>
+                <div class="app-icon" onclick="openWindow('systemMonitor')" title="System Monitor">📊</div>
+                <div class="app-icon" onclick="openWindow('textEditor')" title="Text Editor">📝</div>
+                <div class="app-icon" onclick="openWindow('imageViewer')" title="Image Viewer">🖼️</div>
+                <div class="app-icon" onclick="openWindow('musicPlayer')" title="Music Player">🎵</div>
+                <div class="app-icon" onclick="openWindow('trash')" title="Trash">🗑️</div>
+                <div class="app-icon" onclick="openWindow('settings')" title="System Preferences">⚙️</div>
+            </div>
+        </div>
+        
+        <!-- System tray moved outside taskbar to avoid overlap -->
+        <div class="system-tray">
+            <div class="notif-toggle" title="Notifications" style="margin-right:10px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <span>🔔</span>
+                <span class="notif-badge" id="notificationsBadgeDetailed" style="display:none;">0</span>
+            </div>
+            <div class="system-stats">
+                <div>Corridors: <span id="activeCorridors">0</span> • Memory: <span id="allocatedMemory">0 GB</span></div>
+            </div>
+            <div class="time" id="systemTime">00:00:00</div>
+        </div>
+        
+        <!-- Start Menu -->
+        <div class="start-menu" id="startMenu">
+            <div class="start-menu-header">
+                <h3>System Applications</h3>
+            </div>
+            <div class="start-menu-apps">
+                <div class="start-app" onclick="openWindow('fileManager')">
+                    <div class="start-app-icon">📁</div>
+                    <div class="start-app-name">Files</div>
+                </div>
+                <div class="start-app" onclick="openWindow('terminal')">
+                    <div class="start-app-icon">💻</div>
+                    <div class="start-app-name">Terminal</div>
+                </div>
+                <div class="start-app" onclick="openWindow('browser')">
+                    <div class="start-app-icon">🌐</div>
+                    <div class="start-app-name">Browser</div>
+                </div>
+                <div class="start-app" onclick="openWindow('systemMonitor')">
+                    <div class="start-app-icon">📊</div>
+                    <div class="start-app-name">Monitor</div>
+                </div>
+                <div class="start-app" onclick="openWindow('textEditor')">
+                    <div class="start-app-icon">📝</div>
+                    <div class="start-app-name">Text Editor</div>
+                </div>
+                <div class="start-app" onclick="openWindow('imageViewer')">
+                    <div class="start-app-icon">🖼️</div>
+                    <div class="start-app-name">Image Viewer</div>
+                </div>
+                <div class="start-app" onclick="openWindow('musicPlayer')">
+                    <div class="start-app-icon">🎵</div>
+                    <div class="start-app-name">Music</div>
+                </div>
+                <div class="start-app" onclick="openWindow('settings')">
+                    <div class="start-app-icon">⚙️</div>
+                    <div class="start-app-name">Settings</div>
+                </div>
+                <div class="start-app" onclick="showShutdown()">
+                    <div class="start-app-icon">⚡</div>
+                    <div class="start-app-name">Shutdown</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toasts -->
+    <div id="toast-notifications" class="notifications"></div>
+    <!-- Notification Center Panel -->
+    <aside id="notificationsPanelDetailed" class="notif-panel" aria-hidden="true">
+        <div class="notif-header">
+            <div class="title">Notifications <button id="notifSettingsBtn" title="Notification Settings" style="background:transparent;border:1px solid rgba(255,255,255,.12);color:#ccc;border-radius:8px;padding:4px 8px;cursor:pointer">⚙️</button></div>
+            <div class="actions">
+                <button onclick="clearAllNotificationsDetailed()">Clear All</button>
+                <button onclick="toggleNotificationsPanelDetailed()" title="Close">×</button>
+            </div>
+        </div>
+        <div id="notifSettingsPanel" style="display:none;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.08);color:#bbb;font-size:13px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="prefToasts"/> Enable toasts</label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="prefPersist"/> Persist to center</label>
+        </div>
+        <div id="notifListDetailed" class="notif-list" role="list"></div>
+        <div id="notifEmptyDetailed" class="notif-empty" style="display:none;">No notifications</div>
+    </aside>
+    
+    <script>
+        // Basic mobile detection to adjust frame sizing
+        (function setMobileFrame(){
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
+            if (isMobile) {
+                document.documentElement.classList.add('is-mobile');
+            }
+        })();
+
+        let installationStep = 0;
+        let activeWindows = [];
+        let draggedWindow = null;
+        let dragOffset = { x: 0, y: 0 };
+        
+        const installSteps = [
+            { label: "SCANNING HARDWARE", percent: 12 },
+            { label: "LOADING PHOTONIC DRIVERS", percent: 25 },
+            { label: "INITIALIZING CXL SUBSYSTEM", percent: 38 },
+            { label: "CONFIGURING QUANTUM BRIDGE", percent: 52 },
+            { label: "ESTABLISHING CORRIDORS", percent: 67 },
+            { label: "CALIBRATING WAVELENGTHS", percent: 80 },
+            { label: "FINALIZING BOOT SEQUENCE", percent: 95 },
+            { label: "SYSTEM READY", percent: 100 }
+        ];
+        
+        function startInstallation() {
+            const installBtn = document.getElementById('installBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            
+            installBtn.disabled = true;
+            installBtn.textContent = 'INITIALIZING...';
+            progressContainer.style.display = 'block';
+            
+            installationStep = 0;
+            installCorridorOS();
+        }
+        
+        function installCorridorOS() {
+            if (installationStep < installSteps.length) {
+                const step = installSteps[installationStep];
+                const progressBar = document.getElementById('progressBar');
+                const progressPercent = document.getElementById('progressPercent');
+                const progressLabel = document.getElementById('progressLabel');
+                
+                // Calculate stroke-dashoffset for circular progress
+                const circumference = 2 * Math.PI * 90; // radius = 90
+                const offset = circumference - (step.percent / 100) * circumference;
+                
+                progressBar.style.strokeDashoffset = offset;
+                progressPercent.textContent = step.percent + '%';
+                progressLabel.textContent = step.label;
+                
+                installationStep++;
+                // Speed factor from toggle/URL/localStorage
+                const fast = document.getElementById('fastInstallToggle')?.checked || new URLSearchParams(location.search).get('fastboot')==='1' || localStorage.getItem('corridoros-fast-boot')==='1';
+                const instant = new URLSearchParams(location.search).get('instant')==='1';
+                let delay = 600 + Math.random() * 400; // reasonably fast baseline
+                if (fast) delay = 350 + Math.random() * 250; // much faster
+                if (instant) delay = 60; // nearly instant sweep
+                setTimeout(installCorridorOS, delay);
+            } else {
+                const instant = new URLSearchParams(location.search).get('instant')==='1';
+                setTimeout(completeInstallation, instant ? 100 : 400);
+            }
+        }
+        
+        function completeInstallation() {
+            document.getElementById('bootScreen').classList.add('hidden');
+            document.getElementById('osInterface').style.display = 'block';
+            initializeOS();
+            // Default theme: Quantum
+            try { document.getElementById('themeSelect').value = 'quantum'; } catch(_){ }
+            changeTheme('quantum');
+            showNotificationDetailed('System Initialized', 'Welcome to CorridorOS - Quantum-Photonic Computing Platform');
+            // Auto-activate a photonic corridor once per session on boot
+            autoActivateCorridorOnce();
+            // Auto-allocate Free-Form Memory (256 GB) on boot
+            autoAllocateMemoryOnce();
+        }
+        
+        function initializeOS() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            setInterval(updateSystemMetrics, 2000);
+            initializeCharts();
+            
+            // Make windows draggable
+            document.querySelectorAll('.window-header').forEach(header => {
+                header.addEventListener('mousedown', startDrag);
+            });
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+            
+            // Close start menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const startMenu = document.getElementById('startMenu');
+                const startButton = document.querySelector('.start-button');
+                if (!startMenu.contains(e.target) && !startButton.contains(e.target)) {
+                    startMenu.classList.remove('show');
+                }
+            });
+
+            // Bind notifications toggle and load persisted notifications
+            const nt = document.querySelector('.notif-toggle');
+            if (nt){ nt.addEventListener('click', toggleNotificationsPanelDetailed); }
+            loadNotificationsDetailed();
+
+            // Desktop icon drag ordering
+            initDesktopIconDrag(); loadDesktopIconOrder();
+        }
+
+        function autoActivateCorridorOnce(){
+            try {
+                if (!sessionStorage.getItem('autoCorridorActivatedDetailed')){
+                    sessionStorage.setItem('autoCorridorActivatedDetailed','1');
+                    // Simulate activation
+                    const el = document.getElementById('activeCorridors'); if (el) el.textContent = '1';
+                    showNotificationDetailed('Photonic Corridor Activated', 'Auto-configured 8 lanes at 1550-1557nm, 250ns budget');
+                }
+            } catch(_){}
+        }
+
+        function autoAllocateMemoryOnce(){
+            try {
+                if (!sessionStorage.getItem('autoFFMAllocated256')){
+                    sessionStorage.setItem('autoFFMAllocated256','1');
+                    const memEl = document.getElementById('allocatedMemory');
+                    if (memEl) memEl.textContent = '256 GB';
+                    showNotificationDetailed('Free‑Form Memory', 'Allocated 256 GB (T2, 150 Gbps floor)');
+                } else {
+                    const memEl = document.getElementById('allocatedMemory');
+                    if (memEl && !memEl.textContent.trim()) memEl.textContent = '256 GB';
+                }
+            } catch(_){}
+        }
+
+        // ---------- File Manager (Simulated FS) ----------
+        const FS = {
+            '/': [
+                { name: 'Applications', type: 'folder' },
+                { name: 'Documents', type: 'folder' },
+                { name: 'Downloads', type: 'folder' },
+                { name: 'Corridor', type: 'folder' },
+                { name: 'Config', type: 'folder' },
+                { name: 'Systems', type: 'folder' },
+                { name: 'Network', type: 'folder' },
+                { name: 'Sandbox', type: 'folder' }
+            ],
+            '/Applications': [
+                { name: 'Text Editor', type: 'app', target: 'textEditor', icon: '📝' },
+                { name: 'Image Viewer', type: 'app', target: 'imageViewer', icon: '🖼️' },
+                { name: 'Music Player', type: 'app', target: 'musicPlayer', icon: '🎵' }
+            ],
+            '/Documents': [
+                { name: 'Readme.txt', type: 'file', ext: 'txt', icon: '📄', content: 'Welcome to CorridorOS Documents.' }
+            ],
+            '/Downloads': [
+                { name: 'sample.png', type: 'image', icon: '🖼️' }
+            ],
+            '/Corridor': [
+                { name: 'allocations.log', type: 'file', ext: 'log', icon: '📜', content: 'p99, pj/bit, gbps...' }
+            ],
+            '/Config': [
+                { name: 'corrd.conf', type: 'file', ext: 'conf', icon: '⚙️', content: '# corrd config' },
+                { name: 'memqosd.service', type: 'file', ext: 'service', icon: '⚙️', content: '# memqosd service' }
+            ],
+            '/Systems': [], '/Network': [], '/Sandbox': []
+        };
+
+        const fmState = { path: '/', history: ['/'], idx: 0, selected: null };
+
+        function initFileManager(){ renderDir('/'); }
+
+        function fmBack(){ if (fmState.idx>0){ fmState.idx--; renderDir(fmState.history[fmState.idx], false); } }
+        function fmUp(){ if (fmState.path !== '/') { const up = fmState.path.replace(/\/?[^\/]+$/, '') || '/'; fmOpen(up); } }
+        function fmOpen(path){ fmState.path = path; fmState.history = fmState.history.slice(0, fmState.idx+1).concat(path); fmState.idx = fmState.history.length-1; renderDir(path); }
+
+        function renderDir(path, pushHist=true){
+            const grid = document.getElementById('fileGrid'); const pathEl = document.getElementById('fmPath'); if (!grid||!pathEl) return;
+            pathEl.textContent = path;
+            grid.innerHTML = '';
+            const entries = FS[path] || [];
+            for (const item of entries){
+                const el = document.createElement('div'); el.className='file-item'; el.tabIndex=0;
+                const icon = document.createElement('div'); icon.className='file-icon'; icon.textContent = item.icon || (item.type==='folder'?'📁': item.type==='image'?'🖼️':'📄');
+                const name = document.createElement('div'); name.className='file-name'; name.textContent = item.name;
+                el.dataset.name = item.name; el.dataset.type = item.type; if (item.target) el.dataset.target=item.target; if (item.ext) el.dataset.ext=item.ext;
+                el.appendChild(icon); el.appendChild(name);
+                el.addEventListener('click', ()=>{ selectFileItem(el); });
+                el.addEventListener('dblclick', ()=>{ openFileItem(el); });
+                grid.appendChild(el);
+            }
+        }
+
+        function selectFileItem(el){
+            document.querySelectorAll('#fileGrid .file-item').forEach(i=>i.classList.remove('selected'));
+            el.classList.add('selected'); fmState.selected = el.dataset.name;
+        }
+
+        function openFileItem(el){
+            const type = el.dataset.type; const name = el.dataset.name; const base = fmState.path.endsWith('/')? fmState.path+name : `${fmState.path}/${name}`;
+            if (type==='folder'){ fmOpen(base); return; }
+            if (type==='app' && el.dataset.target){ openWindow(el.dataset.target); return; }
+            if (type==='image'){ openWindow('imageViewer'); return; }
+            // files
+            if (type==='file'){
+                openWindow('textEditor');
+                // Load basic content if present
+                const txt = Array.from((FS[fmState.path]||[])).find(i=>i.name===name)?.content || `${name}`;
+                const ta = document.querySelector('#textEditor textarea'); if (ta) ta.value = txt;
+                return;
+            }
+            showNotificationDetailed('Open', `Cannot open ${name}`);
+        }
+
+        // ---------- Desktop icons drag & order ----------
+        function initDesktopIconDrag(){
+            const col = document.getElementById('desktopIconColumn'); if (!col) return;
+            let dragEl=null;
+            col.addEventListener('dragstart', e=>{ const t=e.target.closest('.desktop-icon'); if (!t) return; dragEl=t; e.dataTransfer.effectAllowed='move';});
+            col.addEventListener('dragover', e=>{ e.preventDefault(); const t=e.target.closest('.desktop-icon'); if (!dragEl||!t||t===dragEl) return; const children=[...col.children]; const dragIdx=children.indexOf(dragEl); const overIdx=children.indexOf(t); if (dragIdx<overIdx) col.insertBefore(dragEl, t.nextSibling); else col.insertBefore(dragEl, t);});
+            col.addEventListener('drop', ()=>{ saveDesktopIconOrder(); });
+        }
+        function saveDesktopIconOrder(){ const col=document.getElementById('desktopIconColumn'); if(!col) return; const order=[...col.children].map(el=>el.dataset.id); localStorage.setItem('co-desktop-order', JSON.stringify(order)); }
+        function loadDesktopIconOrder(){ const col=document.getElementById('desktopIconColumn'); if(!col) return; try{ const order=JSON.parse(localStorage.getItem('co-desktop-order')||'[]'); if(order.length){ const map={}; [...col.children].forEach(el=>map[el.dataset.id]=el); order.forEach(id=>{ if(map[id]) col.appendChild(map[id]); }); } }catch(_){}
+        }
+        
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById('systemTime').textContent = timeString;
+        }
+        
+        function updateSystemMetrics() {
+            const cpu = Math.floor(Math.random() * 15) + 10;
+            const mem = Math.floor(Math.random() * 20) + 30;
+            const ber = (1.0 + Math.random() * 0.8).toFixed(1) + 'e-12';
+            const temp = Math.floor(Math.random() * 10) + 45;
+            
+            document.getElementById('cpuUsage').textContent = cpu + '%';
+            document.getElementById('memUsage').textContent = mem + '%';
+            document.getElementById('photonicBER').textContent = ber;
+            document.getElementById('corridorTemp').textContent = temp + '°C';
+            
+            updateChart('cpuChart', cpu);
+            updateChart('memChart', mem);
+            updateChart('tempChart', temp);
+        }
+        
+        function initializeCharts() {
+            ['cpuChart', 'memChart', 'berChart', 'tempChart'].forEach(chartId => {
+                const chart = document.getElementById(chartId);
+                for (let i = 0; i < 30; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'chart-bar';
+                    bar.style.left = (i * 3) + 'px';
+                    bar.style.height = Math.random() * 50 + 'px';
+                    chart.appendChild(bar);
+                }
+            });
+        }
+        
+        function updateChart(chartId, value) {
+            const chart = document.getElementById(chartId);
+            const bars = chart.querySelectorAll('.chart-bar');
+            
+            // Shift existing bars
+            for (let i = 0; i < bars.length - 1; i++) {
+                bars[i].style.height = bars[i + 1].style.height;
+            }
+            
+            // Add new bar
+            bars[bars.length - 1].style.height = (value * 0.6) + 'px';
+        }
+        
+        function openWindow(windowId) {
+            const window = document.getElementById(windowId);
+            window.style.display = 'block';
+            bringToFront(window);
+            
+            // Auto-size window to content
+            autoSizeWindow(window, windowId);
+            
+            if (!activeWindows.includes(windowId)) {
+                activeWindows.push(windowId);
+                updateTaskbarIcons();
+            }
+
+            // Initialize file manager on first open
+            if (windowId === 'fileManager') {
+                if (!window.__fmInited) { initFileManager(); window.__fmInited = true; }
+            }
+            if (windowId === 'trash') {
+                const btn = document.getElementById('emptyTrashBtn');
+                if (btn && !btn.__bound) {
+                    btn.addEventListener('click', ()=>{
+                        document.getElementById('trashList').innerHTML='';
+                        const c = document.getElementById('trashCount'); if (c) c.textContent = '0 items';
+                        const empty = document.getElementById('trashEmptyState'); if (empty) empty.style.display='block';
+                        showNotificationDetailed('Trash', 'Emptied successfully');
+                    });
+                    btn.__bound = true;
+                }
+            }
+        }
+        
+        function autoSizeWindow(window, windowId) {
+            // Set optimal sizes for different window types
+            const sizes = {
+                'fileManager': { width: '550px', height: '400px' },
+                'terminal': { width: '650px', height: '350px' },
+                'browser': { width: '750px', height: '500px' },
+                'systemMonitor': { width: '550px', height: '400px' },
+                'settings': { width: '700px', height: '550px' },
+                'textEditor': { width: '700px', height: '460px' },
+                'imageViewer': { width: '620px', height: '420px' },
+                'musicPlayer': { width: '620px', height: '280px' },
+                'trash': { width: '600px', height: '380px' }
+            };
+            
+            if (sizes[windowId]) {
+                window.style.width = sizes[windowId].width;
+                window.style.height = sizes[windowId].height;
+            }
+        }
+        
+        function closeWindow(windowId) {
+            const window = document.getElementById(windowId);
+            window.style.display = 'none';
+            
+            const index = activeWindows.indexOf(windowId);
+            if (index > -1) {
+                activeWindows.splice(index, 1);
+                updateTaskbarIcons();
+            }
+        }
+        
+        function bringToFront(window) {
+            document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
+            window.classList.add('active');
+        }
+        
+        function updateTaskbarIcons() {
+            document.querySelectorAll('.app-icon').forEach(icon => {
+                icon.classList.remove('active');
+            });
+            
+            activeWindows.forEach(windowId => {
+                const icons = Array.from(document.querySelectorAll('.taskbar .app-icon'));
+                const titleMap = {
+                    'fileManager': 'File Manager',
+                    'terminal': 'Terminal',
+                    'browser': 'Browser',
+                    'systemMonitor': 'System Monitor',
+                    'textEditor': 'Text Editor',
+                    'imageViewer': 'Image Viewer',
+                    'musicPlayer': 'Music Player',
+                    'trash': 'Trash',
+                    'settings': 'System Preferences'
+                };
+                const title = titleMap[windowId];
+                const el = icons.find(i => i.getAttribute('title') === title);
+                if (el) el.classList.add('active');
+            });
+        }
+        
+        function toggleStartMenu() {
+            const startMenu = document.getElementById('startMenu');
+            startMenu.classList.toggle('show');
+        }
+        
+        // Router: reflect new URL without changing content
+        (function routeRename(){
+            try {
+                const p = window.location.pathname;
+                if (p.endsWith('corridoros_advanced.html')) {
+                    const newPath = p.replace('corridoros_advanced.html','corridoros_detailed.html');
+                    history.replaceState({}, document.title, newPath + window.location.search + window.location.hash);
+                }
+            } catch(_){}
+        })();
+
+        function openEngineeringDashboard() {
+            window.open('http://localhost:8000/corridoros_dashboard.html', '_blank');
+            showNotificationDetailed('Engineering Dashboard', 'Opening advanced photonic controls in new window');
+        }
+
+        // Notification Center (detailed)
+        const NOTIF_KEY_DETAILED = 'corridor-detailed-notifications-v1';
+        let notifStoreDetailed = [];
+        let unreadDetailed = 0;
+        const NOTIF_PREF_KEY = 'corridor-detailed-notif-prefs';
+        let notifPrefs = { toasts: true, persist: true };
+
+        function loadNotificationsDetailed(){
+            try {
+                const raw = localStorage.getItem(NOTIF_KEY_DETAILED);
+                notifStoreDetailed = raw ? JSON.parse(raw) : [];
+                unreadDetailed = notifStoreDetailed.reduce((a,n)=>a+(!n.read?1:0),0);
+                renderNotifListDetailed();
+                updateNotifBadgeDetailed();
+            } catch(e){ notifStoreDetailed=[]; }
+            try { const p = JSON.parse(localStorage.getItem(NOTIF_PREF_KEY)||'{}'); notifPrefs = { ...notifPrefs, ...p }; } catch(_){ }
+            const btn=document.getElementById('notifSettingsBtn'); const panel=document.getElementById('notifSettingsPanel'); if(btn&&panel){ btn.onclick=()=>{ panel.style.display = panel.style.display==='none'?'block':'none'; }; }
+            const cbT=document.getElementById('prefToasts'); const cbP=document.getElementById('prefPersist'); if(cbT&&cbP){ cbT.checked=!!notifPrefs.toasts; cbP.checked=!!notifPrefs.persist; cbT.onchange=()=>{ notifPrefs.toasts=cbT.checked; localStorage.setItem(NOTIF_PREF_KEY, JSON.stringify(notifPrefs)); }; cbP.onchange=()=>{ notifPrefs.persist=cbP.checked; localStorage.setItem(NOTIF_PREF_KEY, JSON.stringify(notifPrefs)); }; }
+        }
+        function saveNotificationsDetailed(){
+            try { localStorage.setItem(NOTIF_KEY_DETAILED, JSON.stringify(notifStoreDetailed)); } catch(_){}
+        }
+        function updateNotifBadgeDetailed(){
+            const b = document.getElementById('notificationsBadgeDetailed');
+            if (!b) return; if (unreadDetailed>0){ b.textContent=String(unreadDetailed); b.style.display='inline-flex'; } else { b.style.display='none'; }
+        }
+        function renderNotifListDetailed(){
+            const list = document.getElementById('notifListDetailed');
+            const empty = document.getElementById('notifEmptyDetailed');
+            if (!list) return; list.innerHTML='';
+            if (!notifStoreDetailed.length){ if (empty) empty.style.display='block'; return; }
+            if (empty) empty.style.display='none';
+            notifStoreDetailed.forEach(n=>{
+                const item = document.createElement('div');
+                item.className='notif-item';
+                const time = new Date(n.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+                item.innerHTML = `
+                    <div class="title">${n.title}</div>
+                    <button class="close" title="Dismiss">×</button>
+                    <div class="meta">${time}</div>
+                    <div class="body">${n.body}</div>
+                `;
+                item.querySelector('.close').addEventListener('click',()=>dismissNotificationDetailed(n.id));
+                list.appendChild(item);
+            });
+        }
+        function toggleNotificationsPanelDetailed(){
+            const panel = document.getElementById('notificationsPanelDetailed');
+            const isOpen = panel.classList.toggle('open');
+            panel.setAttribute('aria-hidden', isOpen ? 'false':'true');
+            if (isOpen){
+                let changed=false; notifStoreDetailed.forEach(n=>{ if(!n.read){ n.read=true; changed=true; } });
+                if (changed){ unreadDetailed=0; saveNotificationsDetailed(); updateNotifBadgeDetailed(); renderNotifListDetailed(); }
+            }
+        }
+        function dismissNotificationDetailed(id){
+            const idx = notifStoreDetailed.findIndex(n=>n.id===id);
+            if (idx!==-1){ if(!notifStoreDetailed[idx].read && unreadDetailed>0){ unreadDetailed--; }
+                notifStoreDetailed.splice(idx,1); saveNotificationsDetailed(); renderNotifListDetailed(); updateNotifBadgeDetailed(); }
+        }
+        function clearAllNotificationsDetailed(){ notifStoreDetailed = []; unreadDetailed=0; saveNotificationsDetailed(); renderNotifListDetailed(); updateNotifBadgeDetailed(); }
+        function showNotificationDetailed(title, body, duration=4000){
+            const n = { id:'n_'+Date.now()+'_'+Math.random().toString(36).slice(2,5), title, body, ts:Date.now(), read:false };
+            if (notifPrefs.persist){ notifStoreDetailed.unshift(n); unreadDetailed++; saveNotificationsDetailed(); renderNotifListDetailed(); updateNotifBadgeDetailed(); }
+            if (notifPrefs.toasts){
+                const toasts = document.getElementById('toast-notifications');
+                const toast = document.createElement('div'); toast.className='notification';
+                toast.innerHTML = `<div class=\"title\"><span>${title}</span><button class=\"close\" aria-label=\"Dismiss\">×</button></div><div class=\"body\">${body}</div>`;
+                toast.querySelector('.close').addEventListener('click',()=>{ toast.remove(); });
+                toasts.appendChild(toast);
+                if (duration>0){ setTimeout(()=>{ toast.remove(); }, duration); }
+                if (toasts.children.length>5){ toasts.firstElementChild?.remove(); }
+            }
+        }
+        
+        function showShutdown() {
+            if (confirm('Are you sure you want to shutdown CorridorOS?')) {
+                document.getElementById('osInterface').style.display = 'none';
+                document.getElementById('bootScreen').classList.remove('hidden');
+                document.getElementById('installBtn').textContent = 'RESTART SYSTEM';
+                document.getElementById('installBtn').disabled = false;
+                document.getElementById('progressContainer').style.display = 'none';
+                showNotificationDetailed('System Shutdown', 'CorridorOS has been safely shutdown');
+            }
+            document.getElementById('startMenu').classList.remove('show');
+        }
+        
+        // Window dragging
+        function startDrag(e) {
+            draggedWindow = e.target.closest('.window');
+            if (draggedWindow) {
+                const rect = draggedWindow.getBoundingClientRect();
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+                bringToFront(draggedWindow);
+            }
+        }
+        
+        function drag(e) {
+            if (draggedWindow) {
+                const x = e.clientX - dragOffset.x;
+                const y = e.clientY - dragOffset.y;
+                draggedWindow.style.left = Math.max(0, Math.min(x, window.innerWidth - draggedWindow.offsetWidth)) + 'px';
+                draggedWindow.style.top = Math.max(0, Math.min(y, window.innerHeight - draggedWindow.offsetHeight - 60)) + 'px';
+            }
+        }
+        
+        function endDrag() {
+            draggedWindow = null;
+        }
+        
+        // Terminal simulation
+        function addTerminalCommand(command) {
+            const terminal = document.getElementById('terminalContent');
+            const commandLine = document.createElement('div');
+            commandLine.className = 'terminal-line';
+            commandLine.innerHTML = `<span class="terminal-prompt">root@corridor:~$</span> ${command}`;
+            
+            const cursor = terminal.querySelector('.terminal-cursor');
+            terminal.insertBefore(commandLine, cursor.parentNode);
+            
+            // Simulate command output
+            setTimeout(() => {
+                const output = getCommandOutput(command);
+                const outputLine = document.createElement('div');
+                outputLine.className = 'terminal-line';
+                outputLine.textContent = output;
+                terminal.insertBefore(outputLine, cursor.parentNode);
+            }, 500);
+        }
+        
+        function getCommandOutput(command) {
+            return 'Command Line Interface not ready yet!';
+        }
+        
+        // Click terminal to focus
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#terminal')) {
+                document.addEventListener('keypress', handleTerminalInput);
+            }
+        });
+        
+        let terminalInput = '';
+        function handleTerminalInput(e) {
+            if (e.key === 'Enter') {
+                if (terminalInput.trim()) {
+                    addTerminalCommand(terminalInput);
+                    terminalInput = '';
+                }
+                document.removeEventListener('keypress', handleTerminalInput);
+            } else {
+                terminalInput += e.key;
+            }
+        }
+        
+        // Settings Functions
+        function initializeSettings() {
+            // Settings category switching
+            document.querySelectorAll('.settings-category').forEach(category => {
+                category.addEventListener('click', (e) => {
+                    document.querySelectorAll('.settings-category').forEach(c => c.classList.remove('active'));
+                    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+                    
+                    e.target.classList.add('active');
+                    const panelId = e.target.dataset.category + 'Panel';
+                    document.getElementById(panelId).classList.add('active');
+                    // Update header toolbar for the selected category
+                    renderSettingsToolbar(e.target.dataset.category);
+                });
+            });
+            // Initial toolbar state (based on default active category)
+            const activeCat = document.querySelector('.settings-category.active')?.dataset.category || 'general';
+            renderSettingsToolbar(activeCat);
+        }
+
+        // Contextual actions next to the Settings title
+        function renderSettingsToolbar(category){
+            const tb = document.getElementById('settingsToolbar');
+            if (!tb) return;
+            tb.innerHTML = '';
+            tb.classList.remove('show');
+
+            if (category === 'audio') {
+                const currentVol = parseInt(document.getElementById('masterVolume')?.value || '75', 10);
+                const currentOut = document.getElementById('audioOutput')?.value || 'speakers';
+                tb.innerHTML = `
+                    <button class="icon-btn" id="toolbarMute" title="Mute">🔇</button>
+                    <input type="range" id="toolbarVolume" class="toolbar-slider" min="0" max="100" value="${currentVol}"/>
+                    <select id="toolbarOutput" class="toolbar-select">
+                        <option value=\"speakers\">Built-in Speakers</option>
+                        <option value=\"headphones\">Headphones</option>
+                        <option value=\"bluetooth\">Bluetooth Audio</option>
+                    </select>
+                `;
+                tb.classList.add('show');
+                // Sync output device
+                const sel = tb.querySelector('#toolbarOutput');
+                if (sel) sel.value = currentOut;
+                sel?.addEventListener('change', (e)=>{
+                    const val = e.target.value; const out = document.getElementById('audioOutput'); if (out){ out.value = val; }
+                    showNotificationDetailed('Audio Output', `Switched to ${val.replace(/^./,c=>c.toUpperCase())}`);
+                });
+                // Sync volume
+                const vol = tb.querySelector('#toolbarVolume');
+                vol?.addEventListener('input', (e)=>{
+                    const v = parseInt(e.target.value,10);
+                    const mv = document.getElementById('masterVolume');
+                    if (mv) { mv.value = String(v); }
+                    const mvLabel = document.getElementById('masterVolumeValue'); if (mvLabel) mvLabel.textContent = `${v}%`;
+                });
+                vol?.addEventListener('change', (e)=>{
+                    const v = parseInt(e.target.value,10); changeVolume('master', v);
+                });
+                // Mute toggle preserves last volume
+                let lastVol = currentVol;
+                tb.querySelector('#toolbarMute')?.addEventListener('click', ()=>{
+                    const mv = document.getElementById('masterVolume');
+                    const volInput = tb.querySelector('#toolbarVolume');
+                    if (!mv || !volInput) return;
+                    const now = parseInt(mv.value,10);
+                    if (now > 0) { lastVol = now; mv.value = '0'; volInput.value = '0'; changeVolume('master', 0); }
+                    else { mv.value = String(lastVol); volInput.value = String(lastVol); changeVolume('master', lastVol); }
+                });
+                // Prevent window-drag when interacting
+                tb.addEventListener('mousedown', (e)=>{ e.stopPropagation(); });
+            }
+        }
+        
+        function changeTheme(theme) {
+            const body = document.body;
+            const osInterface = document.getElementById('osInterface');
+            
+            // Remove existing theme classes
+            body.classList.remove('theme-dark', 'theme-quantum', 'theme-photonic');
+            
+            switch (theme) {
+                case 'quantum':
+                    body.classList.add('theme-quantum');
+                    osInterface.style.background = 'linear-gradient(135deg, #1a1a3a 0%, #2e2e5a 50%, #4a4a7a 100%)';
+                    break;
+                case 'photonic':
+                    body.classList.add('theme-photonic');
+                    osInterface.style.background = 'linear-gradient(135deg, #0f2a0f 0%, #1a4a1a 50%, #2a6a2a 100%)';
+                    break;
+                default:
+                    body.classList.add('theme-dark');
+                    osInterface.style.background = 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #2a2a4e 100%)';
+            }
+            
+            showNotificationDetailed('Theme Changed', `Switched to ${theme} theme`);
+        }
+        
+        function toggleTransparency(enabled) {
+            const windows = document.querySelectorAll('.window');
+            windows.forEach(window => {
+                if (enabled) {
+                    window.style.backdropFilter = 'blur(20px)';
+                    window.style.background = 'rgba(20, 20, 30, 0.95)';
+                } else {
+                    window.style.backdropFilter = 'none';
+                    window.style.background = 'rgba(20, 20, 30, 1)';
+                }
+            });
+            
+            showNotificationDetailed('Transparency', enabled ? 'Enabled' : 'Disabled');
+        }
+        
+        function toggleAnimations(enabled) {
+            const root = document.documentElement;
+            if (enabled) {
+                root.style.setProperty('--animation-speed', '1');
+            } else {
+                root.style.setProperty('--animation-speed', '0');
+            }
+            
+            showNotificationDetailed('Animations', enabled ? 'Enabled' : 'Disabled');
+        }
+        
+        function changeDockPosition(position) {
+            const taskbar = document.querySelector('.taskbar');
+            
+            // Reset position styles
+            taskbar.style.top = '';
+            taskbar.style.bottom = '';
+            taskbar.style.left = '';
+            taskbar.style.right = '';
+            taskbar.style.width = '';
+            taskbar.style.height = '';
+            taskbar.style.flexDirection = '';
+            
+            switch (position) {
+                case 'top':
+                    taskbar.style.top = '0';
+                    taskbar.style.bottom = 'auto';
+                    break;
+                case 'left':
+                    taskbar.style.left = '0';
+                    taskbar.style.width = '60px';
+                    taskbar.style.height = '100vh';
+                    taskbar.style.flexDirection = 'column';
+                    break;
+                case 'right':
+                    taskbar.style.right = '0';
+                    taskbar.style.width = '60px';
+                    taskbar.style.height = '100vh';
+                    taskbar.style.flexDirection = 'column';
+                    break;
+                default: // bottom
+                    taskbar.style.bottom = '0';
+                    taskbar.style.top = 'auto';
+            }
+            
+            showNotificationDetailed('Dock Position', `Moved to ${position}`);
+        }
+        
+        function toggleDockAutoHide(enabled) {
+            const taskbar = document.querySelector('.taskbar');
+            if (enabled) {
+                taskbar.style.transform = 'translateY(90%)';
+                taskbar.addEventListener('mouseenter', () => {
+                    taskbar.style.transform = 'translateY(0)';
+                });
+                taskbar.addEventListener('mouseleave', () => {
+                    taskbar.style.transform = 'translateY(90%)';
+                });
+            } else {
+                taskbar.style.transform = 'translateY(0)';
+                taskbar.onmouseenter = null;
+                taskbar.onmouseleave = null;
+            }
+            
+            showNotificationDetailed('Auto-hide', enabled ? 'Enabled' : 'Disabled');
+        }
+        
+        function changeDockSize(size) {
+            const taskbar = document.querySelector('.taskbar');
+            taskbar.style.height = size + 'px';
+            document.getElementById('dockSizeValue').textContent = size + 'px';
+            
+            showNotificationDetailed('Dock Size', `Changed to ${size}px`);
+        }
+        
+        function changeVolume(type, value) {
+            document.getElementById(type + 'VolumeValue').textContent = value + '%';
+            showNotificationDetailed('Volume', `${type} volume: ${value}%`);
+        }
+        
+        function toggleSystemSounds(enabled) {
+            showNotificationDetailed('System Sounds', enabled ? 'Enabled' : 'Disabled');
+        }
+        
+        function changeBrightness(value) {
+            document.getElementById('brightnessValue').textContent = value + '%';
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'black';
+            overlay.style.opacity = (100 - value) / 200;
+            overlay.style.pointerEvents = 'none';
+            overlay.style.zIndex = '10';
+            
+            // Remove existing overlay
+            const existingOverlay = document.querySelector('.brightness-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
+            
+            overlay.className = 'brightness-overlay';
+            document.body.appendChild(overlay);
+            
+            showNotificationDetailed('Brightness', `Set to ${value}%`);
+        }
+        
+        function toggleNightMode(enabled) {
+            const body = document.body;
+            if (enabled) {
+                body.style.filter = 'sepia(0.2) saturate(0.8) hue-rotate(15deg)';
+            } else {
+                body.style.filter = '';
+            }
+            
+            showNotificationDetailed('Night Mode', enabled ? 'Enabled' : 'Disabled');
+        }
+        
+        // Initialize settings when opening the window
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(initializeSettings, 1000);
+        });
+    </script>
+</body>
+</html>

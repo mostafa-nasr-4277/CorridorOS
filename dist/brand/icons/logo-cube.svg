@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="prism" x1="0" y1="0" x2="64" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF2E6E"/>
+      <stop offset="0.2" stop-color="#FF7A1A"/>
+      <stop offset="0.4" stop-color="#FFC14A"/>
+      <stop offset="0.6" stop-color="#A6FF3C"/>
+      <stop offset="0.8" stop-color="#26E6FF"/>
+      <stop offset="1" stop-color="#7B5CFF"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#26E6FF" stroke-width="2" stroke-linejoin="round">
+    <path d="M10 22 L32 10 L54 22 L32 34 Z"/>   
+    <path d="M10 22 L10 42 L32 54 L32 34 Z"/>     
+    <path d="M54 22 L54 42 L32 54 L32 34 Z"/>     
+  </g>
+  <!-- Luminous corridor strands -->
+  <g stroke="url(#prism)" stroke-width="1.8">
+    <path d="M18 26 L18 44"/>
+    <path d="M23 23 L23 47"/>
+    <path d="M28 21 L28 49"/>
+    <path d="M36 21 L36 49"/>
+    <path d="M41 23 L41 47"/>
+    <path d="M46 26 L46 44"/>
+  </g>
+</svg>

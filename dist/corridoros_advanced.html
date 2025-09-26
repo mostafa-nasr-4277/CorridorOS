@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CorridorOS • Redirecting…</title>
+  <meta http-equiv="refresh" content="0; url=corridoros_detailed.html" />
+  <style>
+    body{font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; background:#0b1220; color:#dbeafe; display:flex; align-items:center; justify-content:center; height:100vh; margin:0}
+    .box{padding:24px 28px; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(20,27,45,.96)}
+    a{color:#26E6FF; font-weight:600; text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div>Redirecting to the new simulator…</div>
+    <div><a id="fallback" href="corridoros_detailed.html">Open CorridorOS Detailed Simulator</a></div>
+  </div>
+  <script>
+    const next = 'corridoros_detailed.html' + window.location.search + window.location.hash;
+    try { window.location.replace(next); } catch (_) { window.location.href = next; }
+    document.getElementById('fallback').href = next;
+  </script>
+</body>
+</html>
