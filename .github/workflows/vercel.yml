@@ -1,0 +1,41 @@
+name: Deploy to Vercel (optional)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  vercel:
+    if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Pull Vercel env
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Build (static)
+        run: |
+          echo "Using dist/ as static output"
+
+      - name: Deploy Production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -d dist ]; then OUT=dist; else OUT=.; fi
+          vercel deploy --prod --token=$VERCEL_TOKEN --prebuilt --yes --scope ${{ secrets.VERCEL_ORG_ID }} $OUT || vercel deploy --prod --token=$VERCEL_TOKEN --yes $OUT
+
+  vercel-skip:
+    if: ${{ !(secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '') }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Skipping Vercel deploy (secrets not set). Add VERCEL_TOKEN/ORG_ID/PROJECT_ID to enable."
+

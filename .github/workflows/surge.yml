@@ -1,0 +1,44 @@
+name: Deploy to Surge (optional)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  surge:
+    if: ${{ secrets.SURGE_LOGIN != '' && secrets.SURGE_TOKEN != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Surge CLI
+        run: npm install -g surge
+
+      - name: Deploy to Surge
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+          SURGE_DOMAIN: ${{ secrets.SURGE_DOMAIN }}
+        run: |
+          export SURGE_LOGIN
+          export SURGE_TOKEN
+          DIST=dist
+          if [ ! -d "$DIST" ] || [ -z "$(ls -A "$DIST")" ]; then
+            echo "dist/ missing or empty; falling back to repo root"
+            DIST=.
+          fi
+          if [ -z "$SURGE_DOMAIN" ]; then
+            echo "SURGE_DOMAIN not set; using a generated domain"
+            surge "$DIST"
+          else
+            echo "Deploying to $SURGE_DOMAIN"
+            surge "$DIST" "$SURGE_DOMAIN"
+          fi
+
+  surge-skip:
+    if: ${{ !(secrets.SURGE_LOGIN != '' && secrets.SURGE_TOKEN != '') }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Skipping Surge deploy (secrets not set). Add SURGE_LOGIN, SURGE_TOKEN, and optional SURGE_DOMAIN to enable."
+
