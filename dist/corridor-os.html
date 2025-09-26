@@ -284,7 +284,7 @@
   // Register service worker for offline support even when landing directly on OS page
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     });
   }
 </script>
