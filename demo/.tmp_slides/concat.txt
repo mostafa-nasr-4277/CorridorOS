@@ -1,6 +1,0 @@
-file '/users/mnasr/desktop/cos/demo/.tmp_slides/s1.mp4'
-file '/users/mnasr/desktop/cos/demo/.tmp_slides/s2.mp4'
-file '/users/mnasr/desktop/cos/demo/.tmp_slides/s3.mp4'
-file '/users/mnasr/desktop/cos/demo/.tmp_slides/s4.mp4'
-file '/users/mnasr/desktop/cos/demo/.tmp_slides/s5.mp4'
-file '/users/mnasr/desktop/cos/demo/.tmp_slides/s6.mp4'
