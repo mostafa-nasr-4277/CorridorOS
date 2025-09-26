@@ -1,0 +1,1 @@
+Corridor‑class devices can receive power without exposed pins: 1) Capacitive/inductive (contactless) couplers with pre‑charge; 2) Flush conductive pads with current sharing. The toolkit helps size pads, pre‑charge, and compensation networks.

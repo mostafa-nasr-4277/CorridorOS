@@ -26,9 +26,17 @@ If video files are not available, the player will automatically fall back to the
 
 ## Usage
 
-The video player is automatically integrated into the landing page demo section and will:
-- Show a play button overlay initially
-- Display video controls when playing
-- Support fullscreen mode
-- Show progress bar with time display
-- Allow seeking by clicking the progress bar
+To generate the 3-minute video from the project’s slides, run:
+
+```
+bash scripts/build_demo_video.sh
+```
+
+This produces:
+- `demo/corridoros-demo.mp4` (H.264)
+- `demo/corridoros-demo.webm` (VP9), if available
+
+The landing page video player will automatically use these local files when present. It supports:
+- Native controls (play/pause/seek/volume/fullscreen)
+- Responsive 16:9 display with rounded corners
+- Graceful fallback if files are missing
