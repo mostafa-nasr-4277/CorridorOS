@@ -124,12 +124,20 @@ make_slide() {
   local font_opt=""
   if [ -n "$FONT" ]; then font_opt=":fontfile=${FONT}"; fi
 
+  # Pre-calc fade-out start to avoid inline bc dependency
+  local FADE_IN=0.6
+  local FADE_OUT=0.6
+  local ST_OUT
+  ST_OUT=$(awk -v d="$dur" -v o="$FADE_OUT" 'BEGIN{printf "%.2f", d-o}')
+
   ffmpeg -v error -y \
     -f lavfi -i "color=c=${bg}:s=${RES}:d=${dur},format=yuv420p" \
     -vf "\
-      drawtext=textfile='${title}'${font_opt}:fontcolor=white:fontsize=48:x=(w-text_w)/2:y=h*0.32:borderw=1.5:bordercolor=black@0.45,\
-      drawtext=textfile='${sub}'${font_opt}:fontcolor=0x99bbdd:fontsize=30:x=(w-text_w)/2:y=h*0.42:borderw=1.2:bordercolor=black@0.35,\
-      drawtext=textfile='${body}'${font_opt}:fontcolor=0xE8E8F0:fontsize=24:line_spacing=6:x=(w-text_w)/2:y=h*0.60:box=1:boxcolor=black@0.20:boxborderw=12" \
+      vignette=0.15:0.5,\
+      drawtext=textfile='${title}'${font_opt}:fontcolor=white:fontsize=48:x=(w-text_w)/2:y=h*0.32:borderw=1.5:bordercolor=black@0.45:alpha='if(lt(t,0.4), t/0.4, 1)',\
+      drawtext=textfile='${sub}'${font_opt}:fontcolor=0x99bbdd:fontsize=30:x=(w-text_w)/2:y=h*0.42:borderw=1.2:bordercolor=black@0.35:alpha='if(lt(t,0.6), if(lt(t,0.2), 0, (t-0.2)/0.4), 1)',\
+      drawtext=textfile='${body}'${font_opt}:fontcolor=0xE8E8F0:fontsize=24:line_spacing=6:x=(w-text_w)/2:y=h*0.60:box=1:boxcolor=black@0.20:boxborderw=12:alpha='if(lt(t,1.0), if(lt(t,0.6), 0, (t-0.6)/0.4), 1)',\
+      fade=t=in:st=0:d=${FADE_IN},fade=t=out:st=${ST_OUT}:d=${FADE_OUT}" \
     -r ${FPS} -c:v libx264 -pix_fmt yuv420p -profile:v high -movflags +faststart -crf 20 -preset veryfast \
     "$out"
 }
