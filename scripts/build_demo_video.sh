@@ -57,7 +57,7 @@ cat > "$tmp_dir/s2_sub.txt" <<'TXT'
 Stabilize BER and eye with minimal power
 TXT
 cat > "$tmp_dir/s2_body.txt" <<'TXT'
-Estimates background offset from lunar, zodiacal, airglow, galactic, and skyglow contributions and tunes bias/λ to hold error targets.
+Estimates background offset from lunar, airglow, galactic, and skyglow contributions and tunes bias/λ to hold error targets.
 TXT
 
 cat > "$tmp_dir/s3_title.txt" <<'TXT'
@@ -134,9 +134,9 @@ make_slide() {
     -f lavfi -i "color=c=${bg}:s=${RES}:d=${dur},format=yuv420p" \
     -vf "\
       vignette=0.15:0.5,\
-      drawtext=textfile='${title}'${font_opt}:fontcolor=white:fontsize=48:x=(w-text_w)/2:y=h*0.32:borderw=1.5:bordercolor=black@0.45:alpha='if(lt(t,0.4), t/0.4, 1)',\
-      drawtext=textfile='${sub}'${font_opt}:fontcolor=0x99bbdd:fontsize=30:x=(w-text_w)/2:y=h*0.42:borderw=1.2:bordercolor=black@0.35:alpha='if(lt(t,0.6), if(lt(t,0.2), 0, (t-0.2)/0.4), 1)',\
-      drawtext=textfile='${body}'${font_opt}:fontcolor=0xE8E8F0:fontsize=24:line_spacing=6:x=(w-text_w)/2:y=h*0.60:box=1:boxcolor=black@0.20:boxborderw=12:alpha='if(lt(t,1.0), if(lt(t,0.6), 0, (t-0.6)/0.4), 1)',\
+      drawtext=textfile='${title}'${font_opt}:fontcolor=white:fontsize=48:x=(w-text_w)/2:y=h*0.30:borderw=1.5:bordercolor=black@0.45:alpha='if(lt(t,0.4), t/0.4, 1)',\
+      drawtext=textfile='${sub}'${font_opt}:fontcolor=0x99bbdd:fontsize=30:x=(w-text_w)/2:y=h*0.48:borderw=1.2:bordercolor=black@0.35:alpha='if(lt(t,0.6), if(lt(t,0.2), 0, (t-0.2)/0.4), 1)',\
+      drawtext=textfile='${body}'${font_opt}:fontcolor=0xE8E8F0:fontsize=24:line_spacing=6:x=(w-text_w)/2:y=h*0.68:box=1:boxcolor=black@0.20:boxborderw=12:alpha='if(lt(t,1.0), if(lt(t,0.6), 0, (t-0.6)/0.4), 1)',\
       fade=t=in:st=0:d=${FADE_IN},fade=t=out:st=${ST_OUT}:d=${FADE_OUT}" \
     -r ${FPS} -c:v libx264 -pix_fmt yuv420p -profile:v high -movflags +faststart -crf 20 -preset veryfast \
     "$out"
@@ -184,7 +184,14 @@ ffmpeg -v error -y -i "$out_dir/corridoros-demo.mp4" -i "$audio_src" \
   -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -b:a 128k -shortest \
   "$out_dir/corridoros-demo.tmp.mp4" && mv "$out_dir/corridoros-demo.tmp.mp4" "$out_dir/corridoros-demo.mp4"
 
-# Build a VP9 webm if encoder is present
+# Speed up final video to 1.2x (video+audio)
+echo "      → Speeding to 1.2x"
+ffmpeg -v error -y -i "$out_dir/corridoros-demo.mp4" \
+  -filter_complex "[0:v]setpts=PTS/1.2[v];[0:a]atempo=1.2[a]" \
+  -map "[v]" -map "[a]" -r ${FPS} -c:v libx264 -pix_fmt yuv420p -crf 20 -preset veryfast -movflags +faststart \
+  "$out_dir/corridoros-demo.speed.mp4" && mv "$out_dir/corridoros-demo.speed.mp4" "$out_dir/corridoros-demo.mp4"
+
+# Build a VP9 webm from the speed-adjusted file if encoder is present
 if ffmpeg -hide_banner -encoders 2>/dev/null | grep -q libvpx-vp9; then
   echo "      → Producing VP9 WebM"
   ffmpeg -v error -y -i "$out_dir/corridoros-demo.mp4" \
