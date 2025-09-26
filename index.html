@@ -11,7 +11,7 @@
   <meta property="og:image:alt" content="CorridorOS dashboard showing reserved photonic corridors and Free-Form Memory bandwidth floors.">
   <meta name="corridoros-version" content="v4">
   <meta name="theme-color" content="#ff0080">
-  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.css">
   <style>
     :root{
@@ -59,10 +59,18 @@
     .demo{margin:36px auto 12px;max-width:960px}
     .demo-frame{aspect-ratio:16/9;background:linear-gradient(135deg, #000, #1a0a2e);border-radius:16px;border:2px solid rgba(255,0,128,.4);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 54px rgba(255,0,128,.3);cursor:pointer;transition:all .3s ease}
     .demo-frame:hover{transform:scale(1.02);box-shadow:0 24px 64px rgba(255,0,128,.4);border-color:rgba(255,0,128,.6)}
-    .play{position:absolute;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg, var(--magenta), var(--purple));border:3px solid rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(255,0,128,.5);transition:all .3s ease}
+    .play{position:absolute;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg, var(--magenta), var(--purple));border:3px solid rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(255,0,128,.5);transition:all .3s ease;cursor:pointer;z-index:2}
     .play:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(255,0,128,.7)}
     .play::before{content:"▶";font-size:32px;margin-left:6px;color:#fff;font-weight:bold}
     .demo-caption{margin-top:8px;font-size:13px;color:var(--text-secondary);text-align:center}
+    
+    /* Video Controls */
+    .video-controls{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,.8));padding:20px;display:flex;align-items:center;gap:12px;z-index:3;border-radius:0 0 16px 16px}
+    .control-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:16px;transition:all .2s ease}
+    .control-btn:hover{background:rgba(255,255,255,.3);transform:scale(1.05)}
+    .progress-bar{flex:1;height:4px;background:rgba(255,255,255,.3);border-radius:2px;cursor:pointer;position:relative}
+    .progress{height:100%;background:linear-gradient(90deg, var(--magenta), var(--purple));border-radius:2px;width:0%;transition:width .1s ease}
+    .time-display{color:#fff;font-size:14px;font-weight:500;min-width:100px;text-align:center}
     /* Proof cards */
     .proof{margin:56px 0 8px}
     .proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
@@ -113,14 +121,32 @@
       <div class="hero-visual" aria-label="Abstract photonic corridors with wavelength hints"></div>
     </section>
 
-    <!-- Demo GIF Block -->
+    <!-- Demo Video Block -->
     <section class="demo" id="demo" aria-labelledby="demoLabel">
       <h3 id="demoLabel" style="margin:0 0 10px 0">Experience CorridorOS: Reserve light and guarantee memory floors in real time.</h3>
       <div class="demo-frame" id="demoFrame" role="button" aria-label="Play demo">
-        <div class="play"></div>
+        <video id="demoVideo" preload="metadata" poster="brand/pngs/grad_1920x480.png" style="width:100%;height:100%;object-fit:cover;border-radius:16px;display:none;">
+          <source src="demo/corridoros-demo.mp4" type="video/mp4">
+          <source src="demo/corridoros-demo.webm" type="video/webm">
+          Your browser does not support the video tag.
+        </video>
+        <div class="play" id="playButton"></div>
+        <div class="video-controls" id="videoControls" style="display:none;">
+          <button class="control-btn" id="playPauseBtn" aria-label="Play/Pause">⏸️</button>
+          <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+          </div>
+          <div class="time-display">
+            <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+          </div>
+          <button class="control-btn" id="fullscreenBtn" aria-label="Fullscreen">⛶</button>
+        </div>
       </div>
       <div class="demo-caption">Allocate corridor → set 150 GB/s floor → run workload → HELIOPASS recalibrates.</div>
-      <div style="margin-top:10px;text-align:center"><a class="btn ghost" href="scripts/golden_demo.sh" download>Download Repro Demo</a></div>
+      <div style="margin-top:10px;text-align:center">
+        <a class="btn ghost" href="scripts/golden_demo.sh" download>Download Repro Demo</a>
+        <a class="btn ghost" href="demo/corridoros-demo.mp4" download style="margin-left:10px">Download Video</a>
+      </div>
     </section>
 
     <!-- Proof Section -->
@@ -199,13 +225,120 @@
 
   <script src="webgpu-check.js" defer></script>
   <script>
+    let videoPlayer = null;
+    let isVideoPlaying = false;
+    
     function scrollToDemo(){
       const el=document.getElementById('demo'); if(!el) return; el.scrollIntoView({behavior:'smooth'});
     }
     
-    function startDemoSimulation(){
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function updateProgress() {
+      if (!videoPlayer) return;
+      const progress = document.getElementById('progress');
+      const currentTime = document.getElementById('currentTime');
+      const duration = document.getElementById('duration');
+      
+      if (progress && currentTime && duration) {
+        const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+        progress.style.width = percent + '%';
+        currentTime.textContent = formatTime(videoPlayer.currentTime);
+        duration.textContent = formatTime(videoPlayer.duration);
+      }
+    }
+    
+    function togglePlayPause() {
+      if (!videoPlayer) return;
+      
+      if (videoPlayer.paused) {
+        videoPlayer.play();
+        document.getElementById('playPauseBtn').textContent = '⏸️';
+      } else {
+        videoPlayer.pause();
+        document.getElementById('playPauseBtn').textContent = '▶️';
+      }
+    }
+    
+    function toggleFullscreen() {
+      if (!videoPlayer) return;
+      
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        videoPlayer.requestFullscreen();
+      }
+    }
+    
+    function startVideoPlayer() {
       const demoFrame = document.getElementById('demoFrame');
-      const playButton = document.querySelector('.play');
+      const playButton = document.getElementById('playButton');
+      const video = document.getElementById('demoVideo');
+      const videoControls = document.getElementById('videoControls');
+      
+      if (!demoFrame || !playButton || !video || !videoControls) return;
+      
+      // Hide play button and show video
+      playButton.style.display = 'none';
+      video.style.display = 'block';
+      videoControls.style.display = 'flex';
+      
+      videoPlayer = video;
+      
+      // Set up video event listeners
+      video.addEventListener('loadedmetadata', () => {
+        updateProgress();
+      });
+      
+      video.addEventListener('timeupdate', updateProgress);
+      
+      video.addEventListener('play', () => {
+        isVideoPlaying = true;
+        document.getElementById('playPauseBtn').textContent = '⏸️';
+      });
+      
+      video.addEventListener('pause', () => {
+        isVideoPlaying = false;
+        document.getElementById('playPauseBtn').textContent = '▶️';
+      });
+      
+      video.addEventListener('ended', () => {
+        isVideoPlaying = false;
+        document.getElementById('playPauseBtn').textContent = '▶️';
+        // Reset to beginning
+        video.currentTime = 0;
+        updateProgress();
+      });
+      
+      // Set up control event listeners
+      document.getElementById('playPauseBtn')?.addEventListener('click', togglePlayPause);
+      document.getElementById('fullscreenBtn')?.addEventListener('click', toggleFullscreen);
+      
+      // Progress bar click to seek
+      const progressBar = document.querySelector('.progress-bar');
+      progressBar?.addEventListener('click', (e) => {
+        if (!videoPlayer) return;
+        const rect = progressBar.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percent = clickX / rect.width;
+        videoPlayer.currentTime = percent * videoPlayer.duration;
+      });
+      
+      // Start playing the video
+      video.play().catch(err => {
+        console.log('Video autoplay failed:', err);
+        // Show fallback simulation if video fails to load
+        startDemoSimulation();
+      });
+    }
+    
+    function startDemoSimulation() {
+      const demoFrame = document.getElementById('demoFrame');
+      const playButton = document.getElementById('playButton');
       
       if (!demoFrame || !playButton) return;
       
@@ -257,18 +390,36 @@
       if (!demoFrame) return;
       
       demoFrame.innerHTML = `
-        <div class="play"></div>
+        <video id="demoVideo" preload="metadata" poster="brand/pngs/grad_1920x480.png" style="width:100%;height:100%;object-fit:cover;border-radius:16px;display:none;">
+          <source src="demo/corridoros-demo.mp4" type="video/mp4">
+          <source src="demo/corridoros-demo.webm" type="video/webm">
+          Your browser does not support the video tag.
+        </video>
+        <div class="play" id="playButton"></div>
+        <div class="video-controls" id="videoControls" style="display:none;">
+          <button class="control-btn" id="playPauseBtn" aria-label="Play/Pause">⏸️</button>
+          <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+          </div>
+          <div class="time-display">
+            <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+          </div>
+          <button class="control-btn" id="fullscreenBtn" aria-label="Fullscreen">⛶</button>
+        </div>
       `;
+      
+      // Re-attach event listeners
+      document.getElementById('playButton')?.addEventListener('click', startVideoPlayer);
     }
     
     document.getElementById('ctaDemo')?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToDemo(); });
     document.getElementById('ctaDemo2')?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToDemo(); });
-    document.getElementById('demoFrame')?.addEventListener('click', startDemoSimulation);
+    document.getElementById('playButton')?.addEventListener('click', startVideoPlayer);
     
     // Register service worker for offline support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+        navigator.serviceWorker.register('service-worker.js').catch(()=>{});
       });
     }
   </script>

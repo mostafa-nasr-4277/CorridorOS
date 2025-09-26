@@ -6,7 +6,7 @@
     <title>Corridor OS v4 - Hybrid Quantum-Photonic Operating System</title>
     <meta name="corridoros-version" content="v4">
     <meta name="theme-color" content="#ff0080">
-    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="corridor-os-styles.84d8f5a3.css">
     <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.css">
     <!-- Removed remote Google Fonts to avoid offline render blocking; rely on system fallbacks -->
@@ -286,7 +286,7 @@
   // Register service worker for offline support even when landing directly on OS page
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
     });
   }
 </script>

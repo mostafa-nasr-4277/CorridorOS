@@ -171,6 +171,263 @@ class CorridorApps {
     }
     
     // Application Implementations
+    createVideoPlayerApp() {
+        // Build a self-contained 3-minute presentation about CorridorOS theory of compute
+        // Includes HELIOPASS demo and pin-free tactile power transmission
+        const appId = 'video-player';
+        // Initialize state holder once
+        if (!this._presentation) {
+            this._presentation = {
+                totalMs: 180000,
+                slides: [
+                    {
+                        id: 'intro',
+                        title: 'CorridorOS: Theory of Compute',
+                        subtitle: 'Reserve Light. Guarantee Memory.',
+                        content: 'A three-minute walkthrough of the Corridor model: photonic corridors (λ lanes), Free-Form Memory (CXL) with bandwidth floors, HELIOPASS calibration, and system safety.',
+                        bg: 'linear-gradient(135deg, #0a0412, #1a0a2e)',
+                        durationMs: 20000
+                    },
+                    {
+                        id: 'heliopass',
+                        title: 'HELIOPASS — Photonic Environment Calibration',
+                        subtitle: 'Stabilize BER and eye with minimal power',
+                        content: 'HELIOPASS estimates background offset from lunar, zodiacal, airglow, galactic, and skyglow contributions and tunes bias/λ to hold error targets.',
+                        bg: 'linear-gradient(135deg, #001018, #032b3a)',
+                        durationMs: 40000,
+                        render: () => {
+                            try {
+                                if (window.heliopassSystem && typeof window.heliopassSystem.getSensorData === 'function') {
+                                    const d = window.heliopassSystem.getSensorData();
+                                    const lines = [];
+                                    for (const [k, v] of Object.entries(d.sensors)) {
+                                        lines.push(`${k}: ${v.value.toFixed(3)} ${v.unit}`);
+                                    }
+                                    return `<div class=\"heliopass-banner\"><span>${
+                                        `HELIOPASS offset: ${d.backgroundOffset.toFixed(3)} · ` + lines.join(' · ')
+                                    }</span></div>`;
+                                }
+                            } catch (e) {}
+                            return '<div class=\"heliopass-banner\"><span>HELIOPASS live data unavailable — running static demo.</span></div>';
+                        }
+                    },
+                    {
+                        id: 'corridors',
+                        title: 'Photonic Corridors (λ Lanes)',
+                        subtitle: 'Reserve wavelength sets per workload',
+                        content: 'Corridors allocate WDM lanes with policy: shaping, preemption guards, and power-aware bias tuning via HELIOPASS integration.',
+                        bg: 'linear-gradient(135deg, #160a3a, #2d1b69)',
+                        durationMs: 35000
+                    },
+                    {
+                        id: 'ffm',
+                        title: 'Free-Form Memory (CXL)',
+                        subtitle: 'GB/s floors as first-class resources',
+                        content: 'Pooled memory carved into QoS bundles with floor guarantees and latency classes; exposed to schedulers via CRDs and attested at boot.',
+                        bg: 'linear-gradient(135deg, #0f1535, #1f2a6e)',
+                        durationMs: 30000
+                    },
+                    {
+                        id: 'tactile-power',
+                        title: 'Tactile Power — Pin-free, Genderless',
+                        subtitle: 'Pad-to-pad, magnet-aligned, or contactless',
+                        content: 'Corridor-class devices can receive power without exposed pins: 1) Capacitive/inductive (contactless) couplers with pre-charge; 2) Flush conductive pads with current sharing. The included tactile-power-toolkit helps size pads, pre-charge, and compensation networks.',
+                        bg: 'linear-gradient(135deg, #1a1a1a, #2b2b2b)',
+                        durationMs: 35000,
+                        extra: `<div class=\"tp-diagram\">
+  <div class=\"tp-row\">
+    <div class=\"tile\">
+      <div class=\"magnet\">N</div>
+      <div class=\"pad a\"></div>
+      <div class=\"pad b\"></div>
+      <div class=\"magnet\">S</div>
+    </div>
+    <div class=\"gap\">≈1–3mm</div>
+    <div class=\"tile\">
+      <div class=\"magnet\">S</div>
+      <div class=\"pad a\"></div>
+      <div class=\"pad b\"></div>
+      <div class=\"magnet\">N</div>
+    </div>
+  </div>
+  <div class=\"tp-caption\">Pin-free: magnet alignment + dual pads (or IPT/CPT couplers) with pre-charge for inrush safety.</div>
+</div>`
+                    },
+                    {
+                        id: 'wrap',
+                        title: 'Putting It Together',
+                        subtitle: 'Schedule compute, light, memory — and power',
+                        content: 'CorridorOS unifies photonic corridors, calibrated by HELIOPASS, with QoS memory and safe, pin-free power delivery — observable and schedulable from day one.',
+                        bg: 'linear-gradient(135deg, #1a0a2e, #2d1b69)',
+                        durationMs: 20000
+                    }
+                ],
+                idx: 0,
+                running: false,
+                handle: null,
+                endsAt: 0,
+                slideEndsAt: 0,
+                elapsedMs: 0
+            };
+        }
+
+        // HTML UI
+        return `
+            <style>
+              .vp-app { display: flex; flex-direction: column; gap: 12px; height: 100%; }
+              .vp-stage { flex: 1; border-radius: 12px; border: 1px solid rgba(255,255,255,.15); overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; padding: 24px; }
+              .vp-slide { width: 100%; height: 100%; display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px; color: #fff; }
+              .vp-title { font-size: 22px; font-weight: 800; letter-spacing: .02em; }
+              .vp-sub { color: #9ad; font-weight: 600; }
+              .vp-body { align-self: start; max-width: 900px; line-height: 1.4; font-size: 15px; color: #e8e8f0; }
+              .vp-footer { font-size: 12px; color: #bcd; opacity: .9; display: flex; align-items: center; justify-content: space-between; }
+              .vp-controls { display: flex; gap: 8px; }
+              .vp-btn { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); color: #fff; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+              .vp-btn:hover { background: rgba(255,255,255,.2); }
+              .vp-progress { height: 6px; width: 100%; background: rgba(255,255,255,.1); border-radius: 999px; overflow: hidden; }
+              .vp-progress > div { height: 100%; width: 0%; background: linear-gradient(90deg, #00d4ff, #ff00ff); }
+              .heliopass-banner { margin-top: 8px; }
+              .tp-diagram { margin-top: 12px; color: #ddd; }
+              .tp-row { display: flex; align-items: center; gap: 16px; justify-content: center; }
+              .tile { width: 140px; height: 64px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; display: grid; grid-template-columns: 16px 1fr 1fr 16px; align-items: center; padding: 6px; gap: 6px; }
+              .tile .magnet { background: rgba(255,0,128,.25); border: 1px solid rgba(255,0,128,.35); color: #fff; font-size: 10px; border-radius: 6px; height: 100%; display: flex; align-items: center; justify-content: center; }
+              .tile .pad { height: 80%; border-radius: 6px; }
+              .tile .pad.a { background: rgba(0,212,255,.35); border: 1px solid rgba(0,212,255,.5); }
+              .tile .pad.b { background: rgba(255,215,0,.35); border: 1px solid rgba(255,215,0,.5); }
+              .gap { color: #9aa; font-size: 12px; }
+              .tp-caption { margin-top: 8px; font-size: 12px; color: #bcd; text-align: center; }
+            </style>
+            <div class=\"vp-app\" id=\"vp-${appId}\">
+              <div class=\"vp-stage\" id=\"vp-stage-${appId}\">
+                ${this._renderSlide(this._presentation.slides[0])}
+              </div>
+              <div class=\"vp-footer\">
+                <div class=\"vp-controls\">
+                  <button class=\"vp-btn\" onclick=\"corridorApps._prevSlide()\">⟨ Prev</button>
+                  <button class=\"vp-btn\" id=\"vp-playbtn\" onclick=\"corridorApps._togglePlay()\">▶ Play</button>
+                  <button class=\"vp-btn\" onclick=\"corridorApps._nextSlide()\">Next ⟩</button>
+                  <button class=\"vp-btn\" onclick=\"corridorApps._resetPresentation()\">⟲ Restart</button>
+                </div>
+                <div style=\"display:flex;align-items:center;gap:8px;min-width:40%;\">
+                  <div class=\"vp-progress\"><div id=\"vp-progress-bar\"></div></div>
+                  <div id=\"vp-time\" style=\"width:84px;text-align:right;\">0:00 / 3:00</div>
+                </div>
+              </div>
+            </div>
+        `;
+    }
+
+    _renderSlide(slide) {
+        const extra = slide.render ? slide.render() : (slide.extra || '');
+        return `
+          <div class=\"vp-slide\" style=\"background:${slide.bg}\">
+            <div class=\"vp-title\">${slide.title}</div>
+            <div class=\"vp-sub\">${slide.subtitle || ''}</div>
+            <div class=\"vp-body\">${slide.content || ''}${extra}</div>
+            <div style=\"opacity:.75;font-size:12px;\">Slide ${this._presentation.slides.indexOf(slide)+1} of ${this._presentation.slides.length}</div>
+          </div>
+        `;
+    }
+
+    _togglePlay() {
+        const p = this._presentation;
+        if (!p.running) {
+            this._startOrResume();
+        } else {
+            this._pause();
+        }
+    }
+
+    _startOrResume() {
+        const p = this._presentation;
+        p.running = true;
+        const playBtn = document.getElementById('vp-playbtn');
+        if (playBtn) playBtn.textContent = '⏸ Pause';
+        // Compute slide end if starting fresh
+        const slide = p.slides[p.idx];
+        const now = performance.now();
+        if (!p.slideEndsAt || p.slideEndsAt <= now) {
+            p.slideEndsAt = now + slide.durationMs;
+        }
+        if (!p.endsAt) {
+            p.endsAt = now + (p.totalMs - p.elapsedMs);
+        }
+        this._tick();
+    }
+
+    _pause() {
+        const p = this._presentation;
+        p.running = false;
+        const playBtn = document.getElementById('vp-playbtn');
+        if (playBtn) playBtn.textContent = '▶ Play';
+        if (p.handle) cancelAnimationFrame(p.handle);
+        p.handle = null;
+    }
+
+    _resetPresentation() {
+        const p = this._presentation;
+        p.idx = 0; p.running = false; p.handle = null; p.endsAt = 0; p.slideEndsAt = 0; p.elapsedMs = 0;
+        const stage = document.getElementById('vp-stage-video-player');
+        if (stage) stage.innerHTML = this._renderSlide(p.slides[0]);
+        const bar = document.getElementById('vp-progress-bar');
+        if (bar) bar.style.width = '0%';
+        const t = document.getElementById('vp-time');
+        if (t) t.textContent = '0:00 / 3:00';
+        const playBtn = document.getElementById('vp-playbtn');
+        if (playBtn) playBtn.textContent = '▶ Play';
+    }
+
+    _nextSlide() {
+        const p = this._presentation;
+        p.idx = Math.min(p.idx + 1, p.slides.length - 1);
+        p.slideEndsAt = performance.now() + p.slides[p.idx].durationMs;
+        const stage = document.getElementById('vp-stage-video-player');
+        if (stage) stage.innerHTML = this._renderSlide(p.slides[p.idx]);
+    }
+
+    _prevSlide() {
+        const p = this._presentation;
+        p.idx = Math.max(p.idx - 1, 0);
+        p.slideEndsAt = performance.now() + p.slides[p.idx].durationMs;
+        const stage = document.getElementById('vp-stage-video-player');
+        if (stage) stage.innerHTML = this._renderSlide(p.slides[p.idx]);
+    }
+
+    _tick() {
+        const p = this._presentation;
+        if (!p.running) return;
+        const now = performance.now();
+        // Timing
+        const remaining = Math.max(0, p.endsAt - now);
+        p.elapsedMs = p.totalMs - remaining;
+        // Slide advance
+        if (now >= p.slideEndsAt) {
+            if (p.idx < p.slides.length - 1) {
+                p.idx += 1;
+                p.slideEndsAt = now + p.slides[p.idx].durationMs;
+                const stage = document.getElementById('vp-stage-video-player');
+                if (stage) stage.innerHTML = this._renderSlide(p.slides[p.idx]);
+            } else {
+                // End of presentation
+                this._pause();
+            }
+        }
+        // Progress UI
+        const bar = document.getElementById('vp-progress-bar');
+        if (bar) bar.style.width = `${(p.elapsedMs / p.totalMs) * 100}%`;
+        const t = document.getElementById('vp-time');
+        if (t) t.textContent = `${this._fmt(p.elapsedMs)} / 3:00`;
+        p.handle = requestAnimationFrame(() => this._tick());
+    }
+
+    _fmt(ms) {
+        const s = Math.max(0, Math.floor(ms / 1000));
+        const m = Math.floor(s / 60);
+        const r = (s % 60).toString().padStart(2, '0');
+        return `${m}:${r}`;
+    }
+
+    // Application Implementations
     createSettingsApp() {
         return window.corridorSettings.createSettingsWindow();
     }
