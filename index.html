@@ -51,11 +51,9 @@
     .subhead{font-size:18px;line-height:26px;color:var(--text-secondary);margin-bottom:16px}
     .cta-row{display:flex;gap:12px;margin:18px 0 16px 0}
     .chips{display:flex;flex-wrap:wrap;gap:10px;color:var(--text)}
-    .chip{background:rgba(255,64,160,.2);color:var(--accent);border:1px solid rgba(255,64,160,.5);padding:6px 10px;border-radius:999px;font-size:13px}
-    .chip.gold{background:rgba(255,215,0,.15);color:var(--gold);border-color:rgba(255,215,0,.4)}
-    .hero-visual{grid-column:span 6;background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.3);border-radius:16px;min-height:340px;position:relative;overflow:hidden;box-shadow:0 18px 54px rgba(0,200,255,.2)}
-    .hero-visual::before{content:"";position:absolute;inset:-40% -20%;background:repeating-linear-gradient( 70deg, rgba(0,200,255,.3), rgba(0,200,255,.3) 2px, transparent 2px, transparent 28px );filter:blur(4px);opacity:.4}
-    .hero-left{grid-column:span 6;background:rgba(0,200,255,.06);border:1px solid rgba(0,200,255,.2);border-radius:16px;padding:22px;backdrop-filter:blur(6px)}
+    .chip{background:linear-gradient(90deg, rgba(0,200,255,.22), rgba(0,255,213,.20));color:#e6fdff;border:1px solid rgba(255,255,255,.22);padding:6px 10px;border-radius:999px;font-size:13px}
+    .chip.gold{background:linear-gradient(90deg, rgba(255,215,0,.22), rgba(0,255,213,.18));color:#fff5cc;border-color:rgba(255,255,255,.24)}
+    .hero-left{grid-column:1 / -1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:22px;backdrop-filter:blur(10px)}
     /* Demo block */
     .demo{margin:36px auto 12px;max-width:960px}
     .demo-frame{aspect-ratio:16/9;background:linear-gradient(135deg, #000, #1a0a2e);border-radius:16px;border:2px solid rgba(255,0,128,.4);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 54px rgba(255,0,128,.3);cursor:pointer;transition:all .3s ease}
@@ -87,7 +85,7 @@
     /* CTA band */
     .band{margin:56px 0 24px;padding:28px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:linear-gradient(90deg, rgba(106,17,203,.25), rgba(30,159,255,.15))}
     /* Responsive */
-    @media (max-width:1024px){ .hero{grid-template-columns:repeat(8,1fr)} .hero-left,.hero-visual{grid-column:span 8} .proof-grid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:1024px){ .hero{grid-template-columns:repeat(8,1fr)} .hero-left{grid-column:span 8} .proof-grid{grid-template-columns:repeat(2,1fr)} }
     @media (max-width:640px){ h1{font-size:42px;line-height:50px} .proof-grid{grid-template-columns:1fr} .nav{padding:14px 16px} main{padding:32px 16px} }
   </style>
 </head>
@@ -122,7 +120,7 @@
         </div>
         <div style="margin-top:10px;color:rgba(247,243,232,.8);font-size:14px">Open core · Kubernetes‑ready · Attestation & PQC built‑in</div>
       </div>
-      <div class="hero-visual" aria-label="Abstract photonic corridors with wavelength hints"></div>
+      
     </section>
 
     <!-- Demo Video Block -->
