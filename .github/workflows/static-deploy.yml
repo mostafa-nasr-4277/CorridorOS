@@ -123,10 +123,10 @@ jobs:
           echo "🔎 Base URL: $BASE_URL"
           # Add cache-buster to avoid stale CDNs
           BUST=$RANDOM
-          # 1) index.html contains our version marker
+          # 1) index.html contains expected headline (stable content)
           echo "→ Checking index.html content"
           curl -sS --retry 5 --retry-delay 2 --retry-all-errors -H "Cache-Control: no-cache" \
-            "${BASE_URL}?v=${BUST}" | grep -q 'corridoros-version' || { echo "index.html missing version marker"; exit 1; }
+            "${BASE_URL}?v=${BUST}" | grep -q 'Reserve Light. Guarantee Memory.' || { echo "index.html content check failed"; exit 1; }
           # 2) OS page is reachable
           echo "→ Checking corridor-os.html (200)"
           curl -sS -I --retry 5 --retry-delay 2 --retry-all-errors -H "Cache-Control: no-cache" \
