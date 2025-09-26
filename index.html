@@ -39,10 +39,10 @@
     .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:18px 48px;background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));backdrop-filter:saturate(140%) blur(18px);border-bottom:1px solid rgba(255,255,255,.18)}
     .nav .brand{font-weight:800;letter-spacing:.02em;background:linear-gradient(45deg,var(--cyan),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
     .nav .links{display:flex;gap:18px;align-items:center}
-    .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:.85rem 1.2rem;border-radius:10px;border:1.5px solid rgba(255,64,160,.6);text-decoration:none;font-weight:700;letter-spacing:.01em;transition:all .2s ease;color:var(--text)}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,0,128,.3)}
+    .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:.85rem 1.2rem;border-radius:10px;border:1.5px solid rgba(0,200,255,.6);text-decoration:none;font-weight:700;letter-spacing:.01em;transition:all .2s ease;color:var(--text)}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,200,255,.35)}
     .btn.primary{border:none;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#001b2e;box-shadow:0 4px 16px rgba(0,200,255,.4)}
-    .btn.ghost{background:transparent;border-color:rgba(255,64,160,.4)}
+    .btn.ghost{background:transparent;border-color:rgba(0,200,255,.4)}
     main{max-width:1200px;margin:0 auto;padding:48px 24px}
     /* Hero */
     .hero{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center}
@@ -56,8 +56,8 @@
     .hero-left{grid-column:1 / -1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:22px;backdrop-filter:blur(10px)}
     /* Demo block */
     .demo{margin:36px auto 12px;max-width:960px}
-    .demo-frame{aspect-ratio:16/9;background:linear-gradient(135deg, #000, #1a0a2e);border-radius:16px;border:2px solid rgba(255,0,128,.4);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 54px rgba(255,0,128,.3);cursor:pointer;transition:all .3s ease}
-    .demo-frame:hover{transform:scale(1.02);box-shadow:0 24px 64px rgba(255,0,128,.4);border-color:rgba(255,0,128,.6)}
+    .demo-frame{aspect-ratio:16/9;background:linear-gradient(135deg, #000, #0e1a2b);border-radius:16px;border:2px solid rgba(0,200,255,.4);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 54px rgba(0,200,255,.28);cursor:pointer;transition:all .3s ease}
+    .demo-frame:hover{transform:scale(1.02);box-shadow:0 24px 64px rgba(0,200,255,.38);border-color:rgba(0,200,255,.6)}
     .demo-caption{margin-top:8px;font-size:13px;color:var(--text-secondary);text-align:center}
     
     /* Video Player Styling */
@@ -87,9 +87,29 @@
     /* Responsive */
     @media (max-width:1024px){ .hero{grid-template-columns:repeat(8,1fr)} .hero-left{grid-column:span 8} .proof-grid{grid-template-columns:repeat(2,1fr)} }
     @media (max-width:640px){ h1{font-size:42px;line-height:50px} .proof-grid{grid-template-columns:1fr} .nav{padding:14px 16px} main{padding:32px 16px} }
+
+    /* Liminal glow overlay */
+    .glow-layer{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.0;transition:opacity .6s ease}
+    body.glow-on .glow-layer{opacity:.65}
+    .glow-layer::before{content:"";position:absolute;inset: -20% -20%;
+      background:
+        radial-gradient(800px 400px at 20% 20%, rgba(0,200,255,.35), transparent 60%),
+        radial-gradient(900px 500px at 70% 60%, rgba(0,255,213,.25), transparent 62%),
+        radial-gradient(700px 400px at 40% 80%, rgba(110,74,255,.22), transparent 64%);
+      filter:blur(30px);
+      animation: glowDrift 28s ease-in-out infinite alternate;
+    }
+    @keyframes glowDrift{
+      0%{transform:translate3d(-10px,-6px,0) scale(1)}
+      50%{transform:translate3d(12px,10px,0) scale(1.03)}
+      100%{transform:translate3d(-8px,14px,0) scale(0.98)}
+    }
+
+    nav, main{position:relative;z-index:1}
   </style>
 </head>
 <body>
+  <div class="glow-layer" aria-hidden="true"></div>
   <nav class="nav" aria-label="Main">
     <div class="brand">CorridorOS</div>
     <div class="links">
@@ -98,6 +118,7 @@
       <a class="btn ghost" href="docs/SECURITY_BASELINE.md">Security</a>
       <a class="btn ghost" href="https://github.com/mostafa-nasr-4277/CorridorOS" target="_blank" rel="noopener">GitHub</a>
       <a class="btn primary" href="#demo" id="ctaDemo">Try Demo (Simulation)</a>
+      <button class="btn ghost" id="toggleGlow" type="button" title="Toggle Liminal Glow">Liminal Glow</button>
     </div>
   </nav>
 
@@ -262,6 +283,18 @@
     
     document.getElementById('ctaDemo')?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToDemo(); });
     document.getElementById('ctaDemo2')?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToDemo(); });
+    // Liminal glow toggle with persisted preference
+    (function(){
+      const key='glowPref';
+      const btn=document.getElementById('toggleGlow');
+      const apply=(on)=>{ document.body.classList.toggle('glow-on', !!on); };
+      try{ apply(localStorage.getItem(key)==='1'); }catch(e){}
+      btn?.addEventListener('click',()=>{
+        const on=!document.body.classList.contains('glow-on');
+        apply(on);
+        try{ localStorage.setItem(key, on?'1':'0'); }catch(e){}
+      });
+    })();
     
     // Register service worker for offline support
     if ('serviceWorker' in navigator) {
