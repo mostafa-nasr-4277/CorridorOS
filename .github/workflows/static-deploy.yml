@@ -72,6 +72,14 @@ jobs:
           else
             echo "ℹ️  No service-worker.js in _site; skipping bump"
           fi
+
+      - name: Add CNAME (custom domain)
+        if: ${{ secrets.CUSTOM_DOMAIN != '' }}
+        env:
+          CUSTOM_DOMAIN: ${{ secrets.CUSTOM_DOMAIN }}
+        run: |
+          echo "$CUSTOM_DOMAIN" > _site/CNAME
+          echo "CNAME set to: $(cat _site/CNAME)"
         
       - name: Verify deployment package
         run: |
@@ -131,6 +139,7 @@ jobs:
       - name: Smoke check (Pages availability)
         env:
           BASE_URL: ${{ steps.deployment.outputs.page_url }}
+          CUSTOM_DOMAIN: ${{ secrets.CUSTOM_DOMAIN }}
         shell: bash
         run: |
           set -euo pipefail
@@ -151,4 +160,10 @@ jobs:
           echo "→ Checking demo video (200)"
           curl -sS -I --retry 5 --retry-delay 2 --retry-all-errors -H "Cache-Control: no-cache" \
             "${BASE_URL}demo/corridoros-demo.mp4?v=${BUST}" | grep -Eq 'HTTP/.+ 200' || { echo "demo video not 200"; exit 1; }
+          # 4) Optional custom domain check
+          if [ -n "${CUSTOM_DOMAIN:-}" ]; then
+            echo "→ Checking https://${CUSTOM_DOMAIN}/ (optional)"
+            curl -sS --retry 5 --retry-delay 3 --retry-all-errors -H "Cache-Control: no-cache" \
+              "https://${CUSTOM_DOMAIN}/?v=${BUST}" | grep -q 'Reserve Light. Guarantee Memory.' || echo "(info) custom domain not ready yet"
+          fi
           echo "✅ Smoke checks passed"
