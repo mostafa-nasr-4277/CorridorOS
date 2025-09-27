@@ -1,0 +1,164 @@
+{
+  "items": [
+    {
+      "category": "AppIcon.appiconset",
+      "file": "assets/assets/mirror/AppIcon.appiconset/Frame_68.png",
+      "name": "Frame 68.png"
+    },
+    {
+      "category": "Hotels",
+      "file": "assets/assets/mirror/Hotels/Coral_Beach_Hotel_1.imageset/Coral_Beach_Hotel_1.jpg",
+      "name": "Coral_Beach_Hotel_1.jpg"
+    },
+    {
+      "category": "Hotels",
+      "file": "assets/assets/mirror/Hotels/Coral_Beach_Hotel_2.imageset/Coral_Beach_Hotel_2.jpg",
+      "name": "Coral_Beach_Hotel_2.jpg"
+    },
+    {
+      "category": "Hotels",
+      "file": "assets/assets/mirror/Hotels/Coral_Beach_Hotel_3.imageset/Coral_Beach_Hotel_3.jpg",
+      "name": "Coral_Beach_Hotel_3.jpg"
+    },
+    {
+      "category": "Hotels",
+      "file": "assets/assets/mirror/Hotels/Desert_Oasis_Resort_1.imageset/Desert_Oasis_Resort_1.jpg",
+      "name": "Desert_Oasis_Resort_1.jpg"
+    },
+    {
+      "category": "Hotels",
+      "file": "assets/assets/mirror/Hotels/Desert_Oasis_Resort_2.imageset/Desert_Oasis_Resort_2.jpg",
+      "name": "Desert_Oasis_Resort_2.jpg"
+    },
+    {
+      "category": "Hotels",
+      "file": "assets/assets/mirror/Hotels/Desert_Oasis_Resort_3.imageset/Desert_Oasis_Resort_3.jpg",
+      "name": "Desert_Oasis_Resort_3.jpg"
+    },
+    {
+      "category": "Hotels",
+      "file": "assets/assets/mirror/Hotels/Red_Sea_Grand_Resort_1.imageset/Red_Sea_Grand_Resort_1.jpg",
+      "name": "Red_Sea_Grand_Resort_1.jpg"
+    },
+    {
+      "category": "Hotels",
+      "file": "assets/assets/mirror/Hotels/Red_Sea_Grand_Resort_2.imageset/Red_Sea_Grand_Resort_2.jpg",
+      "name": "Red_Sea_Grand_Resort_2.jpg"
+    },
+    {
+      "category": "Hotels",
+      "file": "assets/assets/mirror/Hotels/Red_Sea_Grand_Resort_3.imageset/Red_Sea_Grand_Resort_3.jpg",
+      "name": "Red_Sea_Grand_Resort_3.jpg"
+    },
+    {
+      "category": "LaunchScreen.imageset",
+      "file": "assets/assets/mirror/LaunchScreen.imageset/Frame_69.png",
+      "name": "Frame 69.png"
+    },
+    {
+      "category": "LaunchScreen.imageset",
+      "file": "assets/assets/mirror/LaunchScreen.imageset/Frame_70.png",
+      "name": "Frame 70.png"
+    },
+    {
+      "category": "LaunchScreen.imageset",
+      "file": "assets/assets/mirror/LaunchScreen.imageset/Frame_71.png",
+      "name": "Frame 71.png"
+    },
+    {
+      "category": "Onboarding1.imageset",
+      "file": "assets/assets/mirror/Onboarding1.imageset/Onboarding1.png",
+      "name": "Onboarding1.png"
+    },
+    {
+      "category": "Onboarding1.imageset",
+      "file": "assets/assets/mirror/Onboarding1.imageset/Onboarding1@2x.png",
+      "name": "Onboarding1@2x.png"
+    },
+    {
+      "category": "Onboarding2.imageset",
+      "file": "assets/assets/mirror/Onboarding2.imageset/Onboarding2.png",
+      "name": "Onboarding2.png"
+    },
+    {
+      "category": "Onboarding2.imageset",
+      "file": "assets/assets/mirror/Onboarding2.imageset/Onboarding2@2x.png",
+      "name": "Onboarding2@2x.png"
+    },
+    {
+      "category": "activitiesicon.imageset",
+      "file": "assets/assets/mirror/activitiesicon.imageset/activitiesicon.png",
+      "name": "activitiesicon.png"
+    },
+    {
+      "category": "activitiesicon.imageset",
+      "file": "assets/assets/mirror/activitiesicon.imageset/activitiesicon@2x.png",
+      "name": "activitiesicon@2x.png"
+    },
+    {
+      "category": "activitiesicon.imageset",
+      "file": "assets/assets/mirror/activitiesicon.imageset/activitiesicon@3x.png",
+      "name": "activitiesicon@3x.png"
+    },
+    {
+      "category": "diningicon.imageset",
+      "file": "assets/assets/mirror/diningicon.imageset/diningicon.png",
+      "name": "diningicon.png"
+    },
+    {
+      "category": "diningicon.imageset",
+      "file": "assets/assets/mirror/diningicon.imageset/diningicon@2x.png",
+      "name": "diningicon@2x.png"
+    },
+    {
+      "category": "diningicon.imageset",
+      "file": "assets/assets/mirror/diningicon.imageset/diningicon@3x.png",
+      "name": "diningicon@3x.png"
+    },
+    {
+      "category": "hotelsicon.imageset",
+      "file": "assets/assets/mirror/hotelsicon.imageset/hotelsicon.png",
+      "name": "hotelsicon.png"
+    },
+    {
+      "category": "hotelsicon.imageset",
+      "file": "assets/assets/mirror/hotelsicon.imageset/hotelsicon@2x.png",
+      "name": "hotelsicon@2x.png"
+    },
+    {
+      "category": "hotelsicon.imageset",
+      "file": "assets/assets/mirror/hotelsicon.imageset/hotelsicon@3x.png",
+      "name": "hotelsicon@3x.png"
+    },
+    {
+      "category": "nightlifeicon.imageset",
+      "file": "assets/assets/mirror/nightlifeicon.imageset/nightlifeicon.png",
+      "name": "nightlifeicon.png"
+    },
+    {
+      "category": "nightlifeicon.imageset",
+      "file": "assets/assets/mirror/nightlifeicon.imageset/nightlifeicon@2x.png",
+      "name": "nightlifeicon@2x.png"
+    },
+    {
+      "category": "nightlifeicon.imageset",
+      "file": "assets/assets/mirror/nightlifeicon.imageset/nightlifeicon@3x.png",
+      "name": "nightlifeicon@3x.png"
+    },
+    {
+      "category": "paymentlogo.imageset",
+      "file": "assets/assets/mirror/paymentlogo.imageset/paymentlogo.png",
+      "name": "paymentlogo.png"
+    },
+    {
+      "category": "paymentlogo.imageset",
+      "file": "assets/assets/mirror/paymentlogo.imageset/paymentlogo@2x.png",
+      "name": "paymentlogo@2x.png"
+    },
+    {
+      "category": "paymentlogo.imageset",
+      "file": "assets/assets/mirror/paymentlogo.imageset/paymentlogo@3x.png",
+      "name": "paymentlogo@3x.png"
+    }
+  ]
+}

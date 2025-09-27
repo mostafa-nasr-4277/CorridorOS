@@ -46,7 +46,7 @@ fi
 
 # Apps (offline previews)
 if [ -d "$ROOT_DIR/apps" ]; then
-  rsync -a --prune-empty-dirs --include '*/' --include '*.html' --include '*.png' --include '*.jpg' --include '*.jpeg' --exclude '*' "$ROOT_DIR/apps/" "$DIST/apps/"
+  rsync -a --prune-empty-dirs --include '*/' --include '*.html' --include '*.png' --include '*.jpg' --include '*.jpeg' --include '*.json' --exclude '*' "$ROOT_DIR/apps/" "$DIST/apps/"
 fi
 
 # Core application scripts
