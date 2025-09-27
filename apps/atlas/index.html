@@ -29,7 +29,28 @@
         <button class="btn" onclick="window.top?.postMessage({type:'atlas-open-repo'},'*')">Open Repo</button>
       </div>
     </div>
-    <div id="dyn"></div>
+    <div class="card" style="margin-top:12px">
+      <h3 style="margin:0 0 8px 0">Trips</h3>
+      <form id="tripForm" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;align-items:end">
+        <label style="display:grid;gap:4px">Destination<input required name="dest" placeholder="City / Site" class="btn" style="padding:8px"></label>
+        <label style="display:grid;gap:4px">Start<input required type="date" name="start" class="btn" style="padding:8px"></label>
+        <label style="display:grid;gap:4px">End<input required type="date" name="end" class="btn" style="padding:8px"></label>
+        <label style="display:grid;gap:4px">Hotel<input name="hotel" placeholder="Hotel name" class="btn" style="padding:8px"></label>
+        <label style="display:grid;gap:4px">Guests<input name="guests" type="number" min="1" value="2" class="btn" style="padding:8px"></label>
+        <button class="btn" style="height:36px" type="submit">Add Trip</button>
+      </form>
+      <div id="tripList" style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+    </div>
+
+    <div id="dyn" style="margin-top:12px"></div>
+
+    <!-- Booking overlay -->
+    <div id="booking" style="position:fixed;inset:0;backdrop-filter:blur(8px);background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:10">
+      <div style="width:min(720px,92vw);background:linear-gradient(180deg, rgba(0,200,255,.12), rgba(0,255,213,.08));border:1px solid rgba(0,200,255,.25);border-radius:12px;padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><strong>Booking</strong><button class="btn" onclick="closeBooking()">✕</button></div>
+        <div id="bookingSteps"></div>
+      </div>
+    </div>
   </div>
   <script>
     async function load(){
@@ -62,6 +83,83 @@
       }
     }
     load();
+
+    // Trips logic (localStorage)
+    const K='atlas-trips-v1';
+    function readTrips(){ try{return JSON.parse(localStorage.getItem(K)||'[]')}catch(_){return []} }
+    function writeTrips(t){ localStorage.setItem(K, JSON.stringify(t)); }
+    function renderTrips(){
+      const box=document.getElementById('tripList');
+      const trips=readTrips();
+      if(trips.length===0){ box.innerHTML='<div style="grid-column:1/-1;opacity:.8">No trips yet. Add one above.</div>'; return; }
+      box.innerHTML='';
+      for(const [i,t] of trips.entries()){
+        const card=document.createElement('div');
+        card.className='card';
+        card.innerHTML=`<div style="font-weight:700">${t.dest}</div>
+          <div style="opacity:.9">${t.start} → ${t.end}</div>
+          <div style="opacity:.9">Hotel: ${t.hotel||'—'} · Guests: ${t.guests||2}</div>
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <button class='btn' onclick='openBooking(${i})'>Book</button>
+            <button class='btn' onclick='delTrip(${i})'>Delete</button>
+          </div>`;
+        box.appendChild(card);
+      }
+    }
+    document.getElementById('tripForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const fd=new FormData(e.target);
+      const trip={dest:fd.get('dest'), start:fd.get('start'), end:fd.get('end'), hotel:fd.get('hotel'), guests:parseInt(fd.get('guests')||'2',10)};
+      const trips=readTrips(); trips.push(trip); writeTrips(trips); e.target.reset(); renderTrips();
+      try{ window.top?.postMessage({type:'atlas-trip-added', trip},'*'); }catch(_){ }
+    });
+    function delTrip(i){ const trips=readTrips(); trips.splice(i,1); writeTrips(trips); renderTrips(); }
+    window.addEventListener('load', renderTrips);
+
+    // Booking flow (stepper)
+    function openBooking(i){ const trips=readTrips(); const t=trips[i]; if(!t) return; const m=document.getElementById('booking'); m.style.display='flex';
+      const steps=document.getElementById('bookingSteps');
+      steps.innerHTML=`<div id='s1'>
+        <div style='display:grid;grid-template-columns:repeat(3,1fr);gap:10px'>
+          <label>Room Type<select id='room' class='btn'><option>Standard</option><option>Sea View</option><option>Suite</option></select></label>
+          <label>Nights<input id='nights' class='btn' type='number' min='1' value='${Math.max(1, Math.ceil((new Date(t.end)-new Date(t.start))/86400000))}'/></label>
+          <label>Guests<input id='gu' class='btn' type='number' min='1' value='${t.guests||2}'/></label>
+        </div>
+        <div style='margin-top:10px;display:flex;gap:8px'>
+          <button class='btn' onclick='nextPay(${i})'>Next</button>
+        </div>
+      </div>`;
+    }
+    function nextPay(i){ const steps=document.getElementById('bookingSteps');
+      steps.innerHTML=`<div id='s2'>
+        <div style='display:grid;grid-template-columns:1fr 1fr;gap:10px'>
+          <label>Card Number<input id='cc' class='btn' placeholder='4242 4242 4242 4242'/></label>
+          <label>Expiry<input id='exp' class='btn' placeholder='MM/YY'/></label>
+          <label>CVC<input id='cvc' class='btn' placeholder='123'/></label>
+          <label>Name<input id='name' class='btn' placeholder='Cardholder'/></label>
+        </div>
+        <div style='margin-top:10px;display:flex;gap:8px'>
+          <button class='btn' onclick='confirmPay(${i})'>Confirm</button>
+          <button class='btn' onclick='closeBooking()'>Cancel</button>
+        </div>
+      </div>`;
+    }
+    function confirmPay(i){ const trips=readTrips(); const t=trips[i]; const id='ATL-'+Math.random().toString(36).slice(2,8).toUpperCase();
+      const steps=document.getElementById('bookingSteps');
+      steps.innerHTML=`<div id='s3'>
+        <div class='card' style='margin-bottom:8px'>
+          <div style='font-weight:700;margin-bottom:4px'>Receipt</div>
+          <div>Trip: ${t.dest} (${t.start} → ${t.end})</div>
+          <div>Hotel: ${t.hotel||'—'} · Guests: ${t.guests||2}</div>
+          <div>ID: <strong>${id}</strong></div>
+        </div>
+        <div style='display:flex;gap:8px'>
+          <button class='btn' onclick='closeBooking()'>Close</button>
+        </div>
+      </div>`;
+      try{ window.top?.postMessage({type:'atlas-booked', id, trip:t},'*'); }catch(_){ }
+    }
+    function closeBooking(){ document.getElementById('booking').style.display='none'; }
   </script>
 </body>
 </html>
