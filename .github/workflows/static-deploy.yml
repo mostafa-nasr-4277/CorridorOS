@@ -13,6 +13,9 @@ on:
       - 'service-worker.js'
       - 'manifest.webmanifest'
       - 'scripts/prepare_dist.sh'
+    tags:
+      - 'v*'
+      - 'deploy-*'
   workflow_dispatch:
 
 permissions:
@@ -26,8 +29,11 @@ concurrency:
 
 jobs:
   deploy:
-    # Allow skipping with "[skip pages]" in the commit message
-    if: ${{ !contains(github.event.head_commit.message, '[skip pages]') }}
+    # Opt-in deploys: manual, tag push, or commit message contains [deploy]
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' ||
+          startsWith(github.ref, 'refs/tags/') ||
+          (github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy]')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
