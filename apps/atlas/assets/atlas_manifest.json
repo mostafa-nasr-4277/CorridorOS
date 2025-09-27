@@ -159,6 +159,96 @@
       "category": "paymentlogo.imageset",
       "file": "assets/assets/mirror/paymentlogo.imageset/paymentlogo@3x.png",
       "name": "paymentlogo@3x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/amex@2x.png",
+      "name": "amex@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/default@2x.png",
+      "name": "default@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/dinersclubintl@2x.png",
+      "name": "dinersclubintl@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/discover@2x.png",
+      "name": "discover@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/jcb@2x.png",
+      "name": "jcb@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/laser@2x.png",
+      "name": "laser@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/maestro@2x.png",
+      "name": "maestro@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/mastercard@2x.png",
+      "name": "mastercard@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/visa@2x.png",
+      "name": "visa@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64_x86_64-simulator/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/amex@2x.png",
+      "name": "amex@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64_x86_64-simulator/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/default@2x.png",
+      "name": "default@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64_x86_64-simulator/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/dinersclubintl@2x.png",
+      "name": "dinersclubintl@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64_x86_64-simulator/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/discover@2x.png",
+      "name": "discover@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64_x86_64-simulator/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/jcb@2x.png",
+      "name": "jcb@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64_x86_64-simulator/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/laser@2x.png",
+      "name": "laser@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64_x86_64-simulator/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/maestro@2x.png",
+      "name": "maestro@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64_x86_64-simulator/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/mastercard@2x.png",
+      "name": "mastercard@2x.png"
+    },
+    {
+      "category": "Pods",
+      "file": "assets/assets/mirror_extra/Pods/Paymob/PaymobSDK/Classes/PaymobSDK.xcframework/ios-arm64_x86_64-simulator/PaymobSDK.framework/BKMoneyKit.bundle/CardLogo/visa@2x.png",
+      "name": "visa@2x.png"
     }
   ]
 }
