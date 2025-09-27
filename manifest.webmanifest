@@ -7,11 +7,11 @@
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0a0412",
-  "theme_color": "#ff0080",
+  "theme_color": "#00c8ff",
   "categories": ["utilities", "productivity", "developer-tools"],
   "icons": [
     {
-      "src": "brand/icons/logo-cube.svg",
+      "src": "brand/icons/corridoros-logo.svg",
       "type": "image/svg+xml",
       "sizes": "any",
       "purpose": "any maskable"
