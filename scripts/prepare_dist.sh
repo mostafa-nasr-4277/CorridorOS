@@ -93,8 +93,12 @@ FPMAP="$DIST/.fingerprints.txt"
 # Find css/js except the service worker itself
 while IFS= read -r -d '' f; do
   rel="${f#$DIST/}"
-  # compute short hash
-  hash=$(shasum -a 256 "$f" | awk '{print $1}' | cut -c1-8)
+  # compute short hash (portable)
+  if command -v shasum >/dev/null 2>&1; then
+    hash=$(shasum -a 256 "$f" | awk '{print $1}' | cut -c1-8)
+  else
+    hash=$(sha256sum "$f" | awk '{print $1}' | cut -c1-8)
+  fi
   ext="${rel##*.}"
   base="${rel%.*}"
   newrel="$base.$hash.$ext"
@@ -108,8 +112,12 @@ done < <(find "$DIST" -type f \( -name "*.js" -o -name "*.css" \) ! -name "servi
 for html in "$DIST"/*.html; do
   [ -f "$html" ] || continue
   while read -r old new; do
-    # Replace both href/src occurrences
-    sed -i '' -e "s#\([\"'=(]\)${old}\([\"') ]\)#\1${new}\2#g" "$html"
+    # Replace both href/src occurrences (BSD/GNU sed)
+    if sed --version >/dev/null 2>&1; then
+      sed -i -e "s#\([\"'=(]\)${old}\([\"') ]\)#\1${new}\2#g" "$html"
+    else
+      sed -i '' -e "s#\([\"'=(]\)${old}\([\"') ]\)#\1${new}\2#g" "$html"
+    fi
   done < "$FPMAP"
 done
 

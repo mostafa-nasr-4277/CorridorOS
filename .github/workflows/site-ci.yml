@@ -1,0 +1,75 @@
+name: Site CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'index.html'
+      - 'corridor-os.html'
+      - 'corridoros_*.html'
+      - 'apps/**'
+      - 'brand/**'
+      - 'manifest.webmanifest'
+      - 'service-worker.js'
+      - 'scripts/prepare_dist.sh'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'corridor-os.html'
+      - 'corridoros_*.html'
+      - 'apps/**'
+      - 'brand/**'
+      - 'manifest.webmanifest'
+      - 'service-worker.js'
+      - 'scripts/prepare_dist.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build dist (prepare_dist.sh)
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash scripts/prepare_dist.sh
+
+      - name: Validate required files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dist/index.html || (echo "dist/index.html missing" && exit 1)
+          test -f dist/404.html || (echo "dist/404.html missing" && exit 1)
+          test -f dist/apps/vytall/spa/index.html || (echo "Vytall SPA missing" && exit 1)
+          test -f dist/apps/atlas/assets/atlas_manifest.json || (echo "Atlas manifest missing" && exit 1)
+          jq -e . dist/apps/atlas/assets/atlas_manifest.json >/dev/null 2>&1 || (echo "Atlas manifest invalid JSON" && exit 1)
+          echo "OK: core files present"
+
+      - name: Summarize
+        shell: bash
+        run: |
+          echo "### Site CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Files in dist: $(find dist -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- Atlas images: $(jq '.items | length' dist/apps/atlas/assets/atlas_manifest.json)" >> $GITHUB_STEP_SUMMARY
+          echo "- Vytall SPA present: yes" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist
+          path: dist
+
+      - name: Auto-commit updated dist (if any) [skip pages]
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(build): update dist [skip pages]"
+          file_pattern: dist/**
+
