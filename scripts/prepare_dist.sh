@@ -44,6 +44,11 @@ if [ -d "$ROOT_DIR/demo" ]; then
     --exclude '*' "$ROOT_DIR/demo/" "$DIST/demo/"
 fi
 
+# Apps (offline previews)
+if [ -d "$ROOT_DIR/apps" ]; then
+  rsync -a --prune-empty-dirs --include '*/' --include '*.html' --include '*.png' --include '*.jpg' --include '*.jpeg' --exclude '*' "$ROOT_DIR/apps/" "$DIST/apps/"
+fi
+
 # Core application scripts
 for js in \
   corridor-os.js \

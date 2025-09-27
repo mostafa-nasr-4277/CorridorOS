@@ -907,7 +907,7 @@ def create_bell_state():
               </div>
             </div>
             <div style="position:relative;flex:1;min-height:400px;border:1px solid rgba(0,200,255,.22);border-radius:10px;overflow:hidden;background:rgba(0,0,0,.25)">
-              <iframe id="vytall-frame" title="Vytall" style="position:absolute;inset:0;width:100%;height:100%;border:0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+              <iframe id="vytall-frame" title="Vytall" src="apps/vytall/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
               <div id="vytall-placeholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;color:#e6fdff;">
                 <div style="max-width:640px">
                   <h3 style="margin:0 0 6px 0">Vytall Health</h3>
@@ -962,8 +962,8 @@ def create_bell_state():
                 <div style="margin-top:10px"><button class="studio-button" onclick="alert('In the iOS app, this opens the native booking flow.')">Manage</button></div>
               </div>
               <div style="flex:1;background:rgba(0,0,0,.35);border:1px solid rgba(0,200,255,.2);border-radius:12px;padding:12px">
-                <div style="font-weight:700;margin-bottom:6px">Map</div>
-                <div style="height:100%;min-height:300px;border-radius:8px;border:1px dashed rgba(0,200,255,.22);display:flex;align-items:center;justify-content:center;color:#c3f7ff">iOS Map View (preview)</div>
+                <div style="font-weight:700;margin-bottom:6px">Gallery</div>
+                <iframe src="apps/atlas/index.html" title="Atlas Gallery" style="width:100%;height:100%;min-height:340px;border:0;border-radius:8px"></iframe>
               </div>
             </div>
           </div>
