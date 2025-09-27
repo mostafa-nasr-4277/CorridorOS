@@ -1,0 +1,3 @@
+Pooled memory carved into QoS bundles with floor guarantees and 
+latency classes; exposed to schedulers via CRDs and attested at 
+boot.

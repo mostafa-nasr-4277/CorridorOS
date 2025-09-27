@@ -1,0 +1,175 @@
+%PDF-1.4
+%����
+1 0 obj
+<< /Type /Font /Subtype /Type1 /Name /F1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Length 503 >>
+stream
+q
+0.04 0.08 0.2 rg 0 0 792 612 re f
+BT /F1 28 Tf 0.95 0.98 1.0 rg 1 0 0 1 60 532 Tm (CorridorOS — Theory of Compute) Tj ET
+BT /F1 18 Tf 0.7 0.9 1.0 rg 1 0 0 1 60 494 Tm (A 2‑minute tour) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 460 Tm (Photonic corridors \(λ lanes\), Free‑Form Memory \(CXL\) with bandwidth floors,) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 442 Tm (HELIOPASS calibration, and system safety.) Tj ET
+BT /F1 10 Tf 0.8 0.9 1.0 rg 1 0 0 1 652 24 Tm (Slide 1 of 8) Tj ET
+Q
+
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 18 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Length 552 >>
+stream
+q
+0.02 0.16 0.24 rg 0 0 792 612 re f
+BT /F1 28 Tf 0.95 0.98 1.0 rg 1 0 0 1 60 532 Tm (HELIOPASS — Photonic Environment Calibration) Tj ET
+BT /F1 18 Tf 0.7 0.9 1.0 rg 1 0 0 1 60 494 Tm (Stabilize BER and eye with minimal power) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 460 Tm (HELIOPASS estimates background offset from lunar, airglow, galactic, and) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 442 Tm (skyglow contributions and tunes bias/λ to hold error targets.) Tj ET
+BT /F1 10 Tf 0.8 0.9 1.0 rg 1 0 0 1 652 24 Tm (Slide 2 of 8) Tj ET
+Q
+
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 18 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 523 >>
+stream
+q
+0.09 0.1 0.25 rg 0 0 792 612 re f
+BT /F1 28 Tf 0.95 0.98 1.0 rg 1 0 0 1 60 532 Tm (Photonic Corridors \(λ Lanes\)) Tj ET
+BT /F1 18 Tf 0.7 0.9 1.0 rg 1 0 0 1 60 494 Tm (Reserve wavelength sets per workload) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 460 Tm (Corridors allocate WDM lanes with policy: shaping, preemption guards, and) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 442 Tm (power‑aware bias tuning via HELIOPASS integration.) Tj ET
+BT /F1 10 Tf 0.8 0.9 1.0 rg 1 0 0 1 652 24 Tm (Slide 3 of 8) Tj ET
+Q
+
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 18 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 527 >>
+stream
+q
+0.04 0.08 0.2 rg 0 0 792 612 re f
+BT /F1 28 Tf 0.95 0.98 1.0 rg 1 0 0 1 60 532 Tm (Free‑Form Memory \(CXL\)) Tj ET
+BT /F1 18 Tf 0.7 0.9 1.0 rg 1 0 0 1 60 494 Tm (GB/s floors as first‑class resources) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 460 Tm (Pooled memory carved into QoS bundles with floor guarantees and latency) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 442 Tm (classes; exposed to schedulers via CRDs and attested at boot.) Tj ET
+BT /F1 10 Tf 0.8 0.9 1.0 rg 1 0 0 1 652 24 Tm (Slide 4 of 8) Tj ET
+Q
+
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 18 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 547 >>
+stream
+q
+0.02 0.16 0.24 rg 0 0 792 612 re f
+BT /F1 28 Tf 0.95 0.98 1.0 rg 1 0 0 1 60 532 Tm (Tactile Power — Pin‑free, Genderless) Tj ET
+BT /F1 18 Tf 0.7 0.9 1.0 rg 1 0 0 1 60 494 Tm (Pad‑to‑pad, magnet‑aligned, or contactless) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 460 Tm (Devices receive power without exposed pins: capacitive/inductive couplers with) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 442 Tm (pre‑charge, or flush pads with current sharing.) Tj ET
+BT /F1 10 Tf 0.8 0.9 1.0 rg 1 0 0 1 652 24 Tm (Slide 5 of 8) Tj ET
+Q
+
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 18 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 621 >>
+stream
+q
+0.09 0.1 0.25 rg 0 0 792 612 re f
+BT /F1 28 Tf 0.95 0.98 1.0 rg 1 0 0 1 60 532 Tm (Observability — Proof, Not Promises) Tj ET
+BT /F1 18 Tf 0.7 0.9 1.0 rg 1 0 0 1 60 494 Tm (Grafana Pack · Floors · BER · Energy/Bit) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 460 Tm (CorridorOS exports floors, lane utilization, BER, and energy/bit) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 442 Tm (out‑of‑the‑box. Golden dashboards ship day one — pilots see p99 drop, floors) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 424 Tm (hold.) Tj ET
+BT /F1 10 Tf 0.8 0.9 1.0 rg 1 0 0 1 652 24 Tm (Slide 6 of 8) Tj ET
+Q
+
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 18 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 543 >>
+stream
+q
+0.04 0.08 0.2 rg 0 0 792 612 re f
+BT /F1 28 Tf 0.95 0.98 1.0 rg 1 0 0 1 60 532 Tm (Security & Integrity — Built‑In) Tj ET
+BT /F1 18 Tf 0.7 0.9 1.0 rg 1 0 0 1 60 494 Tm (Measured Boot · SPDM · PQC Ready) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 460 Tm (Attested startup, signed components, SPDM policy lanes, and PQC‑ready crypto) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 442 Tm (harden the plane — production stays safe; Labs stays sandboxed.) Tj ET
+BT /F1 10 Tf 0.8 0.9 1.0 rg 1 0 0 1 652 24 Tm (Slide 7 of 8) Tj ET
+Q
+
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 18 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 611 >>
+stream
+q
+0.02 0.16 0.24 rg 0 0 792 612 re f
+BT /F1 28 Tf 0.95 0.98 1.0 rg 1 0 0 1 60 532 Tm (Putting It Together) Tj ET
+BT /F1 18 Tf 0.7 0.9 1.0 rg 1 0 0 1 60 494 Tm (Schedule compute, light, memory — and power) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 460 Tm (CorridorOS unifies photonic corridors, calibrated by HELIOPASS, with QoS) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 442 Tm (memory and safe, pin‑free power delivery — observable and schedulable from day) Tj ET
+BT /F1 14 Tf 0.92 0.95 1.0 rg 1 0 0 1 60 424 Tm (one.) Tj ET
+BT /F1 10 Tf 0.8 0.9 1.0 rg 1 0 0 1 652 24 Tm (Slide 8 of 8) Tj ET
+Q
+
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 18 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Type /Pages /Count 8 /Kids [3 0 R 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R] >>
+endobj
+19 0 obj
+<< /Type /Catalog /Pages 18 0 R >>
+endobj
+xref
+0 20
+0000000000 65535 f 
+0000000015 00000 n 
+0000000095 00000 n 
+0000000649 00000 n 
+0000000776 00000 n 
+0000001379 00000 n 
+0000001506 00000 n 
+0000002080 00000 n 
+0000002207 00000 n 
+0000002785 00000 n 
+0000002912 00000 n 
+0000003511 00000 n 
+0000003640 00000 n 
+0000004313 00000 n 
+0000004442 00000 n 
+0000005037 00000 n 
+0000005166 00000 n 
+0000005829 00000 n 
+0000005958 00000 n 
+0000006062 00000 n 
+trailer<< /Size 20 /Root 19 0 R >>
+startxref
+6113
+%%EOF

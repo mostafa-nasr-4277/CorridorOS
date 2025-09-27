@@ -1,0 +1,3 @@
+Attested startup, signed components, SPDM policy lanes, and 
+PQC‑ready crypto harden the plane — production stays safe; Labs 
+stays sandboxed.

@@ -1,0 +1,2 @@
+Estimates background offset from lunar, airglow, galactic, and 
+skyglow contributions and tunes bias/λ to hold error targets.

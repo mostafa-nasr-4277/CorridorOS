@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorridorOS - Animated Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .demo-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .demo-screen {
+            width: 800px;
+            height: 500px;
+            background: linear-gradient(145deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            border: 2px solid #e94560;
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 50px rgba(233, 69, 96, 0.3),
+                inset 0 0 50px rgba(233, 69, 96, 0.1);
+        }
+
+        .demo-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(233, 69, 96, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .demo-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #e94560, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.5); }
+        }
+
+        .demo-subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .demo-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .corridor-card, .memory-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .corridor-card::before, .memory-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(233, 69, 96, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #00ffff);
+            border-radius: 4px;
+            width: 0%;
+            animation: progressAnimation 4s ease-in-out infinite;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressAnimation {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #ccc;
+            margin: 10px 0;
+            opacity: 0;
+            animation: fadeInOut 4s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 20% { opacity: 0; }
+            30%, 70% { opacity: 1; }
+            80%, 100% { opacity: 0; }
+        }
+
+        .helio-status {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .helio-text {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            animation: helioGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes helioGlow {
+            0%, 100% { color: #00ffff; text-shadow: 0 0 10px #00ffff; }
+            50% { color: #ffffff; text-shadow: 0 0 20px #00ffff; }
+        }
+
+        .ber-display {
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            animation: berFlicker 1s infinite;
+        }
+
+        @keyframes berFlicker {
+            0%, 90% { opacity: 1; }
+            95% { opacity: 0.7; }
+        }
+
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #e94560;
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .demo-controls {
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .reset-button {
+            background: linear-gradient(45deg, #e94560, #ff6b6b);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .reset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
+        }
+
+        .reset-button:active {
+            transform: translateY(0);
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(233, 69, 96, 0.2);
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 5px;
+            animation: metricUpdate 3s infinite;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        @keyframes metricUpdate {
+            0%, 80% { transform: scale(1); }
+            90% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .slide-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #888;
+            z-index: 3;
+        }
+
+        @keyframes slideTransition {
+            0% { opacity: 0; transform: translateY(20px); }
+            10%, 90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .slide {
+            animation: slideTransition 120s infinite;
+        }
+
+        .slide:nth-child(1) { animation-delay: 0s; }
+        .slide:nth-child(2) { animation-delay: 20s; }
+        .slide:nth-child(3) { animation-delay: 40s; }
+        .slide:nth-child(4) { animation-delay: 60s; }
+        .slide:nth-child(5) { animation-delay: 80s; }
+        .slide:nth-child(6) { animation-delay: 100s; }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-screen">
+            <div class="slide-counter">Slide 1 of 6</div>
+            
+            <div class="floating-particles" id="particles"></div>
+            
+            <!-- Slide 1: Initial State -->
+            <div class="slide">
+                <div class="demo-header">
+                    <div class="demo-title">🚀 CorridorOS Simulation</div>
+                    <div class="demo-subtitle">Initializing photonic corridor allocation...</div>
+                </div>
+                
+                <div class="demo-content">
+                    <div class="corridor-card">
+                        <div class="card-title">
+                            <span>⚡ Photonic Corridors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">Scanning available wavelengths...</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">Ready for allocation</div>
+                    </div>
+                    
+                    <div class="memory-card">
+                        <div class="card-title">
+                            <span>💾 Memory Floors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">Analyzing CXL topology...</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">Standby mode</div>
+                    </div>
+                </div>
+                
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">Lanes Allocated</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0 GB/s</div>
+                        <div class="metric-label">Memory Floor</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">--</div>
+                        <div class="metric-label">BER Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: Corridor Allocation -->
+            <div class="slide">
+                <div class="demo-header">
+                    <div class="demo-title">⚡ Photonic Corridor Allocation</div>
+                    <div class="demo-subtitle">Reserving wavelength lanes for optimal bandwidth...</div>
+                </div>
+                
+                <div class="demo-content">
+                    <div class="corridor-card">
+                        <div class="card-title">
+                            <span>⚡ Photonic Corridors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">Allocating λ-sets...</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">✅ 8 lanes allocated</div>
+                    </div>
+                    
+                    <div class="memory-card">
+                        <div class="card-title">
+                            <span>💾 Memory Floors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">Waiting for corridor setup...</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">Standby mode</div>
+                    </div>
+                </div>
+                
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Lanes Allocated</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">0 GB/s</div>
+                        <div class="metric-label">Memory Floor</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">--</div>
+                        <div class="metric-label">BER Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Memory Floor Setting -->
+            <div class="slide">
+                <div class="demo-header">
+                    <div class="demo-title">💾 Memory Floor Configuration</div>
+                    <div class="demo-subtitle">Setting guaranteed GB/s floors on CXL memory...</div>
+                </div>
+                
+                <div class="demo-content">
+                    <div class="corridor-card">
+                        <div class="card-title">
+                            <span>⚡ Photonic Corridors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">✅ 8 lanes allocated</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">Stable connection</div>
+                    </div>
+                    
+                    <div class="memory-card">
+                        <div class="card-title">
+                            <span>💾 Memory Floors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">Setting GB/s floors...</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">✅ 150 GB/s guaranteed</div>
+                    </div>
+                </div>
+                
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Lanes Allocated</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">150 GB/s</div>
+                        <div class="metric-label">Memory Floor</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">--</div>
+                        <div class="metric-label">BER Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: HELIOPASS Calibration -->
+            <div class="slide">
+                <div class="demo-header">
+                    <div class="demo-title">🔬 HELIOPASS Recalibration</div>
+                    <div class="demo-subtitle">Optimizing BER stability for maximum performance...</div>
+                </div>
+                
+                <div class="demo-content">
+                    <div class="corridor-card">
+                        <div class="card-title">
+                            <span>⚡ Photonic Corridors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">✅ 8 lanes allocated</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">Stable connection</div>
+                    </div>
+                    
+                    <div class="memory-card">
+                        <div class="card-title">
+                            <span>💾 Memory Floors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">✅ 150 GB/s guaranteed</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">Optimal performance</div>
+                    </div>
+                </div>
+                
+                <div class="helio-status">
+                    <div class="helio-text">⚡ HELIOPASS recalibrating...</div>
+                    <div class="ber-display">BER stable at 1e-12</div>
+                </div>
+                
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Lanes Allocated</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">150 GB/s</div>
+                        <div class="metric-label">Memory Floor</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">1e-12</div>
+                        <div class="metric-label">BER Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Performance Optimization -->
+            <div class="slide">
+                <div class="demo-header">
+                    <div class="demo-title">📊 Performance Optimization</div>
+                    <div class="demo-subtitle">Achieving maximum throughput with minimal latency...</div>
+                </div>
+                
+                <div class="demo-content">
+                    <div class="corridor-card">
+                        <div class="card-title">
+                            <span>⚡ Photonic Corridors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">✅ 8 lanes allocated</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">Peak performance</div>
+                    </div>
+                    
+                    <div class="memory-card">
+                        <div class="card-title">
+                            <span>💾 Memory Floors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">✅ 150 GB/s guaranteed</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">Sustained throughput</div>
+                    </div>
+                </div>
+                
+                <div class="helio-status">
+                    <div class="helio-text">🎯 Performance Metrics Achieved</div>
+                    <div class="ber-display">p99 Latency ↓ 35% | Throughput ↑ 200%</div>
+                </div>
+                
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Lanes Allocated</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">200 GB/s</div>
+                        <div class="metric-label">Peak Throughput</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">1e-12</div>
+                        <div class="metric-label">BER Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: System Ready -->
+            <div class="slide">
+                <div class="demo-header">
+                    <div class="demo-title">✅ System Ready for Production</div>
+                    <div class="demo-subtitle">CorridorOS successfully deployed and optimized</div>
+                </div>
+                
+                <div class="demo-content">
+                    <div class="corridor-card">
+                        <div class="card-title">
+                            <span>⚡ Photonic Corridors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">✅ 8 lanes allocated</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">Production ready</div>
+                    </div>
+                    
+                    <div class="memory-card">
+                        <div class="card-title">
+                            <span>💾 Memory Floors</span>
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="status-text">✅ 150 GB/s guaranteed</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="status-text">SLA compliant</div>
+                    </div>
+                </div>
+                
+                <div class="helio-status">
+                    <div class="helio-text">🚀 CorridorOS Operational</div>
+                    <div class="ber-display">All systems optimal - Ready for workload</div>
+                </div>
+                
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Lanes Allocated</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">150 GB/s</div>
+                        <div class="metric-label">Memory Floor</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">1e-12</div>
+                        <div class="metric-label">BER Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-controls">
+                <button class="reset-button" onclick="resetDemo()">Reset Demo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Reset demo function
+        function resetDemo() {
+            location.reload();
+        }
+
+        // Update slide counter
+        function updateSlideCounter() {
+            const counter = document.querySelector('.slide-counter');
+            let currentSlide = 1;
+            
+            setInterval(() => {
+                counter.textContent = `Slide ${currentSlide} of 6`;
+                currentSlide = currentSlide === 6 ? 1 : currentSlide + 1;
+            }, 20000); // 20 seconds per slide
+        }
+
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            updateSlideCounter();
+            
+            // Add some interactive effects
+            const cards = document.querySelectorAll('.corridor-card, .memory-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 10px 30px rgba(233, 69, 96, 0.3)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+
+        // Add some random metric updates
+        setInterval(() => {
+            const metricValues = document.querySelectorAll('.metric-value');
+            metricValues.forEach(metric => {
+                if (metric.textContent.includes('GB/s')) {
+                    const currentValue = parseInt(metric.textContent);
+                    const variation = Math.floor(Math.random() * 10) - 5;
+                    const newValue = Math.max(0, currentValue + variation);
+                    metric.textContent = newValue + ' GB/s';
+                }
+            });
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+A 2‑minute tour: photonic corridors (λ lanes), Free‑Form Memory 
+(CXL) with bandwidth floors, HELIOPASS calibration, and system 
+safety.

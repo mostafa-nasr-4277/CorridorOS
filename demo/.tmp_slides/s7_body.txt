@@ -1,0 +1,3 @@
+CorridorOS exports floors, lane util, BER, and energy/bit 
+out‑of‑the‑box. Golden dashboards ship day one — pilots see p99 
+drop, floors hold.
