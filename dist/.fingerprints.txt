@@ -2,7 +2,7 @@ heliopass.js heliopass.3ddbc0d6.js
 ui-tilt.js ui-tilt.b51314b6.js
 corridor-settings.js corridor-settings.c33d2c77.js
 thermal-model.js thermal-model.38b09692.js
-corridor-apps.js corridor-apps.e48038a8.js
+corridor-apps.js corridor-apps.68bc82ab.js
 ui-menu.js ui-menu.81b02d2d.js
 auto-cycle.js auto-cycle.4e9369db.js
 brand/corridoros-brand.css brand/corridoros-brand.b501abdc.css
