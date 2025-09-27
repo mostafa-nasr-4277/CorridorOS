@@ -2,17 +2,6 @@ name: CorridorOS Pages Deploy
 
 on:
   push:
-    branches: [ main ]
-    # Only deploy when site assets change (gentler on CI)
-    paths:
-      - 'index.html'
-      - 'corridor-os.html'
-      - 'corridoros_*.html'
-      - 'brand/**'
-      - 'apps/**'
-      - 'service-worker.js'
-      - 'manifest.webmanifest'
-      - 'scripts/prepare_dist.sh'
     tags:
       - 'v*'
       - 'deploy-*'
@@ -29,11 +18,7 @@ concurrency:
 
 jobs:
   deploy:
-    # Opt-in deploys: manual, tag push, or commit message contains [deploy]
-    if: >-
-      ${{ github.event_name == 'workflow_dispatch' ||
-          startsWith(github.ref, 'refs/tags/') ||
-          (github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy]')) }}
+    # Triggered only on manual dispatch or tag push (v* / deploy-*)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
