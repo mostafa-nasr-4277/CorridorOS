@@ -33,7 +33,14 @@ done
 # Core styles and brand assets
 copy "$ROOT_DIR/corridor-os-styles.css" "$DIST/corridor-os-styles.css"
 if [ -d "$ROOT_DIR/brand" ]; then
-  rsync -a --prune-empty-dirs --include '*/' --include '*.css' --include 'icons/*.svg' --exclude '*' "$ROOT_DIR/brand/" "$DIST/brand/"
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a --prune-empty-dirs --include '*/' --include '*.css' --include 'icons/*.svg' --exclude '*' "$ROOT_DIR/brand/" "$DIST/brand/"
+  else
+    find "$ROOT_DIR/brand" -type d -name icons -o -name . -o -type f -name '*.css' -o -type f -name '*.svg' | while read -r p; do
+      rel="${p#$ROOT_DIR/}"
+      dest="$DIST/$rel"; mkdir -p "$(dirname "$dest")"; cp "$p" "$dest" 2>/dev/null || true
+    done
+  fi
 fi
 
 # Demo media (video) used by index; optional
@@ -46,7 +53,14 @@ fi
 
 # Apps (offline previews)
 if [ -d "$ROOT_DIR/apps" ]; then
-  rsync -a --prune-empty-dirs --include '*/' --include '*.html' --include '*.png' --include '*.jpg' --include '*.jpeg' --include '*.json' --exclude '*' "$ROOT_DIR/apps/" "$DIST/apps/"
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a --prune-empty-dirs --include '*/' --include '*.html' --include '*.png' --include '*.jpg' --include '*.jpeg' --include '*.json' --exclude '*' "$ROOT_DIR/apps/" "$DIST/apps/"
+  else
+    find "$ROOT_DIR/apps" -type f \( -name '*.html' -o -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.json' \) | while read -r p; do
+      rel="${p#$ROOT_DIR/}"
+      dest="$DIST/$rel"; mkdir -p "$(dirname "$dest")"; cp "$p" "$dest"
+    done
+  fi
 fi
 
 # Core application scripts

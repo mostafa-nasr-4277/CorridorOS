@@ -29,6 +29,9 @@ permissions:
 
 jobs:
   build-and-validate:
+    concurrency:
+      group: site-ci-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,8 +53,15 @@ jobs:
           test -f dist/404.html || (echo "dist/404.html missing" && exit 1)
           test -f dist/apps/vytall/spa/index.html || (echo "Vytall SPA missing" && exit 1)
           test -f dist/apps/atlas/assets/atlas_manifest.json || (echo "Atlas manifest missing" && exit 1)
-          jq -e . dist/apps/atlas/assets/atlas_manifest.json >/dev/null 2>&1 || (echo "Atlas manifest invalid JSON" && exit 1)
-          echo "OK: core files present"
+          python3 - <<'PY'
+import json,sys
+try:
+  json.load(open('dist/apps/atlas/assets/atlas_manifest.json','r'))
+except Exception as e:
+  print('Atlas manifest invalid JSON:',e)
+  sys.exit(1)
+print('OK: core files present and valid')
+PY
 
       - name: Summarize
         shell: bash
