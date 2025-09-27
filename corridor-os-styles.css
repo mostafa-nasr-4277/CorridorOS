@@ -67,6 +67,57 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Theme overrides */
+/* Light theme variables using the same tokens but brighter surfaces */
+body[data-theme="light"] {
+    --bg-primary: #f4f7fb;
+    --bg-secondary: #eaf0f8;
+    --bg-tertiary: #dfe8f5;
+    --bg-panel: rgba(255, 255, 255, 0.85);
+    --bg-glass: rgba(255, 255, 255, 0.70);
+    --bg-glass-hover: rgba(255, 255, 255, 0.82);
+
+    --text-primary: #0b1020;
+    --text-secondary: rgba(11, 16, 32, 0.78);
+    --text-tertiary: rgba(11, 16, 32, 0.6);
+    --text-disabled: rgba(11, 16, 32, 0.38);
+
+    --border-color: rgba(11, 16, 32, 0.15);
+}
+
+/* Auto theme follows system preference */
+@media (prefers-color-scheme: light) {
+  body[data-theme="auto"] {
+    --bg-primary: #f4f7fb;
+    --bg-secondary: #eaf0f8;
+    --bg-tertiary: #dfe8f5;
+    --bg-panel: rgba(255, 255, 255, 0.85);
+    --bg-glass: rgba(255, 255, 255, 0.70);
+    --bg-glass-hover: rgba(255, 255, 255, 0.82);
+
+    --text-primary: #0b1020;
+    --text-secondary: rgba(11, 16, 32, 0.78);
+    --text-tertiary: rgba(11, 16, 32, 0.6);
+    --text-disabled: rgba(11, 16, 32, 0.38);
+
+    --border-color: rgba(11, 16, 32, 0.15);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  body[data-theme="auto"] {
+    /* dark is default; keep variables as defined in :root */
+  }
+}
+
+/* Accessibility toggles wired from settings */
+body.no-animations * {
+  animation: none !important;
+  transition: none !important;
+}
+body[data-font-size="small"] { font-size: 14px; }
+body[data-font-size="medium"] { font-size: 16px; }
+body[data-font-size="large"] { font-size: 18px; }
+
 /* Boot Splash Screen */
 .boot-splash {
     position: fixed;
@@ -174,6 +225,22 @@ body {
         radial-gradient(800px 400px at 40% 80%, rgba(110, 74, 255, 0.12), transparent 65%),
         linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 55%, var(--bg-tertiary) 100%);
     animation: backgroundFlow 30s ease-in-out infinite;
+}
+
+/* Wallpaper variants */
+body[data-wallpaper="photonic-waves"] .desktop-background {
+    background:
+        radial-gradient(900px 500px at 15% 20%, rgba(0, 255, 213, 0.18), transparent 60%),
+        radial-gradient(1000px 600px at 85% 30%, rgba(0, 200, 255, 0.16), transparent 60%),
+        radial-gradient(700px 360px at 50% 80%, rgba(255, 215, 0, 0.10), transparent 60%),
+        linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 55%, var(--bg-tertiary) 100%);
+}
+body[data-wallpaper="corridor-abstract"] .desktop-background {
+    background:
+        radial-gradient(800px 420px at 20% 70%, rgba(110, 74, 255, 0.16), transparent 60%),
+        radial-gradient(780px 420px at 70% 20%, rgba(233, 84, 32, 0.16), transparent 60%),
+        radial-gradient(600px 300px at 45% 50%, rgba(0, 226, 143, 0.12), transparent 65%),
+        linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 55%, var(--bg-tertiary) 100%);
 }
 
 @keyframes backgroundFlow {

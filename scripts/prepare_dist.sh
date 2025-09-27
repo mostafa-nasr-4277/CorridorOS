@@ -32,6 +32,10 @@ done
 
 # Core styles and brand assets
 copy "$ROOT_DIR/corridor-os-styles.css" "$DIST/corridor-os-styles.css"
+# Also copy any top-level CSS (including hashed variants referenced by HTML)
+find "$ROOT_DIR" -maxdepth 1 -type f -name "*.css" -print0 | while IFS= read -r -d '' p; do
+  rel="${p#$ROOT_DIR/}"; copy "$p" "$DIST/$rel";
+done
 if [ -d "$ROOT_DIR/brand" ]; then
   if command -v rsync >/dev/null 2>&1; then
     rsync -a --prune-empty-dirs --include '*/' --include '*.css' --include 'icons/*.svg' --exclude '*' "$ROOT_DIR/brand/" "$DIST/brand/"
@@ -80,11 +84,19 @@ for js in \
   orchestrator.js \
   heliopass.js \
   thermal-model.js \
-  main.js
+  main.js \
+  webgpu-check.js \
+  unified-model.js \
+  ambient-lab.js
 do
   if [ -f "$ROOT_DIR/$js" ]; then
     copy "$ROOT_DIR/$js" "$DIST/$js"
   fi
+done
+
+# Also bring over any top-level hashed JS bundles referenced by HTML (e.g., corridor-*.hash.js)
+find "$ROOT_DIR" -maxdepth 1 -type f -name "*.js" -print0 | while IFS= read -r -d '' p; do
+  rel="${p#$ROOT_DIR/}"; [ -f "$DIST/$rel" ] || copy "$p" "$DIST/$rel";
 done
 
 # API spec expected by index (place under /apis)
@@ -100,13 +112,23 @@ fi
 # Service Worker
 copy "$ROOT_DIR/service-worker.js" "$DIST/service-worker.js"
 
+# Copy manifest (optional)
+if [ -f "$ROOT_DIR/manifest.webmanifest" ]; then
+  copy "$ROOT_DIR/manifest.webmanifest" "$DIST/manifest.webmanifest"
+fi
+
 # --- Asset fingerprinting for cache-busting (near-realtime updates) ---
 echo "[build] Fingerprinting assets..."
 FPMAP="$DIST/.fingerprints.txt"
 > "$FPMAP"
-# Find css/js except the service worker itself
+# Find css/js except the service worker itself; avoid re-fingerprinting files that already include an 8-char hash.
 while IFS= read -r -d '' f; do
   rel="${f#$DIST/}"
+  base="$(basename "$rel")"
+  # Skip already-hashed files like name.abcdef12.css/js
+  if echo "$base" | grep -Eq '\\.[0-9a-f]{8}\\.(css|js)$'; then
+    continue
+  fi
   # compute short hash (portable)
   if command -v shasum >/dev/null 2>&1; then
     hash=$(shasum -a 256 "$f" | awk '{print $1}' | cut -c1-8)
@@ -114,8 +136,8 @@ while IFS= read -r -d '' f; do
     hash=$(sha256sum "$f" | awk '{print $1}' | cut -c1-8)
   fi
   ext="${rel##*.}"
-  base="${rel%.*}"
-  newrel="$base.$hash.$ext"
+  base_noext="${rel%.*}"
+  newrel="$base_noext.$hash.$ext"
   newpath="$DIST/$newrel"
   mkdir -p "$(dirname "$newpath")"
   mv "$f" "$newpath"
@@ -136,5 +158,15 @@ for html in "$DIST"/*.html; do
 done
 
 echo "[build] Fingerprinted $(wc -l < "$FPMAP" | tr -d ' ') assets"
+
+# Back-compat aliases for previously-hashed assets referenced by older HTML
+if ls "$DIST"/corridor-os-styles.84d8f5a3.*.css >/dev/null 2>&1; then
+  latest=$(ls -1t "$DIST"/corridor-os-styles.84d8f5a3.*.css | head -n1)
+  [ -f "$DIST/corridor-os-styles.84d8f5a3.css" ] || cp "$latest" "$DIST/corridor-os-styles.84d8f5a3.css"
+fi
+if ls "$DIST"/brand/corridoros-brand.b501abdc*.css >/dev/null 2>&1; then
+  latest=$(ls -1t "$DIST"/brand/corridoros-brand.b501abdc*.css | head -n1)
+  [ -f "$DIST/brand/corridoros-brand.b501abdc.css" ] || cp "$latest" "$DIST/brand/corridoros-brand.b501abdc.css"
+fi
 
 echo "[build] Dist prepared with $(find "$DIST" -type f | wc -l | tr -d ' ') files"

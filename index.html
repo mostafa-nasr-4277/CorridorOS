@@ -9,7 +9,7 @@
   <meta property="og:title" content="CorridorOS — Reserve Light. Guarantee Memory.">
   <meta property="og:description" content="CorridorOS turns photonic interconnect and pooled memory into schedulable OS resources.">
   <meta property="og:image:alt" content="CorridorOS dashboard showing reserved photonic corridors and Free-Form Memory bandwidth floors.">
-  <meta name="corridoros-version" content="v4">
+  <meta name="corridoros-version" content="v5">
   <meta name="theme-color" content="#00c8ff">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="brand/icons/corridoros-logo.svg">
@@ -40,7 +40,7 @@
     a{color:inherit}
     /* Nav */
     .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:18px 48px;background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));backdrop-filter:saturate(140%) blur(18px);border-bottom:1px solid rgba(255,255,255,.18)}
-    .nav .brand{font-weight:800;letter-spacing:.02em;background:linear-gradient(45deg,var(--cyan),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav .brand{font-weight:800;letter-spacing:.02em;font-size:26px;line-height:1;background:linear-gradient(45deg,var(--cyan),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
     .nav .links{display:flex;gap:18px;align-items:center}
     .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:.85rem 1.2rem;border-radius:10px;border:1.5px solid rgba(0,200,255,.6);text-decoration:none;font-weight:700;letter-spacing:.01em;transition:all .2s ease;color:var(--text)}
     .btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,200,255,.35)}
@@ -80,7 +80,12 @@
     .proof{margin:56px 0 8px}
     .proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
     .card{background:linear-gradient(180deg, rgba(0,200,255,.10), rgba(0,255,213,.08));border:1px solid rgba(0,200,255,.26);border-radius:14px;padding:18px 16px;box-shadow:0 12px 36px rgba(0,0,0,.25)}
-    .num{font-size:32px;font-weight:800;margin-bottom:4px;color:#c3f7ff}
+    /* Make the headline numbers more prominent */
+    .num{font-size:44px;line-height:1.1;font-weight:900;letter-spacing:-0.01em;margin-bottom:6px;color:#e6fdff;text-shadow:0 0 22px rgba(0,200,255,.18),0 0 44px rgba(0,255,213,.10)}
+    /* Theme-appropriate colors per metric */
+    .card.latency .num{color:var(--green);text-shadow:0 0 22px rgba(0,226,143,.22),0 0 46px rgba(0,226,143,.12)}
+    .card.energy .num{background:linear-gradient(90deg,var(--teal),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;text-shadow:0 0 22px rgba(0,200,255,.20),0 0 46px rgba(0,255,213,.12)}
+    .card.memory .num{color:var(--gold);text-shadow:0 0 22px rgba(255,215,0,.22),0 0 46px rgba(255,215,0,.12)}
     .spark{position:relative;height:44px;background:linear-gradient(180deg,rgba(0,200,255,.12),rgba(0,255,213,.08));border-radius:10px;margin-top:10px;overflow:hidden;border:1px solid rgba(0,200,255,.2)}
     .spark canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     .spark .axis{position:absolute;left:0;right:0;height:1px;background:rgba(0,200,255,.28)}
@@ -180,17 +185,17 @@
       <h2 id="proofH2" style="text-align:center;margin:0 0 16px 0">Measurable proof — not promises.</h2>
       <p style="text-align:center;color:rgba(247,243,232,.85);max-width:840px;margin:0 auto 16px">CorridorOS ships with a Grafana pack. You’ll see energy per bit, BER, lane utilization, and GB/s floors within minutes.</p>
       <div class="proof-grid">
-        <div class="card" title="PromQL: histogram_quantile(0.99, sum(rate(req_latency_bucket[5m])) by (le))">
+        <div class="card latency" title="PromQL: histogram_quantile(0.99, sum(rate(req_latency_bucket[5m])) by (le))">
           <div class="num">p99 Tail Latency ↓ 32%</div>
           <div> SaaS search workload, 95/99th tail reduction after setting 150 GB/s floor.</div>
           <div class="spark" id="spark-latency" data-type="down" data-percent="32" aria-label="Sparkline showing ~32% latency reduction"><canvas></canvas></div>
         </div>
-        <div class="card" title="PromQL: avg_over_time(energy_per_bit_pj[5m])">
+        <div class="card energy" title="PromQL: avg_over_time(energy_per_bit_pj[5m])">
           <div class="num">Energy per bit ↓ 28%</div>
           <div> Photonic lanes + HELIOPASS DVFS lowered pJ/bit at steady BER.</div>
           <div class="spark" id="spark-energy" data-type="down" data-percent="28" aria-label="Sparkline showing ~28% energy-per-bit reduction"><canvas></canvas></div>
         </div>
-        <div class="card" title="PromQL: min_over_time(ffm_achieved_gbps[5m]) / floor">
+        <div class="card memory" title="PromQL: min_over_time(ffm_achieved_gbps[5m]) / floor">
           <div class="num">Memory Floors: 150–200 GB/s</div>
           <div> CXL Free‑Form Memory holds floors under contention.</div>
           <div class="spark" id="spark-memory" data-type="band" data-min="150" data-max="200" data-cap="220" aria-label="Band showing 150–200 GB/s floor with stable achieved"><canvas></canvas></div>

@@ -129,6 +129,12 @@ class CorridorSettings {
         
         this.currentCategory = 'system';
         this.searchQuery = '';
+        try {
+            this.loadSettings();
+            this.applySettingChange('appearance.theme', this.settings.appearance.theme);
+            this.applySettingChange('appearance.animations', this.settings.appearance.animations);
+            this.applySettingChange('appearance.fontSize', this.settings.appearance.fontSize);
+        } catch (_) {}
     }
     
     createSettingsWindow() {
@@ -819,6 +825,9 @@ class CorridorSettings {
                 break;
             case 'appearance.fontSize':
                 document.body.setAttribute('data-font-size', value);
+                break;
+            case 'appearance.wallpaper':
+                document.body.setAttribute('data-wallpaper', value);
                 break;
             case 'privacy.lockDelay':
                 if (window.corridorOS) {

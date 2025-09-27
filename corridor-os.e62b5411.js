@@ -44,6 +44,7 @@ class CorridorOS {
     
     init() {
         this.setupEventListeners();
+        this.applySavedAppearanceOnStartup();
         this.loadNotificationsFromStorage();
         this.wireFastBootToggle();
         this.startBootSequence();
@@ -645,9 +646,9 @@ class CorridorOS {
             window.corridorApps.openApp(appName);
         }
     }
-}
+    }
 
-// Global functions for HTML event handlers
+    // Global functions for HTML event handlers
 function showActivitiesOverview() {
     window.corridorOS.showActivitiesOverview();
 }
@@ -737,3 +738,25 @@ const shakeCSS = `
 const style = document.createElement('style');
 style.textContent = shakeCSS;
 document.head.appendChild(style);
+
+// Appearance helpers: apply saved theme/animation/font size on early init
+CorridorOS.prototype.applySavedAppearanceOnStartup = function() {
+    try {
+        const savedRaw = localStorage.getItem('corridor-os-settings');
+        if (!savedRaw) return;
+        const saved = JSON.parse(savedRaw);
+        const app = saved.appearance || {};
+        if (app.theme) {
+            document.body.setAttribute('data-theme', app.theme);
+        }
+        if (typeof app.animations === 'boolean') {
+            document.body.classList.toggle('no-animations', !app.animations);
+        }
+        if (app.fontSize) {
+            document.body.setAttribute('data-font-size', app.fontSize);
+        }
+        if (app.wallpaper) {
+            document.body.setAttribute('data-wallpaper', app.wallpaper);
+        }
+    } catch (_) { /* ignore */ }
+};

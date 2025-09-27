@@ -1,6 +1,6 @@
 /* CorridorOS simple service worker for offline support */
-// v4: Updated to include video player functionality in corridor-apps.80c3fc57.js
-const CACHE_NAME = 'corridoros-cache-v4';
+// v5: Cache bump to invalidate old assets; includes Ambient Lab + Unified Model
+const CACHE_NAME = 'corridoros-cache-v5';
 // Resolve paths correctly for both root hosting and GitHub Pages project hosting
 const scopeURL = new URL(self.registration?.scope || self.location.href);
 const scopePath = scopeURL.pathname.replace(/\/$/, '');
