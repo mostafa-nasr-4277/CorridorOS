@@ -1,4 +1,5 @@
 /* CorridorOS simple service worker for offline support */
+// v4: Updated to include video player functionality in corridor-apps.80c3fc57.js
 const CACHE_NAME = 'corridoros-cache-v4';
 // Resolve paths correctly for both root hosting and GitHub Pages project hosting
 const scopeURL = new URL(self.registration?.scope || self.location.href);
@@ -44,7 +45,9 @@ self.addEventListener('activate', (event) => {
         if (self.registration.navigationPreload) {
           await self.registration.navigationPreload.enable();
         }
-      } catch (e) {}
+      } catch (e) {
+        // ignore
+      }
       await self.clients.claim();
     })()
   );

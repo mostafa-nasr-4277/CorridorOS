@@ -10,17 +10,20 @@
   <meta property="og:description" content="CorridorOS turns photonic interconnect and pooled memory into schedulable OS resources.">
   <meta property="og:image:alt" content="CorridorOS dashboard showing reserved photonic corridors and Free-Form Memory bandwidth floors.">
   <meta name="corridoros-version" content="v4">
-  <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.css">
+  <meta name="theme-color" content="#00c8ff">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="brand/corridoros-brand.b501abdc.b501abdc.css">
   <style>
     :root{
-      --bg-0:#0a0412; /* darker base */
-      --bg-1:#1a0a2e; /* deep magenta */
-      --bg-2:#2d1b69; /* rich magenta */
-      --magenta:#ff0080; /* real magenta */
-      --purple:#8b00ff;  /* vibrant purple */
-      --accent:#ff40a0;  /* bright magenta accent */
+      /* Vista‑style palette */
+      --bg-0:#0b1020;
+      --bg-1:#0e1a2b;
+      --bg-2:#13283f;
+      --cyan:#00c8ff;
+      --teal:#00ffd5;
+      --accent:#00a2ff;
       --gold:#FFD700;
-      --green:#00FF7F;
+      --green:#00E28F;
       --text:#FFFFFF;
       --text-secondary:#E0E0E0;
     }
@@ -28,17 +31,18 @@
     html,body{margin:0}
     body{font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; color:var(--text);
       background:
-        radial-gradient(90% 60% at 80% 0%, rgba(255,0,128,.25), transparent 60%),
+        radial-gradient(80% 60% at 15% 10%, rgba(0,255,213,.24), transparent 60%),
+        radial-gradient(90% 60% at 80% 0%, rgba(255,0,128,.12), transparent 60%),
         radial-gradient(120% 120% at 50% 0%, var(--bg-2) 0%, var(--bg-1) 48%, var(--bg-0) 100%);
     }
     a{color:inherit}
     /* Nav */
-    .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:18px 48px;background:linear-gradient(180deg, rgba(26,10,46,.85), rgba(26,10,46,.65));backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,0,128,.3)}
-    .nav .brand{font-weight:800;letter-spacing:.02em;background:linear-gradient(45deg,var(--magenta),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:18px 48px;background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));backdrop-filter:saturate(140%) blur(18px);border-bottom:1px solid rgba(255,255,255,.18)}
+    .nav .brand{font-weight:800;letter-spacing:.02em;background:linear-gradient(45deg,var(--cyan),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
     .nav .links{display:flex;gap:18px;align-items:center}
     .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:.85rem 1.2rem;border-radius:10px;border:1.5px solid rgba(0,200,255,.6);text-decoration:none;font-weight:700;letter-spacing:.01em;transition:all .2s ease;color:var(--text)}
     .btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,200,255,.35)}
-    .btn.primary{border:none;background:linear-gradient(135deg,var(--magenta),var(--purple));color:#fff;box-shadow:0 4px 16px rgba(255,0,128,.4)}
+    .btn.primary{border:none;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#001b2e;box-shadow:0 4px 16px rgba(0,200,255,.4)}
     .btn.ghost{background:transparent;border-color:rgba(0,200,255,.4)}
     main{max-width:1200px;margin:0 auto;padding:48px 24px}
     /* Hero */
@@ -55,10 +59,21 @@
     .demo{margin:36px auto 12px;max-width:960px}
     .demo-frame{aspect-ratio:16/9;background:linear-gradient(135deg, #000, #0e1a2b);border-radius:16px;border:2px solid rgba(0,200,255,.4);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 54px rgba(0,200,255,.28);cursor:pointer;transition:all .3s ease}
     .demo-frame:hover{transform:scale(1.02);box-shadow:0 24px 64px rgba(0,200,255,.38);border-color:rgba(0,200,255,.6)}
-    .play{position:absolute;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg, var(--magenta), var(--purple));border:3px solid rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(255,0,128,.5);transition:all .3s ease}
-    .play:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(255,0,128,.7)}
-    .play::before{content:"▶";font-size:32px;margin-left:6px;color:#fff;font-weight:bold}
     .demo-caption{margin-top:8px;font-size:13px;color:var(--text-secondary);text-align:center}
+    
+    /* Video Player Styling */
+    #demoVideo {
+      border-radius: 16px;
+      box-shadow: 0 18px 54px rgba(0,200,255,.32);
+    }
+    
+    #demoVideo::-webkit-media-controls {
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    }
+    
+    #demoVideo::-webkit-media-controls-panel {
+      background: rgba(0,0,0,0.6);
+    }
     /* Proof cards */
     .proof{margin:56px 0 8px}
     .proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
@@ -73,9 +88,33 @@
     /* Responsive */
     @media (max-width:1024px){ .hero{grid-template-columns:repeat(8,1fr)} .hero-left{grid-column:span 8} .proof-grid{grid-template-columns:repeat(2,1fr)} }
     @media (max-width:640px){ h1{font-size:42px;line-height:50px} .proof-grid{grid-template-columns:1fr} .nav{padding:14px 16px} main{padding:32px 16px} }
+    /* Footer */
+    .site-footer{max-width:1200px;margin:24px auto 32px;padding:16px 20px;border-top:1px solid rgba(0,200,255,.22);background:linear-gradient(90deg, rgba(0,200,255,.10), rgba(0,255,213,.08));border-radius:12px;color:var(--text-secondary)}
+    .site-footer a{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(0,200,255,.4)}
+    .site-footer strong{color:#e6fdff}
+
+    /* Liminal glow overlay */
+    .glow-layer{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.0;transition:opacity .6s ease}
+    body.glow-on .glow-layer{opacity:.65}
+    .glow-layer::before{content:"";position:absolute;inset: -20% -20%;
+      background:
+        radial-gradient(800px 400px at 20% 20%, rgba(0,200,255,.35), transparent 60%),
+        radial-gradient(900px 500px at 70% 60%, rgba(0,255,213,.25), transparent 62%),
+        radial-gradient(700px 400px at 40% 80%, rgba(110,74,255,.22), transparent 64%);
+      filter:blur(30px);
+      animation: glowDrift 28s ease-in-out infinite alternate;
+    }
+    @keyframes glowDrift{
+      0%{transform:translate3d(-10px,-6px,0) scale(1)}
+      50%{transform:translate3d(12px,10px,0) scale(1.03)}
+      100%{transform:translate3d(-8px,14px,0) scale(0.98)}
+    }
+
+    nav, main{position:relative;z-index:1}
   </style>
 </head>
 <body>
+  <div class="glow-layer" aria-hidden="true"></div>
   <nav class="nav" aria-label="Main">
     <div class="brand">CorridorOS</div>
     <div class="links">
@@ -84,6 +123,7 @@
       <a class="btn ghost" href="https://github.com/mostafa-nasr-4277/CorridorOS/blob/main/docs/SECURITY_BASELINE.md" target="_blank" rel="noopener">Security</a>
       <a class="btn ghost" href="https://github.com/mostafa-nasr-4277/CorridorOS" target="_blank" rel="noopener">GitHub</a>
       <a class="btn primary" href="#demo" id="ctaDemo">Try Demo (Simulation)</a>
+      <button class="btn ghost" id="toggleGlow" type="button" title="Toggle Liminal Glow">Liminal Glow</button>
     </div>
   </nav>
 
@@ -101,6 +141,7 @@
           <div class="chip" role="listitem">✅ BER stable ≤ 1e‑12 (HELIOPASS calibrated)</div>
           <div class="chip gold" role="listitem">✅ 150–200 GB/s memory floors on CXL</div>
           <div class="chip" role="listitem">✅ p99 latency ↓ 25–40% in pilot tests</div>
+          <div id="webgpu-chip" class="chip gold" role="listitem" style="display:none"></div>
         </div>
         <div style="margin-top:10px;color:rgba(247,243,232,.8);font-size:14px">Open core · Kubernetes‑ready · Attestation & PQC built‑in</div>
       </div>
@@ -111,11 +152,12 @@
     <section class="demo" id="demo" aria-labelledby="demoLabel">
       <h3 id="demoLabel" style="margin:0 0 10px 0">Experience CorridorOS: Reserve light and guarantee memory floors in real time.</h3>
       <div class="demo-frame" id="demoFrame">
-        <video id="demoVideo"
-               controls
-               preload="metadata"
-               poster="brand/pngs/grad_1920x480.png"
+        <video id="demoVideo" 
+               controls 
+               preload="metadata" 
+               poster="brand/pngs/grad_1920x480.png" 
                style="width:100%;height:100%;object-fit:contain;background:#000;border-radius:16px;">
+          <!-- Local demo assets -->
           <source src="demo/corridoros-demo.webm" type="video/webm">
           <source src="demo/corridoros-demo.mp4" type="video/mp4">
           <p>Your browser doesn't support HTML5 video. A downloadable MP4 will be provided.</p>
@@ -189,7 +231,7 @@
     <section class="ethics" aria-label="Ethics & Security" style="margin:24px 0">
       <h3>Ethics & Security</h3>
       <p>We separate production from Labs. Production carries attestation, encryption, PQC. Labs modules use explicit Consent Manifests and community governance — and never run by default.</p>
-      <a class="btn ghost" href="docs/SECURITY_BASELINE.md">Read our security & ethics note →</a>
+      <a class="btn ghost" href="https://github.com/mostafa-nasr-4277/CorridorOS/blob/main/docs/SECURITY_BASELINE.md" target="_blank" rel="noopener">Read our security & ethics note →</a>
     </section>
 
     <!-- Final CTA -->
@@ -202,97 +244,66 @@
       <div style="color:var(--text-secondary)">Open‑core license · Works with existing apps · Vendor‑neutral</div>
     </section>
   </main>
+  <footer class="site-footer" aria-label="Company Information">
+    <div><strong>Celine Online Egypt</strong></div>
+    <div><a href="tel:+201070756060">+20 10 70756060</a></div>
+    <address>1 Roxy Square, Heliopolis, Cairo, Egypt 11864</address>
+  </footer>
 
+  <script src="webgpu-check.js" defer></script>
   <script>
     function scrollToDemo(){
       const el=document.getElementById('demo'); if(!el) return; el.scrollIntoView({behavior:'smooth'});
     }
     
-    function startDemoSimulation(){
-      const demoFrame = document.getElementById('demoFrame');
-      const playButton = document.querySelector('.play');
-      
-      if (!demoFrame || !playButton) return;
-      
-      // Add loading state
-      playButton.innerHTML = '<div style="width: 20px; height: 20px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>';
-      
-      // Create demo content
-      setTimeout(() => {
-        demoFrame.innerHTML = `
-          <div style="position: absolute; inset: 0; background: linear-gradient(135deg, #000, #1a0a2e); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px;">
-            <div style="font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #ff0080;">🚀 CorridorOS Simulation</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 600px;">
-              <div style="background: rgba(255,0,128,0.1); border: 1px solid rgba(255,0,128,0.3); border-radius: 8px; padding: 15px;">
-                <div style="color: #ff40a0; font-weight: bold; margin-bottom: 10px;">📡 Photonic Corridors</div>
-                <div style="font-size: 14px;">Reserving λ-sets...</div>
-                <div style="font-size: 12px; color: #00ff7f; margin-top: 5px;">✅ 8 lanes allocated</div>
-              </div>
-              <div style="background: rgba(255,0,128,0.1); border: 1px solid rgba(255,0,128,0.3); border-radius: 8px; padding: 15px;">
-                <div style="color: #ff40a0; font-weight: bold; margin-bottom: 10px;">💾 Memory Floors</div>
-                <div style="font-size: 14px;">Setting GB/s floors...</div>
-                <div style="font-size: 12px; color: #00ff7f; margin-top: 5px;">✅ 150 GB/s guaranteed</div>
-              </div>
-            </div>
-            <div style="margin-top: 20px; font-size: 16px; color: #ffd700;">
-              ⚡ HELIOPASS recalibrating... BER stable at 1e-12
-            </div>
-            <div style="margin-top: 15px;">
-              <button onclick="resetDemo()" style="background: linear-gradient(135deg, #ff0080, #8b00ff); border: none; color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
-                🔄 Reset Demo
-              </button>
-            </div>
-          </div>
-        `;
-        
-        // Add CSS animation
-        const style = document.createElement('style');
-        style.textContent = `
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `;
-        document.head.appendChild(style);
-      }, 1000);
-    }
-    
-    function resetDemo(){
-      const demoFrame = document.getElementById('demoFrame');
-      if (!demoFrame) return;
-      
-      demoFrame.innerHTML = `
-        <div class="play"></div>
-      `;
-    }
-    
-    document.getElementById('ctaDemo')?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToDemo(); });
-    document.getElementById('ctaDemo2')?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToDemo(); });
-    // Only enable simulation click if video is not present
-    if (!document.getElementById('demoVideo')) {
-      document.getElementById('demoFrame')?.addEventListener('click', startDemoSimulation);
-    }
-
-    // Enhance video player UX when present
+    // Simple video player setup
     document.addEventListener('DOMContentLoaded', function() {
       const video = document.getElementById('demoVideo');
       if (video) {
+        // Add some styling to make the video player look better
         video.style.borderRadius = '16px';
-        video.style.boxShadow = '0 18px 54px rgba(255,0,128,.3)';
-        video.addEventListener('error', function() {
+        video.style.boxShadow = '0 18px 54px rgba(0,200,255,.32)';
+        
+        // Optional: Add event listeners for better UX
+        video.addEventListener('loadstart', function() {
+          console.log('Video loading started');
+        });
+        
+        video.addEventListener('canplay', function() {
+          console.log('Video can start playing');
+        });
+        
+        video.addEventListener('error', function(e) {
+          console.log('Video error:', e);
+          // Show fallback message if video fails to load
           const demoFrame = document.getElementById('demoFrame');
           if (demoFrame) {
             demoFrame.innerHTML = `
-              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:white;text-align:center;padding:20px;">
-                <div style="font-size:24px;margin-bottom:16px;">🎥 Video Player</div>
-                <div style="font-size:16px;margin-bottom:20px;opacity:.8;">Video content will be available soon</div>
-                <div style="font-size:14px;opacity:.6;">This will show the 3-minute CorridorOS demonstration</div>
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: white; text-align: center; padding: 20px;">
+                <div style="font-size: 24px; margin-bottom: 16px;">🎥 Video Player</div>
+                <div style="font-size: 16px; margin-bottom: 20px; opacity: 0.8;">Video content will be available soon</div>
+                <div style="font-size: 14px; opacity: 0.6;">This will show the 3-minute CorridorOS demonstration</div>
               </div>
             `;
           }
         });
       }
     });
+    
+    document.getElementById('ctaDemo')?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToDemo(); });
+    document.getElementById('ctaDemo2')?.addEventListener('click', (e)=>{ e.preventDefault(); scrollToDemo(); });
+    // Liminal glow toggle with persisted preference
+    (function(){
+      const key='glowPref';
+      const btn=document.getElementById('toggleGlow');
+      const apply=(on)=>{ document.body.classList.toggle('glow-on', !!on); };
+      try{ apply(localStorage.getItem(key)==='1'); }catch(e){}
+      btn?.addEventListener('click',()=>{
+        const on=!document.body.classList.contains('glow-on');
+        apply(on);
+        try{ localStorage.setItem(key, on?'1':'0'); }catch(e){}
+      });
+    })();
     
     // Register service worker for offline support
     if ('serviceWorker' in navigator) {

@@ -31,7 +31,8 @@
     html,body{margin:0}
     body{font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; color:var(--text);
       background:
-        radial-gradient(90% 60% at 80% 0%, rgba(255,0,128,.25), transparent 60%),
+        radial-gradient(80% 60% at 15% 10%, rgba(0,255,213,.24), transparent 60%),
+        radial-gradient(90% 60% at 80% 0%, rgba(255,0,128,.12), transparent 60%),
         radial-gradient(120% 120% at 50% 0%, var(--bg-2) 0%, var(--bg-1) 48%, var(--bg-0) 100%);
     }
     a{color:inherit}
@@ -63,7 +64,7 @@
     /* Video Player Styling */
     #demoVideo {
       border-radius: 16px;
-      box-shadow: 0 18px 54px rgba(255,0,128,.3);
+      box-shadow: 0 18px 54px rgba(0,200,255,.32);
     }
     
     #demoVideo::-webkit-media-controls {
@@ -87,6 +88,10 @@
     /* Responsive */
     @media (max-width:1024px){ .hero{grid-template-columns:repeat(8,1fr)} .hero-left{grid-column:span 8} .proof-grid{grid-template-columns:repeat(2,1fr)} }
     @media (max-width:640px){ h1{font-size:42px;line-height:50px} .proof-grid{grid-template-columns:1fr} .nav{padding:14px 16px} main{padding:32px 16px} }
+    /* Footer */
+    .site-footer{max-width:1200px;margin:24px auto 32px;padding:16px 20px;border-top:1px solid rgba(0,200,255,.22);background:linear-gradient(90deg, rgba(0,200,255,.10), rgba(0,255,213,.08));border-radius:12px;color:var(--text-secondary)}
+    .site-footer a{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(0,200,255,.4)}
+    .site-footer strong{color:#e6fdff}
 
     /* Liminal glow overlay */
     .glow-layer{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.0;transition:opacity .6s ease}
@@ -226,7 +231,7 @@
     <section class="ethics" aria-label="Ethics & Security" style="margin:24px 0">
       <h3>Ethics & Security</h3>
       <p>We separate production from Labs. Production carries attestation, encryption, PQC. Labs modules use explicit Consent Manifests and community governance — and never run by default.</p>
-      <a class="btn ghost" href="docs/SECURITY_BASELINE.md">Read our security & ethics note →</a>
+      <a class="btn ghost" href="https://github.com/mostafa-nasr-4277/CorridorOS/blob/main/docs/SECURITY_BASELINE.md" target="_blank" rel="noopener">Read our security & ethics note →</a>
     </section>
 
     <!-- Final CTA -->
@@ -239,6 +244,11 @@
       <div style="color:var(--text-secondary)">Open‑core license · Works with existing apps · Vendor‑neutral</div>
     </section>
   </main>
+  <footer class="site-footer" aria-label="Company Information">
+    <div><strong>Celine Online Egypt</strong></div>
+    <div><a href="tel:+201070756060">+20 10 70756060</a></div>
+    <address>1 Roxy Square, Heliopolis, Cairo, Egypt 11864</address>
+  </footer>
 
   <script src="webgpu-check.js" defer></script>
   <script>
@@ -252,7 +262,7 @@
       if (video) {
         // Add some styling to make the video player look better
         video.style.borderRadius = '16px';
-        video.style.boxShadow = '0 18px 54px rgba(255,0,128,.3)';
+        video.style.boxShadow = '0 18px 54px rgba(0,200,255,.32)';
         
         // Optional: Add event listeners for better UX
         video.addEventListener('loadstart', function() {

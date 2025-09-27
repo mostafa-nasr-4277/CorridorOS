@@ -1,17 +1,17 @@
 /* Corridor OS - Modern Operating System Styles */
 :root {
     /* Vista‑inspired glass + aurora palette */
-    --primary-orange: #FF8A00;
-    --primary-purple: #6e4aff;
-    --primary-blue: #00a2ff;
-    --primary-green: #00e28f;
-    --primary-cyan: #00c8ff;
-    --primary-teal: #00ffd5;
+    --primary-orange: #FF8A00; /* legacy accent for warnings */
+    --primary-purple: #6e4aff; /* secondary glow */
+    --primary-blue: #00a2ff;   /* Vista cyan */
+    --primary-green: #00e28f;  /* status/ok */
+    --primary-cyan: #00c8ff;   /* default accent */
+    --primary-teal: #00ffd5;   /* glow accent */
     
     /* Dark glass theme colors */
-    --bg-primary: #0b1020;
-    --bg-secondary: #0e1a2b;
-    --bg-tertiary: #13283f;
+    --bg-primary: #0b1020;     /* deep blue/black */
+    --bg-secondary: #0e1a2b;   /* pane */
+    --bg-tertiary: #13283f;    /* titlebar */
     --bg-panel: rgba(12, 26, 44, 0.55);
     --bg-glass: rgba(255, 255, 255, 0.10);
     --bg-glass-hover: rgba(255, 255, 255, 0.16);
@@ -202,8 +202,12 @@ body {
     z-index: 1000;
     box-shadow: var(--shadow-small);
 }
-
-.top-panel::after { content: ''; position: absolute; left:0; right:0; top:0; height:28px; background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent); pointer-events:none; }
+.top-panel::after {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 0; height: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent);
+    pointer-events: none;
+}
 
 .panel-left {
     display: flex;
@@ -215,6 +219,7 @@ body {
     background: linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
     color: #00253f;
     border: 1px solid rgba(255,255,255,0.35);
+    color: white;
     padding: 8px 16px;
     border-radius: var(--radius-medium);
     font-weight: 600;
@@ -317,7 +322,11 @@ body {
     box-shadow: var(--shadow-large);
     z-index: 1000;
 }
-.dock::before { content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; box-shadow: inset 0 1px 0 rgba(255,255,255,0.35); }
+.dock::before {
+    content: '';
+    position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+}
 
 .dock-apps {
     display: flex;
@@ -497,8 +506,8 @@ body {
 
 .window {
     position: absolute;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    background: linear-gradient(180deg, rgba(18,30,50,0.72), rgba(15,24,40,0.58));
+    border: 1px solid rgba(255,255,255,0.22);
     border-radius: var(--radius-medium);
     box-shadow: var(--shadow-large);
     min-width: 400px;
@@ -521,13 +530,17 @@ body {
 
 .window-titlebar {
     height: 40px;
-    background: var(--bg-tertiary);
-    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.06));
+    border-bottom: 1px solid rgba(255,255,255,0.28);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
     cursor: move;
+}
+.window-titlebar::after{
+    content:''; position:absolute; left:0; right:0; top:0; height:20px; pointer-events:none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent);
 }
 
 .window-title {
@@ -548,17 +561,10 @@ body {
     transition: var(--transition-fast);
 }
 
-.window-control.close {
-    background: #ff5f56;
-}
-
-.window-control.minimize {
-    background: #ffbd2e;
-}
-
-.window-control.maximize {
-    background: #27ca3f;
-}
+.window-control { background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.18)); border:1px solid rgba(255,255,255,0.35);} 
+.window-control.close { box-shadow: 0 0 0 2px rgba(255,0,0,0.15) inset; }
+.window-control.minimize { box-shadow: 0 0 0 2px rgba(255,200,0,0.15) inset; }
+.window-control.maximize { box-shadow: 0 0 0 2px rgba(0,255,120,0.15) inset; }
 
 .window-control:hover {
     transform: scale(1.1);

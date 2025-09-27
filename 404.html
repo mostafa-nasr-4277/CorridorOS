@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — CorridorOS</title>
+  <style>
+    :root { --bg:#0b1020; --panel:#121a2e; --text:#fff; --muted:#a9b3c7; --cyan:#00c8ff; --teal:#00ffd5; }
+    html,body{height:100%;margin:0;background:radial-gradient(120% 120% at 50% 0%, #13283f 0%, #0e1a2b 48%, var(--bg) 100%);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:28px}
+    .card{max-width:760px;width:100%;background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:22px 22px 18px 22px;backdrop-filter:blur(8px)}
+    h1{margin:0;font-size:42px;line-height:1.1;background:linear-gradient(45deg,var(--cyan),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    p{color:var(--muted);margin:10px 0}
+    code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    .btn{min-height:40px;padding:.7rem 1rem;border-radius:10px;border:1.5px solid rgba(0,200,255,.6);text-decoration:none;color:var(--text);font-weight:700}
+    .btn.primary{border:none;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#001b2e}
+    .hint{font-size:13px;color:#c9d3e1;opacity:.85;margin-top:10px}
+  </style>
+  <meta name="robots" content="noindex" />
+  <script>
+    (function(){
+      const owner = 'mostafa-nasr-4277';
+      const repo  = 'CorridorOS';
+      const path = window.location.pathname;
+      // Derive the missing path relative to the repo base (handles project pages like /CorridorOS/…)
+      const parts = path.split('/');
+      const repoIdx = parts.indexOf(repo);
+      const missing = (repoIdx >= 0 ? parts.slice(repoIdx + 1) : parts.slice(1)).join('/');
+      const isMarkdown = /\.md(\?|#|$)/i.test(missing);
+      const ghBlob = `https://github.com/${owner}/${repo}/blob/main/${missing}`;
+      window.__corridor404 = { path, missing, isMarkdown, ghBlob };
+      // Gentle auto-redirect for Markdown files (these usually live in the repo)
+      if (isMarkdown) {
+        setTimeout(() => { window.location.replace(ghBlob); }, 1400);
+      }
+    })();
+  </script>
+  
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="alert">
+      <h1>404 — File not found</h1>
+      <p>The URL you requested doesn’t exist on this site.</p>
+      <p id="what"></p>
+      <div class="actions">
+        <a class="btn primary" href="/CorridorOS/">Go Home</a>
+        <a class="btn" id="repoLink" href="https://github.com/mostafa-nasr-4277/CorridorOS" target="_blank" rel="noopener">Open Repository</a>
+        <a class="btn" id="ghBlobLink" target="_blank" rel="noopener" style="display:none">Try on GitHub</a>
+        <a class="btn" href="/CorridorOS/corridor-os.html">Open OS Demo</a>
+      </div>
+      <div class="hint" id="hint"></div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const ctx = window.__corridor404 || {};
+      const what = document.getElementById('what');
+      const hint = document.getElementById('hint');
+      const gh = document.getElementById('ghBlobLink');
+      if (ctx.missing) {
+        what.innerHTML = `Missing path: <code>/${ctx.missing}</code>`;
+      }
+      if (ctx.isMarkdown && ctx.ghBlob) {
+        gh.style.display = 'inline-flex';
+        gh.href = ctx.ghBlob;
+        gh.textContent = 'Open the file on GitHub';
+        hint.textContent = 'Markdown files live in the repository. You’ll be redirected shortly.';
+      } else {
+        hint.textContent = 'If you followed a link here, it may be outdated or moved.';
+      }
+    })();
+  </script>
+</body>
+</html>
+

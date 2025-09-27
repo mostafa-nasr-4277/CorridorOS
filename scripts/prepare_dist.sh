@@ -16,6 +16,7 @@ copy() { src="$1"; dest="$2"; mkdir -p "$(dirname "$dest")"; cp "$src" "$dest"; 
 # HTML entry points
 for f in \
   index.html \
+  404.html \
   corridor-os.html \
   corridoros_advanced.html \
   corridoros_dashboard.html \
@@ -33,6 +34,14 @@ done
 copy "$ROOT_DIR/corridor-os-styles.css" "$DIST/corridor-os-styles.css"
 if [ -d "$ROOT_DIR/brand" ]; then
   rsync -a --prune-empty-dirs --include '*/' --include '*.css' --include 'icons/*.svg' --exclude '*' "$ROOT_DIR/brand/" "$DIST/brand/"
+fi
+
+# Demo media (video) used by index; optional
+if [ -d "$ROOT_DIR/demo" ]; then
+  rsync -a --prune-empty-dirs \
+    --include '*/' \
+    --include '*.mp4' --include '*.webm' --include 'README.md' \
+    --exclude '*' "$ROOT_DIR/demo/" "$DIST/demo/"
 fi
 
 # Core application scripts
