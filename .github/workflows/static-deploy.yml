@@ -10,7 +10,6 @@ on:
       - 'corridoros_*.html'
       - 'brand/**'
       - 'apps/**'
-      - 'dist/**'
       - 'service-worker.js'
       - 'manifest.webmanifest'
       - 'scripts/prepare_dist.sh'
@@ -39,6 +38,17 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Build dist
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash scripts/prepare_dist.sh
+      - name: Validate built files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dist/index.html || (echo "dist/index.html missing" && exit 1)
+          test -f dist/404.html || (echo "dist/404.html missing" && exit 1)
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:

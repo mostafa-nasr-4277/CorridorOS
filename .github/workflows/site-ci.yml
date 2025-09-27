@@ -66,10 +66,3 @@ jobs:
         with:
           name: site-dist
           path: dist
-
-      - name: Auto-commit updated dist (if any) [skip pages]
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore(build): update dist [skip pages]"
-          file_pattern: dist/**
-

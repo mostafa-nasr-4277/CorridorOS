@@ -1,0 +1,21 @@
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webm binary
+*.mp4 binary
+
+*.svg text
+*.md  text diff=markdown
+*.html text
+*.css  text
+*.js   text
+*.yml  text
+*.yaml text
+*.sh   text eol=lf
+
+# Ensure GitHub linguist classifies assets correctly
+apps/** linguist-vendored
+brand/** linguist-vendored
+dist/** linguist-generated
