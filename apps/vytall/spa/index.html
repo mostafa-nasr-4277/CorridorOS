@@ -137,11 +137,10 @@
     const read=(k)=>{try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(_){return []}}; const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
     function renderList(k,el){ const arr=read(k); el.innerHTML=''; if(arr.length===0){ el.innerHTML='<div class="mut">No items yet.</div>'; return; } arr.forEach((it,i)=>{ const row=document.createElement('div'); row.className='row'; row.innerHTML=`<span>${it.title}</span><span style="display:flex;gap:8px;align-items:center">${it.meta||''}<button class='btn' onclick='delItem("${k}",${i})'>Delete</button></span>`; el.appendChild(row);}); }
     function delItem(k,i){ const arr=read(k); arr.splice(i,1); write(k,arr); boot(); }
-    document.getElementById('apptForm').addEventListener('submit',(e)=>{ e.preventDefault(); const fd=new FormData(e.target); const t=fd.get('type')||'Appointment'; const date=fd.get('date')||''; const time=fd.get('time')||''; const notes=fd.get('notes')||''; const item={title:`${t}`, meta:`${date} ${time}`.trim()+(notes?` · ${notes}`:'' )}; const arr=read(KA); arr.push(item); write(KA,arr); e.target.reset(); boot(); });
-    document.getElementById('medForm').addEventListener('submit',(e)=>{ e.preventDefault(); const fd=new FormData(e.target); const item={title:`${fd.get('name')||'Medication'}`, meta:`${fd.get('dose')||''} ${fd.get('sched')||''}`.trim()+ (fd.get('notes')?` · ${fd.get('notes')}`:'' )}; const arr=read(KM); arr.push(item); write(KM,arr); e.target.reset(); boot(); });
+    document.getElementById('apptForm').addEventListener('submit',(e)=>{ e.preventDefault(); const fd=new FormData(e.target); const t=fd.get('type')||'Appointment'; const date=fd.get('date')||''; const time=fd.get('time')||''; const notes=fd.get('notes')||''; const item={title:`${t}`, meta:`${date} ${time}`.trim()+(notes?` · ${notes}`:'' )}; const arr=read(KA); arr.push(item); write(KA,arr); e.target.reset(); boot(); try{ window.top?.postMessage({type:'vytall-appointment-added', title:item.title, meta:item.meta}, '*'); }catch(_){} });
+    document.getElementById('medForm').addEventListener('submit',(e)=>{ e.preventDefault(); const fd=new FormData(e.target); const item={title:`${fd.get('name')||'Medication'}`, meta:`${fd.get('dose')||''} ${fd.get('sched')||''}`.trim()+ (fd.get('notes')?` · ${fd.get('notes')}`:'' )}; const arr=read(KM); arr.push(item); write(KM,arr); e.target.reset(); boot(); try{ window.top?.postMessage({type:'vytall-med-added', title:item.title, meta:item.meta}, '*'); }catch(_){} });
     function boot(){ renderList(KA, document.getElementById('apptList')); renderList(KM, document.getElementById('medList')); }
     boot();
   </script>
 </body>
 </html>
-

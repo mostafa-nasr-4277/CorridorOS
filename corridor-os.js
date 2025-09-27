@@ -712,6 +712,27 @@ function clearAllNotifications() {
 // Initialize Corridor OS when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.corridorOS = new CorridorOS();
+    // Cross-app notifications from embedded app iframes
+    window.addEventListener('message', (e) => {
+        try {
+            const d = e.data || {};
+            if (!d || typeof d !== 'object') return;
+            switch (d.type) {
+                case 'atlas-trip-added':
+                    window.corridorOS.showNotification('Corridor Atlas', `Trip added: ${d.trip?.dest || ''}`);
+                    break;
+                case 'atlas-booked':
+                    window.corridorOS.showNotification('Corridor Atlas', `Booked: ${d.trip?.dest || ''} · ID ${d.id}`);
+                    break;
+                case 'vytall-appointment-added':
+                    window.corridorOS.showNotification('Vytall', `Appointment: ${d.title || ''}`);
+                    break;
+                case 'vytall-med-added':
+                    window.corridorOS.showNotification('Vytall', `Medication: ${d.title || ''}`);
+                    break;
+            }
+        } catch (_) {}
+    });
 });
 
 // Add CSS for shake animation
