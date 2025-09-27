@@ -1,4 +1,4 @@
-name: CorridorOS Stable Deployment (v4)
+name: CorridorOS Pages Deploy
 
 on:
   push:
@@ -11,158 +11,46 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 6
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Create curated deployment package
-        run: |
-          set -euo pipefail
-          echo "📦 Preparing _site/ for GitHub Pages from dist/"
-          SITE_DIR="_site"
-          rm -rf "$SITE_DIR" && mkdir "$SITE_DIR"
-          
-          # Check if dist directory exists and has content
-          if [ -d "dist" ] && [ "$(ls -A dist)" ]; then
-            echo "✅ Using dist/ directory as source"
-            cp -a dist/* "$SITE_DIR/"
-          else
-            echo "⚠️  dist/ directory not found or empty, falling back to root files"
-            # Use cp -a to avoid rsync dependency; prune heavy/dev folders
-            shopt -s dotglob
-            for f in *; do
-              case "$f" in
-                .git|.github|node_modules|dist|deploy_artifact|_site) ;; # skip
-                daemon)              # remove built targets within daemon
-                  cp -a "$f" "$SITE_DIR/" && find "$SITE_DIR/$f" -name target -type d -prune -exec rm -rf {} + || true ;;
-                *) cp -a "$f" "$SITE_DIR/" ;;
-              esac
-            done
-            shopt -u dotglob
-          fi
-          
-          # Additional pruning
-          find "$SITE_DIR" -name "Cargo.lock" -delete || true
-          find "$SITE_DIR" -name "*.rlib" -o -name "*.rmeta" -o -name "*.d" -delete || true
-          touch "$SITE_DIR/.nojekyll"
-          test -f "$SITE_DIR/index.html" || { echo "❌ index.html missing in _site"; ls -la "$SITE_DIR"; exit 1; }
-          echo "✅ _site prepared"
-
-      - name: Inject cache-busted SW version
-        shell: bash
-        run: |
-          set -euo pipefail
-          SHA=${GITHUB_SHA::8}
-          SW="_site/service-worker.js"
-          if [ -f "$SW" ]; then
-            echo "⚙️  Bumping SW CACHE_NAME to corridoros-cache-$SHA"
-            sed -E -i "s/const CACHE_NAME = 'corridoros-cache-[^']+';/const CACHE_NAME = 'corridoros-cache-$SHA';/" "$SW" || true
-            grep -n "CACHE_NAME" "$SW" || true
-          else
-            echo "ℹ️  No service-worker.js in _site; skipping bump"
-          fi
-
-      - name: Add CNAME (custom domain)
-        if: ${{ secrets.CUSTOM_DOMAIN != '' }}
-        env:
-          CUSTOM_DOMAIN: ${{ secrets.CUSTOM_DOMAIN }}
-        run: |
-          echo "$CUSTOM_DOMAIN" > _site/CNAME
-          echo "CNAME set to: $(cat _site/CNAME)"
-        
-      - name: Verify deployment package
-        run: |
-          echo "📋 Contents of _site:"
-          ls -la _site/ | head -n 200
-          echo "📊 File count in _site:"
-          find _site -type f | wc -l
-          echo "🔍 Checking for problematic files:"
-          find _site -name "*WARNING*" -o -name "*INFO*" -o -name "*SUCCESS*" || echo "✅ No problematic files found"
-          echo "🔍 Checking for Rust build artifacts:"
-          find _site -name "target" -o -name "*.rlib" -o -name "*.rmeta" -o -name "*.d" -o -name "Cargo.lock" || echo "✅ No Rust build artifacts found"
-          echo "🔍 Checking for large files that might cause issues:"
-          find _site -type f -size +10M -exec ls -lh {} \; || echo "✅ No large files found"
-        
-      - name: Upload Pages artifact (try 1)
-        id: upload_artifact_1
-        uses: actions/upload-pages-artifact@v4
-        continue-on-error: true
-        with:
-          path: _site
-
-      - name: Wait before retry
-        if: steps.upload_artifact_1.outcome != 'success'
-        run: sleep 10
-
-      - name: Upload Pages artifact (try 2)
-        id: upload_artifact_2
-        if: steps.upload_artifact_1.outcome != 'success'
-        uses: actions/upload-pages-artifact@v4
-        continue-on-error: true
-        with:
-          path: _site
-
-      - name: Wait before final retry
-        if: steps.upload_artifact_1.outcome != 'success' && steps.upload_artifact_2.outcome != 'success'
-        run: sleep 20
-
-      - name: Upload Pages artifact (try 3)
-        id: upload_artifact_3
-        if: steps.upload_artifact_1.outcome != 'success' && steps.upload_artifact_2.outcome != 'success'
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: _site
-          
   deploy:
-    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 6
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: Smoke check (Pages availability)
+      - name: Smoke check (optional)
         env:
           BASE_URL: ${{ steps.deployment.outputs.page_url }}
           CUSTOM_DOMAIN: ${{ secrets.CUSTOM_DOMAIN }}
         shell: bash
         run: |
           set -euo pipefail
-          # Allow pages propagation before probing (configurable via PAGES_WAIT)
           sleep ${PAGES_WAIT:-15}
           echo "🔎 Base URL: $BASE_URL"
-          # Add cache-buster to avoid stale CDNs
           BUST=$RANDOM
-          # 1) index.html contains expected headline (stable content)
-          echo "→ Checking index.html content"
           curl -sS --retry 5 --retry-delay 2 --retry-all-errors -H "Cache-Control: no-cache" \
             "${BASE_URL}?v=${BUST}" | grep -q 'Reserve Light. Guarantee Memory.' || { echo "index.html content check failed"; exit 1; }
-          # 2) OS page is reachable
-          echo "→ Checking corridor-os.html (200)"
           curl -sS -I --retry 5 --retry-delay 2 --retry-all-errors -H "Cache-Control: no-cache" \
             "${BASE_URL}corridor-os.html?v=${BUST}" | grep -Eq 'HTTP/.+ 200' || { echo "corridor-os.html not 200"; exit 1; }
-          # 3) Demo video is reachable (optional)
-          echo "→ Checking demo video (optional)"
           if ! curl -sS -I --retry 5 --retry-delay 2 --retry-all-errors -H "Cache-Control: no-cache" \
             "${BASE_URL}demo/corridoros-demo.mp4?v=${BUST}" | grep -Eq 'HTTP/.+ 200'; then
             echo "(info) demo video not reachable yet; continuing"
           fi
-          # 4) Optional custom domain check
           if [ -n "${CUSTOM_DOMAIN:-}" ]; then
             echo "→ Checking https://${CUSTOM_DOMAIN}/ (optional)"
             curl -sS --retry 5 --retry-delay 3 --retry-all-errors -H "Cache-Control: no-cache" \
