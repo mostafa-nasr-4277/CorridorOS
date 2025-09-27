@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vytall Health — Offline SPA</title>
+  <style>
+    :root{--c:#00c8ff;--t:#00ffd5;--bg:#0b1020;--p:#101a2e;--text:#e6fdff;--mut:#cfe}
+    html,body{height:100%;margin:0;background:radial-gradient(120% 120% at 50% 0%, #13283f 0%, #0e1a2b 48%, #0b1020 100%);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .nav{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:10px 12px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+    .brand img{height:22px;border-radius:6px}
+    .tabs{display:flex;gap:8px}
+    .tab{border:1px solid rgba(0,200,255,.35);background:transparent;border-radius:10px;padding:8px 12px;color:var(--text);cursor:pointer}
+    .tab.active{background:linear-gradient(135deg,var(--c),var(--t));color:#001b2e;border:none}
+    .view{display:none;margin-top:12px}
+    .view.active{display:block}
+    .panel{background:linear-gradient(180deg, rgba(0,200,255,.10), rgba(0,255,213,.08));border:1px solid rgba(0,200,255,.22);border-radius:12px;padding:12px}
+    .grid-2{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
+    .vitals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .vital{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px;text-align:center}
+    .vital .n{font-size:28px;font-weight:800;color:#c3f7ff}
+    .list{display:grid;gap:8px}
+    .row{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px}
+    .btn{border:1px solid rgba(0,200,255,.4);background:transparent;border-radius:10px;padding:8px 12px;color:var(--text);cursor:pointer}
+    .btn.primary{border:none;background:linear-gradient(135deg,var(--c),var(--t));color:#001b2e}
+    .form{display:grid;grid-template-columns:repeat(4,1fr) 120px;gap:8px;align-items:end}
+    .form label{display:grid;gap:4px}
+    canvas{width:100%;height:180px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);border-radius:10px}
+    .mut{color:#cfd9e6;opacity:.9;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand"><img src="../assets/vytall_logo.png" alt="V"/> Vytall Health — Offline</div>
+      <div class="tabs">
+        <button class="tab active" data-tab="dash">Dashboard</button>
+        <button class="tab" data-tab="appointments">Appointments</button>
+        <button class="tab" data-tab="meds">Medications</button>
+        <button class="tab" data-tab="profile">Profile</button>
+      </div>
+    </div>
+
+    <div id="dash" class="view active">
+      <div class="grid-2">
+        <div class="panel">
+          <h3 style="margin:0 0 8px 0">Vitals</h3>
+          <div class="vitals">
+            <div class="vital"><div>Heart Rate</div><div class="n" id="hrN">72</div><div>bpm</div></div>
+            <div class="vital"><div>SpO₂</div><div class="n" id="spoN">98%</div><div>oxygen</div></div>
+            <div class="vital"><div>BP</div><div class="n" id="bpN">118/76</div><div>mmHg</div></div>
+          </div>
+          <div class="mut" style="margin-top:6px">Simulated data; not medical advice.</div>
+        </div>
+        <div class="panel">
+          <h3 style="margin:0 0 8px 0">Heart Rate (24h)</h3>
+          <canvas id="chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div id="appointments" class="view">
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Upcoming</h3>
+        <div id="apptList" class="list"></div>
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <h3 style="margin:0 0 8px 0">Add Appointment</h3>
+        <form id="apptForm" class="form">
+          <label>Type<input name="type" placeholder="e.g., Cardio" class="btn"></label>
+          <label>Date<input type="date" name="date" class="btn"></label>
+          <label>Time<input type="time" name="time" class="btn"></label>
+          <label>Notes<input name="notes" placeholder="optional" class="btn"></label>
+          <button class="btn primary" type="submit">Add</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="meds" class="view">
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Medications</h3>
+        <div id="medList" class="list"></div>
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <h3 style="margin:0 0 8px 0">Add Medication</h3>
+        <form id="medForm" class="form">
+          <label>Name<input name="name" placeholder="e.g., Atorvastatin" class="btn"></label>
+          <label>Dosage<input name="dose" placeholder="e.g., 10 mg" class="btn"></label>
+          <label>Schedule<input name="sched" placeholder="e.g., Daily" class="btn"></label>
+          <label>Notes<input name="notes" placeholder="optional" class="btn"></label>
+          <button class="btn primary" type="submit">Add</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="profile" class="view">
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Patient</h3>
+        <div class="list">
+          <div class="row"><span>Name</span><span>Corridor User</span></div>
+          <div class="row"><span>DOB</span><span>1993‑05‑01</span></div>
+          <div class="row"><span>Height</span><span>178 cm</span></div>
+          <div class="row"><span>Weight</span><span>74 kg</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tabs
+    document.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+        document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Chart (simple)
+    (function(){
+      const cvs=document.getElementById('chart'); const ctx=cvs.getContext('2d'); const dpr=Math.min(2,window.devicePixelRatio||1);
+      function draw(){
+        const w=Math.floor(cvs.clientWidth*dpr), h=Math.floor(180*dpr); cvs.width=w; cvs.height=h; ctx.scale(dpr,dpr);
+        ctx.clearRect(0,0,w,h); ctx.fillStyle='rgba(255,255,255,.06)'; for(let x=8;x<w/dpr;x+=16){ for(let y=8;y<h/dpr;y+=16){ ctx.fillRect(x,y,1,1);} }
+        // simulated HR around 72
+        const n=64, pts=[]; let base=72; for(let i=0;i<n;i++){ const t=i/(n-1); const v=base + Math.sin(i*0.3)*5 + (Math.random()-0.5)*2; pts.push([t,v]); }
+        const min=60, max=100; const toY=v=> (1-(v-min)/(max-min))*(h/dpr-16)+8; const toX=t=> t*(w/dpr-16)+8;
+        ctx.beginPath(); pts.forEach((p,i)=>{ const x=toX(p[0]), y=toY(p[1]); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.lineWidth=2; const g=ctx.createLinearGradient(0,0,w,0); g.addColorStop(0,'#00ffd5'); g.addColorStop(1,'#00c8ff'); ctx.strokeStyle=g; ctx.stroke();
+      }
+      new ResizeObserver(draw).observe(cvs); draw();
+    })();
+
+    // Appointments/Medications (localStorage)
+    const KA='vytall-appts-v1', KM='vytall-meds-v1';
+    const read=(k)=>{try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(_){return []}}; const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+    function renderList(k,el){ const arr=read(k); el.innerHTML=''; if(arr.length===0){ el.innerHTML='<div class="mut">No items yet.</div>'; return; } arr.forEach((it,i)=>{ const row=document.createElement('div'); row.className='row'; row.innerHTML=`<span>${it.title}</span><span style="display:flex;gap:8px;align-items:center">${it.meta||''}<button class='btn' onclick='delItem("${k}",${i})'>Delete</button></span>`; el.appendChild(row);}); }
+    function delItem(k,i){ const arr=read(k); arr.splice(i,1); write(k,arr); boot(); }
+    document.getElementById('apptForm').addEventListener('submit',(e)=>{ e.preventDefault(); const fd=new FormData(e.target); const t=fd.get('type')||'Appointment'; const date=fd.get('date')||''; const time=fd.get('time')||''; const notes=fd.get('notes')||''; const item={title:`${t}`, meta:`${date} ${time}`.trim()+(notes?` · ${notes}`:'' )}; const arr=read(KA); arr.push(item); write(KA,arr); e.target.reset(); boot(); });
+    document.getElementById('medForm').addEventListener('submit',(e)=>{ e.preventDefault(); const fd=new FormData(e.target); const item={title:`${fd.get('name')||'Medication'}`, meta:`${fd.get('dose')||''} ${fd.get('sched')||''}`.trim()+ (fd.get('notes')?` · ${fd.get('notes')}`:'' )}; const arr=read(KM); arr.push(item); write(KM,arr); e.target.reset(); boot(); });
+    function boot(){ renderList(KA, document.getElementById('apptList')); renderList(KM, document.getElementById('medList')); }
+    boot();
+  </script>
+</body>
+</html>
+

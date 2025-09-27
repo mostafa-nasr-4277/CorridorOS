@@ -907,7 +907,7 @@ def create_bell_state():
               </div>
             </div>
             <div style="position:relative;flex:1;min-height:400px;border:1px solid rgba(0,200,255,.22);border-radius:10px;overflow:hidden;background:rgba(0,0,0,.25)">
-              <iframe id="vytall-frame" title="Vytall" src="apps/vytall/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+              <iframe id="vytall-frame" title="Vytall" src="apps/vytall/spa/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
               <div id="vytall-placeholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;color:#e6fdff;">
                 <div style="max-width:640px">
                   <h3 style="margin:0 0 6px 0">Vytall Health</h3>
