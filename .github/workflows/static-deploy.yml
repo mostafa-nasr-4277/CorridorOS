@@ -3,6 +3,17 @@ name: CorridorOS Pages Deploy
 on:
   push:
     branches: [ main ]
+    # Only deploy when site assets change (gentler on CI)
+    paths:
+      - 'index.html'
+      - 'corridor-os.html'
+      - 'corridoros_*.html'
+      - 'brand/**'
+      - 'apps/**'
+      - 'dist/**'
+      - 'service-worker.js'
+      - 'manifest.webmanifest'
+      - 'scripts/prepare_dist.sh'
   workflow_dispatch:
 
 permissions:
@@ -16,8 +27,10 @@ concurrency:
 
 jobs:
   deploy:
+    # Allow skipping with "[skip pages]" in the commit message
+    if: ${{ !contains(github.event.head_commit.message, '[skip pages]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
