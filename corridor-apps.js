@@ -71,6 +71,21 @@ class CorridorApps {
             category: 'internet',
             createWindow: () => this.createWebBrowserApp()
         });
+
+        // CorridorOS Apps
+        this.apps.set('vytall', {
+            name: 'Vytall Health',
+            icon: '❤️‍🩹',
+            category: 'corridoros',
+            createWindow: () => this.createVytallApp()
+        });
+
+        this.apps.set('corridor-atlas', {
+            name: 'Corridor Atlas',
+            icon: '🧭',
+            category: 'corridoros',
+            createWindow: () => this.createAtlasApp()
+        });
         
         // Media Applications
         this.apps.set('image-viewer', {
@@ -832,7 +847,7 @@ def create_bell_state():
             </div>
         `;
     }
-    
+
     createSystemMonitorApp() {
         return `
             <div class="system-monitor-app">
@@ -874,7 +889,90 @@ def create_bell_state():
             </div>
         `;
     }
-    
+
+    // Vytall Health app (web) — loads live app if available, else shows a rich fallback
+    createVytallApp() {
+        const repoUrl = 'https://github.com/mostafanasrrsp/Vytall';
+        const guessLive = 'https://mostafanasrrsp.github.io/Vytall/';
+        return `
+          <div class="vytall-app" style="display:grid;grid-template-columns:1fr;grid-auto-rows:minmax(40px,auto);gap:10px;height:100%">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="brand/icons/corridoros-logo.svg" alt="V" style="height:20px;filter:hue-rotate(80deg)"/>
+                <strong>Vytall Health</strong>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="studio-button" onclick="corridorApps.openExternal('${repoUrl}')">Open Repo</button>
+                <button class="studio-button" onclick="corridorApps.loadIntoIframe('vytall-frame','${guessLive}')">Load Live</button>
+              </div>
+            </div>
+            <div style="position:relative;flex:1;min-height:400px;border:1px solid rgba(0,200,255,.22);border-radius:10px;overflow:hidden;background:rgba(0,0,0,.25)">
+              <iframe id="vytall-frame" title="Vytall" style="position:absolute;inset:0;width:100%;height:100%;border:0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+              <div id="vytall-placeholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;color:#e6fdff;">
+                <div style="max-width:640px">
+                  <h3 style="margin:0 0 6px 0">Vytall Health</h3>
+                  <p style="opacity:.85;margin:0 0 10px 0">A privacy-forward healthcare app. Load the live build or explore this interactive preview.</p>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div style="background:rgba(0,0,0,.35);border:1px solid rgba(0,200,255,.2);border-radius:10px;padding:12px">
+                      <div style="font-weight:700;margin-bottom:6px">Vitals</div>
+                      <div>HR: <strong>72</strong> bpm</div>
+                      <div>SpO₂: <strong>98%</strong></div>
+                      <div>BP: <strong>118/76</strong> mmHg</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,.35);border:1px solid rgba(0,200,255,.2);border-radius:10px;padding:12px">
+                      <div style="font-weight:700;margin-bottom:6px">Appointments</div>
+                      <div>Cardio consult — Tue 10:30</div>
+                      <div>Lab work — Fri 09:00</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+    }
+
+    // Corridor Atlas (travel, iOS-flavored preview)
+    createAtlasApp() {
+        const repoUrl = 'https://github.com/mostafanasrrsp/RedSeaPortal';
+        return `
+          <div class="atlas-app" style="display:grid;grid-template-columns:1fr;gap:10px;height:100%">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="brand/icons/corridoros-logo.svg" alt="A" style="height:20px;filter:hue-rotate(200deg)"/>
+                <strong>Corridor Atlas</strong><span style="opacity:.7">(iOS preview)</span>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="studio-button" onclick="corridorApps.openExternal('${repoUrl}')">Open Repo</button>
+              </div>
+            </div>
+            <div style="display:flex;gap:16px;align-items:stretch;min-height:420px">
+              <div style="flex:1;background:rgba(0,0,0,.35);border:1px solid rgba(0,200,255,.2);border-radius:12px;padding:12px">
+                <div style="font-weight:700;margin-bottom:6px">Trips</div>
+                <div style="display:grid;gap:8px">
+                  <div style="padding:10px;border-radius:10px;background:linear-gradient(90deg, rgba(0,200,255,.10), rgba(0,255,213,.10));border:1px solid rgba(0,200,255,.22)">Cairo → Hurghada — Oct 12–16</div>
+                  <div style="padding:10px;border-radius:10px;background:linear-gradient(90deg, rgba(0,200,255,.10), rgba(0,255,213,.10));border:1px solid rgba(0,200,255,.22)">Hurghada → Marsa Alam — Oct 16–20</div>
+                </div>
+              </div>
+              <div style="flex:1;background:rgba(0,0,0,.35);border:1px solid rgba(0,200,255,.2);border-radius:12px;padding:12px">
+                <div style="font-weight:700;margin-bottom:6px">Booking</div>
+                <div>Hotel: <strong>Corridor Reef Resort</strong></div>
+                <div>Check-in: <strong>Oct 12, 15:00</strong></div>
+                <div>Excursions: <strong>Snorkeling, Desert Safari</strong></div>
+                <div style="margin-top:10px"><button class="studio-button" onclick="alert('In the iOS app, this opens the native booking flow.')">Manage</button></div>
+              </div>
+              <div style="flex:1;background:rgba(0,0,0,.35);border:1px solid rgba(0,200,255,.2);border-radius:12px;padding:12px">
+                <div style="font-weight:700;margin-bottom:6px">Map</div>
+                <div style="height:100%;min-height:300px;border-radius:8px;border:1px dashed rgba(0,200,255,.22);display:flex;align-items:center;justify-content:center;color:#c3f7ff">iOS Map View (preview)</div>
+              </div>
+            </div>
+          </div>
+        `;
+    }
+
+    // helpers
+    openExternal(url){ try{ window.open(url, '_blank', 'noopener'); }catch(e){} }
+    loadIntoIframe(id,url){ const f=document.getElementById(id); const ph=document.getElementById(id.replace('-frame','-placeholder')); if(f){ f.src=url; if(ph) ph.style.display='none'; } }
     createHelpApp() {
         return `
             <div class="help-app">
