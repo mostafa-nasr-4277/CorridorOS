@@ -19,6 +19,8 @@
     .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid rgba(0,200,255,.3);margin:0 6px 6px 0;font-size:12px}
     .imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
     .imgs img{width:100%;height:140px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.14)}
+    .map{position:relative;width:100%;height:240px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,#0b1426,#09101f)}
+    .map canvas{position:absolute;inset:0}
   </style>
 </head>
 <body>
@@ -39,6 +41,10 @@
         <label style="display:grid;gap:4px">Guests<input name="guests" type="number" min="1" value="2" class="btn" style="padding:8px"></label>
         <button class="btn" style="height:36px" type="submit">Add Trip</button>
       </form>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" id="exportTrips">Export JSON</button>
+        <label class="btn" for="importTrips" style="cursor:pointer">Import JSON<input type="file" id="importTrips" accept="application/json" style="display:none"></label>
+      </div>
       <div id="tripList" style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
     </div>
 
@@ -51,13 +57,22 @@
         <div id="bookingSteps"></div>
       </div>
     </div>
+
+    <!-- Photo picker overlay -->
+    <div id="photoPicker" style="position:fixed;inset:0;backdrop-filter:blur(8px);background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:11">
+      <div style="width:min(920px,94vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg, rgba(0,200,255,.12), rgba(0,255,213,.08));border:1px solid rgba(0,200,255,.25);border-radius:12px;padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><strong>Select Photo</strong><button class="btn" onclick="closePhotoPicker()">✕</button></div>
+        <div id="photoGrid" class="imgs"></div>
+      </div>
+    </div>
   </div>
   <script>
+    let ATLAS_MANIFEST=null;
     async function load(){
       const root = document.getElementById('dyn');
       try{
         const res = await fetch('assets/atlas_manifest.json', {cache:'no-cache'});
-        const j = await res.json();
+        const j = await res.json(); ATLAS_MANIFEST=j;
         const byCat = {};
         for(const it of j.items){ (byCat[it.category] ||= []).push(it); }
         const cats = Object.keys(byCat);
@@ -96,11 +111,13 @@
       for(const [i,t] of trips.entries()){
         const card=document.createElement('div');
         card.className='card';
-        card.innerHTML=`<div style="font-weight:700">${t.dest}</div>
+        const img=t.photo?`<img src="${t.photo}" alt="photo" style="width:100%;height:120px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.14);margin-bottom:6px"/>`:'';
+        card.innerHTML=`${img}<div style="font-weight:700">${t.dest}</div>
           <div style="opacity:.9">${t.start} → ${t.end}</div>
           <div style="opacity:.9">Hotel: ${t.hotel||'—'} · Guests: ${t.guests||2}</div>
           <div style="margin-top:8px;display:flex;gap:8px">
             <button class='btn' onclick='openBooking(${i})'>Book</button>
+            <button class='btn' onclick='openPhotoPicker(${i})'>Photo</button>
             <button class='btn' onclick='delTrip(${i})'>Delete</button>
           </div>`;
         box.appendChild(card);
@@ -125,10 +142,19 @@
           <label>Nights<input id='nights' class='btn' type='number' min='1' value='${Math.max(1, Math.ceil((new Date(t.end)-new Date(t.start))/86400000))}'/></label>
           <label>Guests<input id='gu' class='btn' type='number' min='1' value='${t.guests||2}'/></label>
         </div>
+        <div style='margin-top:10px'>
+          <div class='map'><canvas id='atlMap'></canvas></div>
+          <div style='display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px'>
+            <label>Lat<input id='lat' class='btn' placeholder='e.g., 27.2' value='${t.lat??""}'/></label>
+            <label>Lon<input id='lon' class='btn' placeholder='e.g., 33.8' value='${t.lon??""}'/></label>
+            <button class='btn' onclick='updateMapInputs()' type='button'>Update Map</button>
+          </div>
+        </div>
         <div style='margin-top:10px;display:flex;gap:8px'>
           <button class='btn' onclick='nextPay(${i})'>Next</button>
         </div>
       </div>`;
+      setupMap(t.lat, t.lon);
     }
     function nextPay(i){ const steps=document.getElementById('bookingSteps');
       steps.innerHTML=`<div id='s2'>
@@ -151,6 +177,7 @@
           <div style='font-weight:700;margin-bottom:4px'>Receipt</div>
           <div>Trip: ${t.dest} (${t.start} → ${t.end})</div>
           <div>Hotel: ${t.hotel||'—'} · Guests: ${t.guests||2}</div>
+          <div>Location: ${ (t.lat??'—') }, ${ (t.lon??'—') }</div>
           <div>ID: <strong>${id}</strong></div>
         </div>
         <div style='display:flex;gap:8px'>
@@ -160,6 +187,29 @@
       try{ window.top?.postMessage({type:'atlas-booked', id, trip:t},'*'); }catch(_){ }
     }
     function closeBooking(){ document.getElementById('booking').style.display='none'; }
+
+    // Map rendering (offline)
+    function setupMap(lat,lon){ const c=document.getElementById('atlMap'); const ctx=c.getContext('2d'); const dpr=Math.min(2,window.devicePixelRatio||1); function draw(lati,loni){ const w=c.clientWidth, h=c.clientHeight; c.width=w*dpr; c.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h); // grid
+        ctx.strokeStyle='rgba(255,255,255,.08)'; for(let x=0;x<w;x+=24){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); } for(let y=0;y<h;y+=24){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+        // simplistic coast blobs
+        ctx.fillStyle='rgba(0,200,255,.10)'; ctx.beginPath(); ctx.ellipse(w*0.65,h*0.45,80,50,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(w*0.35,h*0.55,60,40,0,0,Math.PI*2); ctx.fill();
+        // marker
+        if(lati!=null && loni!=null && !isNaN(lati) && !isNaN(loni)){
+          const x=(parseFloat(loni)+180)/360*w; const y=(90-parseFloat(lati))/180*h; ctx.fillStyle='#00ffd5'; ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='rgba(0,200,255,.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.stroke(); }
+      }
+      new ResizeObserver(()=>{ draw(lat,lon); }).observe(c); draw(lat,lon); window.__drawMap=(a,b)=>draw(a,b); }
+    function updateMapInputs(){ const lat=parseFloat(document.getElementById('lat').value); const lon=parseFloat(document.getElementById('lon').value); if(window.__drawMap) window.__drawMap(lat,lon); // persist to trip
+      const trips=readTrips(); const idx=[...document.querySelectorAll('#tripList .card')].length?null:null; /* no-op */ }
+
+    // Export/Import
+    document.getElementById('exportTrips').addEventListener('click',()=>{ const data=JSON.stringify(readTrips(),null,2); const blob=new Blob([data],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='atlas-trips.json'; a.click(); URL.revokeObjectURL(a.href); });
+    document.getElementById('importTrips').addEventListener('change',async (e)=>{ const f=e.target.files[0]; if(!f) return; const txt=await f.text(); try{ const arr=JSON.parse(txt); if(Array.isArray(arr)){ localStorage.setItem(K, JSON.stringify(arr)); renderTrips(); } }catch(_){} e.target.value=''; });
+
+    // Photo picker attach
+    let __photoTripIndex=null;
+    function openPhotoPicker(i){ __photoTripIndex=i; const m=document.getElementById('photoPicker'); m.style.display='flex'; renderPhotoGrid(); }
+    function closePhotoPicker(){ document.getElementById('photoPicker').style.display='none'; __photoTripIndex=null; }
+    function renderPhotoGrid(){ const grid=document.getElementById('photoGrid'); grid.innerHTML=''; const items=(ATLAS_MANIFEST?.items)||[]; items.forEach(it=>{ const im=document.createElement('img'); im.src=it.file; im.alt=it.name; im.style.cursor='pointer'; im.addEventListener('click',()=>{ if(__photoTripIndex!=null){ const trips=readTrips(); const t=trips[__photoTripIndex]; if(t){ t.photo=it.file; writeTrips(trips); renderTrips(); closePhotoPicker(); } } }); grid.appendChild(im); }); }
   </script>
 </body>
 </html>
